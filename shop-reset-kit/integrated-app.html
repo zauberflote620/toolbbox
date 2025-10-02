@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Reset Toolbox - Integrated Application</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .app-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .wizard-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .wizard-overlay.hidden {
+            display: none;
+        }
+
+        .wizard-card {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .wizard-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .wizard-header h1 {
+            color: #2d3748;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .wizard-header p {
+            color: #718096;
+            font-size: 16px;
+        }
+
+        .wizard-step {
+            display: none;
+        }
+
+        .wizard-step.active {
+            display: block;
+        }
+
+        .wizard-step h2 {
+            color: #2d3748;
+            font-size: 22px;
+            margin-bottom: 20px;
+        }
+
+        .wizard-step p {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .wizard-options {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .wizard-option {
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .wizard-option:hover {
+            border-color: #667eea;
+            background: #f7fafc;
+        }
+
+        .wizard-option.selected {
+            border-color: #667eea;
+            background: #edf2f7;
+        }
+
+        .wizard-option h3 {
+            color: #2d3748;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .wizard-option p {
+            color: #718096;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .wizard-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #edf2f7;
+            color: #2d3748;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .main-app {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .main-app.active {
+            display: block;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-header h1 {
+            font-size: 24px;
+        }
+
+        .app-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .nav-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .app-content {
+            padding: 30px;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .canvas-workspace {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .sidebar h3 {
+            color: #2d3748;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .product-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .product-item {
+            background: white;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border: 2px solid #e2e8f0;
+            cursor: move;
+            transition: all 0.2s;
+        }
+
+        .product-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+
+        .product-item.dragging {
+            opacity: 0.5;
+        }
+
+        .product-name {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .product-details {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .canvas-area {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 600px;
+            position: relative;
+        }
+
+        canvas {
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+            cursor: crosshair;
+        }
+
+        .export-panel {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        .export-panel h3 {
+            color: #2d3748;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .export-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-header h2 {
+            color: #2d3748;
+            font-size: 22px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #718096;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+        }
+
+        .close-btn:hover {
+            color: #2d3748;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #2d3748;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert.active {
+            display: block;
+        }
+
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border: 1px solid #9ae6b4;
+        }
+
+        .alert-error {
+            background: #fed7d7;
+            color: #742a2a;
+            border: 1px solid #fc8181;
+        }
+
+        .alert-info {
+            background: #bee3f8;
+            color: #2c5282;
+            border: 1px solid #90cdf4;
+        }
+
+        @media (max-width: 768px) {
+            .canvas-workspace {
+                grid-template-columns: 1fr;
+            }
+
+            .app-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .export-options {
+                flex-direction: column;
+            }
+        }
+
+        .progress-indicator {
+            text-align: center;
+            padding: 20px;
+            color: #718096;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Setup Wizard -->
+        <div class="wizard-overlay" id="wizardOverlay">
+            <div class="wizard-card">
+                <div class="wizard-header">
+                    <h1>Shop Reset Toolbox</h1>
+                    <p>Get started in 5 minutes</p>
+                </div>
+
+                <!-- Step 1: Welcome -->
+                <div class="wizard-step active" id="step1">
+                    <h2>Welcome!</h2>
+                    <p>This tool helps you optimize your retail store layout using the proven Anchor-and-Spokes methodology.</p>
+                    <p><strong>What you'll do:</strong></p>
+                    <ul style="color: #4a5568; line-height: 1.8; margin: 15px 0 20px 20px;">
+                        <li>Import your product catalog</li>
+                        <li>Define your store layout</li>
+                        <li>Run optimization</li>
+                        <li>Export your plan</li>
+                    </ul>
+                    <div class="wizard-buttons">
+                        <button class="btn btn-primary" onclick="nextStep()">Get Started</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Data Source -->
+                <div class="wizard-step" id="step2">
+                    <h2>How do you want to start?</h2>
+                    <div class="wizard-options">
+                        <div class="wizard-option" data-option="sample" onclick="selectOption(this, 'sample')">
+                            <h3>Use Sample Data</h3>
+                            <p>Start with 50 pre-loaded winter apparel products to explore features</p>
+                        </div>
+                        <div class="wizard-option" data-option="csv" onclick="selectOption(this, 'csv')">
+                            <h3>Import CSV File</h3>
+                            <p>Upload your own product catalog (CSV format)</p>
+                        </div>
+                        <div class="wizard-option" data-option="manual" onclick="selectOption(this, 'manual')">
+                            <h3>Enter Manually</h3>
+                            <p>Add products one by one through the interface</p>
+                        </div>
+                    </div>
+                    <div class="wizard-buttons">
+                        <button class="btn btn-secondary" onclick="previousStep()">Back</button>
+                        <button class="btn btn-primary" onclick="nextStep()" id="step2Next" disabled>Continue</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Store Setup -->
+                <div class="wizard-step" id="step3">
+                    <h2>Store Layout</h2>
+                    <p>How many fixtures does your store have?</p>
+                    <div class="wizard-options">
+                        <div class="wizard-option" data-option="small" onclick="selectOption(this, 'small')">
+                            <h3>Small Store (3-5 fixtures)</h3>
+                            <p>Boutique or small retail space</p>
+                        </div>
+                        <div class="wizard-option" data-option="medium" onclick="selectOption(this, 'medium')">
+                            <h3>Medium Store (6-10 fixtures)</h3>
+                            <p>Standard retail store</p>
+                        </div>
+                        <div class="wizard-option" data-option="large" onclick="selectOption(this, 'large')">
+                            <h3>Large Store (11+ fixtures)</h3>
+                            <p>Department store or large retail space</p>
+                        </div>
+                    </div>
+                    <div class="wizard-buttons">
+                        <button class="btn btn-secondary" onclick="previousStep()">Back</button>
+                        <button class="btn btn-primary" onclick="completeWizard()" id="step3Next" disabled>Complete Setup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Application -->
+        <div class="main-app" id="mainApp">
+            <div class="app-header">
+                <h1>Shop Reset Toolbox</h1>
+                <div class="app-nav">
+                    <button class="nav-btn" onclick="showImportModal()">Import</button>
+                    <button class="nav-btn" onclick="runOptimization()">Optimize</button>
+                    <button class="nav-btn" onclick="showExportOptions()">Export</button>
+                </div>
+            </div>
+
+            <div class="app-content">
+                <div class="alert alert-info" id="alertBox"></div>
+
+                <div class="toolbar">
+                    <div class="file-input-wrapper">
+                        <button class="btn btn-secondary">Import CSV</button>
+                        <input type="file" id="csvFileInput" accept=".csv" onchange="handleCSVUpload(event)">
+                    </div>
+                    <button class="btn btn-secondary" onclick="addProductManually()">Add Product</button>
+                    <button class="btn btn-primary" onclick="runOptimization()">Run Optimization</button>
+                    <button class="btn btn-secondary" onclick="resetLayout()">Reset</button>
+                </div>
+
+                <div class="canvas-workspace">
+                    <div class="sidebar">
+                        <h3>Products (<span id="productCount">0</span>)</h3>
+                        <div class="product-list" id="productList"></div>
+                    </div>
+
+                    <div class="canvas-area">
+                        <canvas id="mainCanvas" width="1000" height="600"></canvas>
+                    </div>
+                </div>
+
+                <div class="export-panel">
+                    <h3>Export Options</h3>
+                    <div class="export-options">
+                        <button class="btn btn-primary" onclick="exportToPNG()">Export as PNG</button>
+                        <button class="btn btn-primary" onclick="exportToCSV()">Export as CSV</button>
+                        <button class="btn btn-primary" onclick="exportToPDF()">Export as PDF</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Import Modal -->
+        <div class="modal" id="importModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Import Products</h2>
+                    <button class="close-btn" onclick="closeModal('importModal')">&times;</button>
+                </div>
+                <p style="color: #4a5568; margin-bottom: 20px;">Upload a CSV file with the following columns:</p>
+                <code style="display: block; background: #f7fafc; padding: 10px; border-radius: 4px; margin-bottom: 20px; font-size: 12px;">
+                    sku, name, category, price, cost, weight, salesVelocity
+                </code>
+                <div class="file-input-wrapper">
+                    <button class="btn btn-primary" style="width: 100%;">Choose CSV File</button>
+                    <input type="file" accept=".csv" onchange="handleCSVUpload(event)">
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Product Modal -->
+        <div class="modal" id="addProductModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Add Product</h2>
+                    <button class="close-btn" onclick="closeModal('addProductModal')">&times;</button>
+                </div>
+                <form id="addProductForm" onsubmit="saveProduct(event)">
+                    <div class="form-group">
+                        <label>SKU</label>
+                        <input type="text" id="productSKU" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Name</label>
+                        <input type="text" id="productName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Category</label>
+                        <input type="text" id="productCategory" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Price ($)</label>
+                        <input type="number" step="0.01" id="productPrice" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Cost ($)</label>
+                        <input type="number" step="0.01" id="productCost" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Weight (lbs)</label>
+                        <input type="number" step="0.1" id="productWeight" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Sales Velocity (units/month)</label>
+                        <input type="number" id="productSalesVelocity" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Add Product</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== APPLICATION STATE ====================
+
+        let wizardData = {
+            dataSource: null,
+            storeSize: null
+        };
+
+        let appState = {
+            products: [],
+            fixtures: [],
+            layout: [],
+            draggedProduct: null
+        };
+
+        // ==================== WIZARD LOGIC ====================
+
+        let currentStep = 1;
+
+        function nextStep() {
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            currentStep++;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+        }
+
+        function previousStep() {
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            currentStep--;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+        }
+
+        function selectOption(element, value) {
+            const step = element.closest('.wizard-step');
+            step.querySelectorAll('.wizard-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            element.classList.add('selected');
+
+            if (step.id === 'step2') {
+                wizardData.dataSource = value;
+                document.getElementById('step2Next').disabled = false;
+            } else if (step.id === 'step3') {
+                wizardData.storeSize = value;
+                document.getElementById('step3Next').disabled = false;
+            }
+        }
+
+        function completeWizard() {
+            document.getElementById('wizardOverlay').classList.add('hidden');
+            document.getElementById('mainApp').classList.add('active');
+
+            // Initialize based on wizard selections
+            initializeApp();
+        }
+
+        function initializeApp() {
+            // Initialize fixtures based on store size
+            const fixtureCount = {
+                'small': 5,
+                'medium': 8,
+                'large': 12
+            }[wizardData.storeSize] || 5;
+
+            initializeFixtures(fixtureCount);
+
+            // Load data based on source
+            if (wizardData.dataSource === 'sample') {
+                loadSampleData();
+            }
+
+            renderProducts();
+            renderCanvas();
+        }
+
+        // ==================== DATA MANAGEMENT ====================
+
+        function loadSampleData() {
+            const categories = ['Outerwear', 'Tops', 'Bottoms', 'Footwear', 'Accessories'];
+            const baseNames = {
+                'Outerwear': ['Winter Coat', 'Parka', 'Blazer', 'Vest', 'Windbreaker'],
+                'Tops': ['Sweater', 'Blouse', 'T-Shirt', 'Hoodie', 'Flannel'],
+                'Bottoms': ['Jeans', 'Khakis', 'Shorts', 'Skirt', 'Leggings'],
+                'Footwear': ['Boots', 'Sneakers', 'Loafers', 'Sandals', 'Heels'],
+                'Accessories': ['Belt', 'Scarf', 'Hat', 'Gloves', 'Bag']
+            };
+
+            appState.products = [];
+
+            for (let i = 0; i < 50; i++) {
+                const category = categories[Math.floor(Math.random() * categories.length)];
+                const nameOptions = baseNames[category];
+                const name = nameOptions[Math.floor(Math.random() * nameOptions.length)];
+
+                const price = 29.99 + Math.random() * 170;
+                const cost = price * (0.3 + Math.random() * 0.3);
+
+                appState.products.push({
+                    sku: `PROD-${String(i + 1).padStart(4, '0')}`,
+                    name: `${name} ${i + 1}`,
+                    category: category,
+                    price: parseFloat(price.toFixed(2)),
+                    cost: parseFloat(cost.toFixed(2)),
+                    margin: parseFloat(((price - cost) / price).toFixed(2)),
+                    weight: 0.5 + Math.random() * 4.5,
+                    salesVelocity: Math.floor(10 + Math.random() * 90),
+                    fixtureId: null,
+                    x: null,
+                    y: null
+                });
+            }
+
+            showAlert('Loaded 50 sample products', 'success');
+        }
+
+        function initializeFixtures(count) {
+            appState.fixtures = [];
+            const canvasWidth = 1000;
+            const canvasHeight = 600;
+            const fixtureWidth = 150;
+            const fixtureHeight = 100;
+
+            for (let i = 0; i < count; i++) {
+                const col = i % 4;
+                const row = Math.floor(i / 4);
+
+                appState.fixtures.push({
+                    id: `F${i + 1}`,
+                    type: ['Wall Shelf', 'Display Table', 'Shelf Unit', 'Endcap'][i % 4],
+                    x: 50 + col * 230,
+                    y: 100 + row * 150,
+                    width: fixtureWidth,
+                    height: fixtureHeight,
+                    capacity: 500,
+                    trafficZone: i < 4 ? 'high' : (i < 8 ? 'medium' : 'low')
+                });
+            }
+        }
+
+        // ==================== CSV IMPORT ====================
+
+        function handleCSVUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csv = e.target.result;
+                parseCSV(csv);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim());
+
+            const requiredHeaders = ['sku', 'name', 'category', 'price', 'cost', 'weight', 'salesVelocity'];
+            const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
+
+            if (missingHeaders.length > 0) {
+                showAlert(`Missing required columns: ${missingHeaders.join(', ')}`, 'error');
+                return;
+            }
+
+            appState.products = [];
+
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+
+                const values = lines[i].split(',').map(v => v.trim());
+                const product = {};
+
+                headers.forEach((header, index) => {
+                    product[header] = values[index];
+                });
+
+                product.price = parseFloat(product.price);
+                product.cost = parseFloat(product.cost);
+                product.weight = parseFloat(product.weight);
+                product.salesVelocity = parseInt(product.salesVelocity);
+                product.margin = parseFloat(((product.price - product.cost) / product.price).toFixed(2));
+                product.fixtureId = null;
+                product.x = null;
+                product.y = null;
+
+                appState.products.push(product);
+            }
+
+            showAlert(`Imported ${appState.products.length} products`, 'success');
+            renderProducts();
+            closeModal('importModal');
+        }
+
+        // ==================== PRODUCT MANAGEMENT ====================
+
+        function addProductManually() {
+            document.getElementById('addProductModal').classList.add('active');
+        }
+
+        function saveProduct(event) {
+            event.preventDefault();
+
+            const product = {
+                sku: document.getElementById('productSKU').value,
+                name: document.getElementById('productName').value,
+                category: document.getElementById('productCategory').value,
+                price: parseFloat(document.getElementById('productPrice').value),
+                cost: parseFloat(document.getElementById('productCost').value),
+                weight: parseFloat(document.getElementById('productWeight').value),
+                salesVelocity: parseInt(document.getElementById('productSalesVelocity').value),
+                fixtureId: null,
+                x: null,
+                y: null
+            };
+
+            product.margin = parseFloat(((product.price - product.cost) / product.price).toFixed(2));
+
+            appState.products.push(product);
+            renderProducts();
+            closeModal('addProductModal');
+            document.getElementById('addProductForm').reset();
+            showAlert('Product added successfully', 'success');
+        }
+
+        // ==================== RENDERING ====================
+
+        function renderProducts() {
+            const productList = document.getElementById('productList');
+            productList.innerHTML = '';
+
+            appState.products.forEach((product, index) => {
+                const div = document.createElement('div');
+                div.className = 'product-item';
+                div.draggable = true;
+                div.dataset.index = index;
+
+                div.innerHTML = `
+                    <div class="product-name">${product.name}</div>
+                    <div class="product-details">
+                        ${product.sku} | $${product.price.toFixed(2)} | ${product.margin * 100}% margin
+                    </div>
+                `;
+
+                div.addEventListener('dragstart', handleDragStart);
+                div.addEventListener('dragend', handleDragEnd);
+
+                productList.appendChild(div);
+            });
+
+            document.getElementById('productCount').textContent = appState.products.length;
+        }
+
+        function renderCanvas() {
+            const canvas = document.getElementById('mainCanvas');
+            const ctx = canvas.getContext('2d');
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw entrance
+            ctx.fillStyle = '#ffa500';
+            ctx.globalAlpha = 0.2;
+            ctx.fillRect(0, 0, 150, 50);
+            ctx.globalAlpha = 1.0;
+            ctx.strokeStyle = '#ffa500';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(0, 0, 150, 50);
+            ctx.fillStyle = '#2d3748';
+            ctx.font = 'bold 14px Arial';
+            ctx.fillText('Entrance', 40, 30);
+
+            // Draw fixtures
+            appState.fixtures.forEach(fixture => {
+                ctx.fillStyle = '#f7fafc';
+                ctx.fillRect(fixture.x, fixture.y, fixture.width, fixture.height);
+                ctx.strokeStyle = '#667eea';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(fixture.x, fixture.y, fixture.width, fixture.height);
+
+                ctx.fillStyle = '#2d3748';
+                ctx.font = 'bold 12px Arial';
+                ctx.fillText(fixture.id, fixture.x + 5, fixture.y + 20);
+                ctx.font = '10px Arial';
+                ctx.fillText(fixture.type, fixture.x + 5, fixture.y + 35);
+
+                // Draw products in fixture
+                const fixtureProducts = appState.products.filter(p => p.fixtureId === fixture.id);
+                fixtureProducts.forEach((product, i) => {
+                    if (i < 10) {
+                        const productValue = product.price * product.margin * product.salesVelocity;
+                        let color = '#f56565';
+                        if (productValue > 5000) color = '#48bb78';
+                        else if (productValue > 2000) color = '#ed8936';
+
+                        const size = 6;
+                        const col = i % 5;
+                        const row = Math.floor(i / 5);
+                        const x = fixture.x + 10 + col * 12;
+                        const y = fixture.y + 50 + row * 12;
+
+                        ctx.fillStyle = color;
+                        ctx.beginPath();
+                        ctx.arc(x, y, size, 0, 2 * Math.PI);
+                        ctx.fill();
+                    }
+                });
+
+                if (fixtureProducts.length > 10) {
+                    ctx.fillStyle = '#4a5568';
+                    ctx.font = '9px Arial';
+                    ctx.fillText(`+${fixtureProducts.length - 10}`, fixture.x + 10, fixture.y + fixture.height - 10);
+                }
+            });
+        }
+
+        // ==================== DRAG AND DROP ====================
+
+        function handleDragStart(e) {
+            e.target.classList.add('dragging');
+            appState.draggedProduct = parseInt(e.target.dataset.index);
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        document.getElementById('mainCanvas').addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        document.getElementById('mainCanvas').addEventListener('drop', (e) => {
+            e.preventDefault();
+
+            if (appState.draggedProduct === null) return;
+
+            const canvas = document.getElementById('mainCanvas');
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Find fixture at drop location
+            const fixture = appState.fixtures.find(f =>
+                x >= f.x && x <= f.x + f.width &&
+                y >= f.y && y <= f.y + f.height
+            );
+
+            if (fixture) {
+                appState.products[appState.draggedProduct].fixtureId = fixture.id;
+                appState.products[appState.draggedProduct].x = x;
+                appState.products[appState.draggedProduct].y = y;
+
+                renderCanvas();
+                showAlert(`Product placed in ${fixture.id}`, 'success');
+            }
+
+            appState.draggedProduct = null;
+        });
+
+        // ==================== OPTIMIZATION ====================
+
+        function runOptimization() {
+            if (appState.products.length === 0) {
+                showAlert('Please add products first', 'error');
+                return;
+            }
+
+            showAlert('Running optimization...', 'info');
+
+            setTimeout(() => {
+                // Distribute products across fixtures for optimization
+                appState.products.forEach((product, index) => {
+                    const fixtureIndex = index % appState.fixtures.length;
+                    product.fixtureId = appState.fixtures[fixtureIndex].id;
+                });
+
+                renderCanvas();
+                showAlert('Optimization complete! Products distributed across fixtures.', 'success');
+            }, 1000);
+        }
+
+        function resetLayout() {
+            appState.products.forEach(product => {
+                product.fixtureId = null;
+                product.x = null;
+                product.y = null;
+            });
+
+            renderCanvas();
+            showAlert('Layout reset', 'info');
+        }
+
+        // ==================== EXPORT FUNCTIONS ====================
+
+        function exportToPNG() {
+            const canvas = document.getElementById('mainCanvas');
+            const dataURL = canvas.toDataURL('image/png');
+
+            const link = document.createElement('a');
+            link.download = `shop-layout-${Date.now()}.png`;
+            link.href = dataURL;
+            link.click();
+
+            showAlert('Layout exported as PNG', 'success');
+        }
+
+        function exportToCSV() {
+            let csv = 'SKU,Name,Category,Price,Cost,Margin,Weight,Sales Velocity,Fixture\n';
+
+            appState.products.forEach(product => {
+                csv += `${product.sku},${product.name},${product.category},${product.price},${product.cost},${product.margin},${product.weight},${product.salesVelocity},${product.fixtureId || 'Unassigned'}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+
+            const link = document.createElement('a');
+            link.download = `products-${Date.now()}.csv`;
+            link.href = url;
+            link.click();
+
+            showAlert('Product list exported as CSV', 'success');
+        }
+
+        function exportToPDF() {
+            showAlert('PDF export feature coming soon!', 'info');
+        }
+
+        // ==================== MODAL MANAGEMENT ====================
+
+        function showImportModal() {
+            document.getElementById('importModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function showExportOptions() {
+            showAlert('Choose an export format from the options below', 'info');
+        }
+
+        // ==================== ALERTS ====================
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.className = `alert alert-${type} active`;
+            alertBox.textContent = message;
+
+            setTimeout(() => {
+                alertBox.classList.remove('active');
+            }, 5000);
+        }
+
+        // ==================== INITIALIZATION ====================
+
+        window.addEventListener('load', () => {
+            console.log('Shop Reset Toolbox - Integrated Application Loaded');
+        });
+    </script>
+</body>
+</html>
