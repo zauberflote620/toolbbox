@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excalidraw-React Communication Bridge Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #1e88e5;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .demo-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .panel h2 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .excalidraw-mock {
+            background: #e3f2fd;
+            border: 2px solid #1e88e5;
+        }
+
+        .react-mock {
+            background: #e8f5e9;
+            border: 2px solid #43a047;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 16px;
+            background: #1e88e5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #1565c0;
+        }
+
+        button.success {
+            background: #43a047;
+        }
+
+        button.success:hover {
+            background: #2e7d32;
+        }
+
+        button.danger {
+            background: #e53935;
+        }
+
+        button.danger:hover {
+            background: #c62828;
+        }
+
+        .message-log {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 6px;
+            border-radius: 3px;
+        }
+
+        .log-entry.sent {
+            background: #e3f2fd;
+            border-left: 3px solid #1e88e5;
+        }
+
+        .log-entry.received {
+            background: #e8f5e9;
+            border-left: 3px solid #43a047;
+        }
+
+        .log-entry.error {
+            background: #ffebee;
+            border-left: 3px solid #e53935;
+        }
+
+        .log-entry.health {
+            background: #fff3e0;
+            border-left: 3px solid #fb8c00;
+        }
+
+        .timestamp {
+            color: #666;
+            font-size: 10px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 6px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1e88e5;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-indicator.connected {
+            background: #43a047;
+        }
+
+        .status-indicator.disconnected {
+            background: #e53935;
+        }
+
+        .message-schema {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Excalidraw-React Communication Bridge</h1>
+        <p class="subtitle">Standalone demonstration of postMessage API with 8 message types, validation, retry logic, and health checks</p>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-label">Messages Sent</div>
+                <div class="stat-value" id="stat-sent">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Messages Received</div>
+                <div class="stat-value" id="stat-received">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Errors</div>
+                <div class="stat-value" id="stat-errors" style="color: #e53935;">0</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Health Checks</div>
+                <div class="stat-value" id="stat-health" style="color: #fb8c00;">0</div>
+            </div>
+        </div>
+
+        <div class="demo-layout">
+            <div class="panel excalidraw-mock">
+                <h2>
+                    <span class="status-indicator" id="excalidraw-status"></span>
+                    Excalidraw (Parent Window)
+                </h2>
+                <div class="controls">
+                    <button onclick="sendLayoutData()">📐 Send LAYOUT_DATA</button>
+                    <button onclick="sendProductList()">📦 Send PRODUCT_LIST</button>
+                    <button onclick="sendOptimizationRequest()">🎯 Send OPTIMIZATION_REQUEST</button>
+                    <button onclick="sendUserAction()">👆 Send USER_ACTION</button>
+                    <button class="danger" onclick="sendInvalidMessage()">❌ Send Invalid Message</button>
+                </div>
+                <h3 style="font-size: 14px; margin: 15px 0 10px 0;">Message Log:</h3>
+                <div class="message-log" id="excalidraw-log"></div>
+            </div>
+
+            <div class="panel react-mock">
+                <h2>
+                    <span class="status-indicator" id="react-status"></span>
+                    React App (Iframe Child)
+                </h2>
+                <div class="controls">
+                    <button class="success" onclick="sendOptimizationResult()">✅ Send OPTIMIZATION_RESULT</button>
+                    <button class="success" onclick="sendVisualUpdate()">🎨 Send VISUAL_UPDATE</button>
+                    <button class="success" onclick="sendError()">⚠️ Send ERROR</button>
+                    <button onclick="toggleHealthCheck()">💓 Toggle Health Check</button>
+                </div>
+                <h3 style="font-size: 14px; margin: 15px 0 10px 0;">Message Log:</h3>
+                <div class="message-log" id="react-log"></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>📋 Message Type Schemas</h2>
+            <div class="message-schema">
+                <pre id="schema-display">Click a button above to see the message schema and example...</pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===================================================================
+        // COMMUNICATION BRIDGE CORE IMPLEMENTATION
+        // ===================================================================
+
+        /**
+         * Message type definitions for Excalidraw-React communication
+         */
+        const MessageTypes = {
+            LAYOUT_DATA: 'LAYOUT_DATA',
+            PRODUCT_LIST: 'PRODUCT_LIST',
+            OPTIMIZATION_REQUEST: 'OPTIMIZATION_REQUEST',
+            OPTIMIZATION_RESULT: 'OPTIMIZATION_RESULT',
+            VISUAL_UPDATE: 'VISUAL_UPDATE',
+            USER_ACTION: 'USER_ACTION',
+            ERROR: 'ERROR',
+            HEALTH_CHECK: 'HEALTH_CHECK'
+        };
+
+        /**
+         * Message validation schemas
+         * @typedef {Object} MessageSchema
+         */
+        const MessageSchemas = {
+            [MessageTypes.LAYOUT_DATA]: {
+                required: ['type', 'payload'],
+                payload: ['storeDimensions', 'fixtures'],
+                validate: (msg) => {
+                    return msg.payload.storeDimensions &&
+                           msg.payload.storeDimensions.width &&
+                           msg.payload.storeDimensions.height &&
+                           Array.isArray(msg.payload.fixtures);
+                }
+            },
+            [MessageTypes.PRODUCT_LIST]: {
+                required: ['type', 'payload'],
+                payload: ['products'],
+                validate: (msg) => Array.isArray(msg.payload.products)
+            },
+            [MessageTypes.OPTIMIZATION_REQUEST]: {
+                required: ['type', 'payload'],
+                payload: ['methodology', 'constraints', 'objectives'],
+                validate: (msg) => {
+                    return msg.payload.methodology && msg.payload.constraints;
+                }
+            },
+            [MessageTypes.OPTIMIZATION_RESULT]: {
+                required: ['type', 'payload'],
+                payload: ['placements', 'score', 'metrics'],
+                validate: (msg) => {
+                    return Array.isArray(msg.payload.placements) &&
+                           typeof msg.payload.score === 'number';
+                }
+            },
+            [MessageTypes.VISUAL_UPDATE]: {
+                required: ['type', 'payload'],
+                payload: ['updates'],
+                validate: (msg) => Array.isArray(msg.payload.updates)
+            },
+            [MessageTypes.USER_ACTION]: {
+                required: ['type', 'payload'],
+                payload: ['action', 'target'],
+                validate: (msg) => msg.payload.action && msg.payload.target
+            },
+            [MessageTypes.ERROR]: {
+                required: ['type', 'payload'],
+                payload: ['code', 'message'],
+                validate: (msg) => msg.payload.code && msg.payload.message
+            },
+            [MessageTypes.HEALTH_CHECK]: {
+                required: ['type', 'payload'],
+                payload: ['ping'],
+                validate: (msg) => typeof msg.payload.ping === 'boolean'
+            }
+        };
+
+        /**
+         * Statistics tracking
+         */
+        const stats = {
+            sent: 0,
+            received: 0,
+            errors: 0,
+            health: 0
+        };
+
+        /**
+         * Health check interval
+         */
+        let healthCheckInterval = null;
+        let healthCheckEnabled = false;
+
+        /**
+         * Message queue for retry mechanism
+         */
+        const messageQueue = [];
+
+        /**
+         * Validate message against schema
+         * @param {Object} message - Message to validate
+         * @returns {Object} Validation result {valid: boolean, error: string}
+         */
+        function validateMessage(message) {
+            if (!message || typeof message !== 'object') {
+                return { valid: false, error: 'Message must be an object' };
+            }
+
+            if (!message.type || !MessageTypes[message.type]) {
+                return { valid: false, error: `Invalid message type: ${message.type}` };
+            }
+
+            const schema = MessageSchemas[message.type];
+            if (!schema) {
+                return { valid: false, error: `No schema defined for type: ${message.type}` };
+            }
+
+            // Check required fields
+            for (const field of schema.required) {
+                if (!(field in message)) {
+                    return { valid: false, error: `Missing required field: ${field}` };
+                }
+            }
+
+            // Run custom validation
+            if (schema.validate && !schema.validate(message)) {
+                return { valid: false, error: `Schema validation failed for type: ${message.type}` };
+            }
+
+            return { valid: true };
+        }
+
+        /**
+         * Send message with retry logic
+         * @param {Object} message - Message to send
+         * @param {number} maxRetries - Maximum retry attempts (default: 3)
+         * @param {number} retryDelay - Delay between retries in ms (default: 2000)
+         */
+        function sendMessageWithRetry(message, maxRetries = 3, retryDelay = 2000) {
+            const validation = validateMessage(message);
+
+            if (!validation.valid) {
+                logMessage('excalidraw', `❌ Validation failed: ${validation.error}`, 'error');
+                stats.errors++;
+                updateStats();
+                return;
+            }
+
+            let attempt = 0;
+
+            function attemptSend() {
+                attempt++;
+
+                try {
+                    // Simulate sending message (in real implementation, use postMessage)
+                    // window.parent.postMessage(message, targetOrigin);
+
+                    logMessage('excalidraw', `📤 Sent ${message.type} (attempt ${attempt}/${maxRetries})`, 'sent');
+                    displaySchema(message);
+                    stats.sent++;
+                    updateStats();
+
+                    // Simulate message receipt after 500ms
+                    setTimeout(() => {
+                        receiveMessage(message, 'react');
+                    }, 500);
+
+                } catch (error) {
+                    logMessage('excalidraw', `⚠️ Send failed: ${error.message}`, 'error');
+
+                    if (attempt < maxRetries) {
+                        logMessage('excalidraw', `🔄 Retrying in ${retryDelay}ms...`, 'error');
+                        setTimeout(attemptSend, retryDelay);
+                    } else {
+                        logMessage('excalidraw', `❌ Max retries reached, message failed`, 'error');
+                        stats.errors++;
+                        updateStats();
+                    }
+                }
+            }
+
+            attemptSend();
+        }
+
+        /**
+         * Receive and process message
+         * @param {Object} message - Received message
+         * @param {string} receiver - Which side receives ('excalidraw' or 'react')
+         */
+        function receiveMessage(message, receiver) {
+            const validation = validateMessage(message);
+
+            if (!validation.valid) {
+                logMessage(receiver, `❌ Received invalid message: ${validation.error}`, 'error');
+                stats.errors++;
+                updateStats();
+                return;
+            }
+
+            logMessage(receiver, `📥 Received ${message.type}`, 'received');
+            stats.received++;
+            updateStats();
+
+            // Auto-respond to health checks
+            if (message.type === MessageTypes.HEALTH_CHECK && message.payload.ping) {
+                setTimeout(() => {
+                    const pong = {
+                        type: MessageTypes.HEALTH_CHECK,
+                        payload: { ping: false, pong: true },
+                        timestamp: Date.now()
+                    };
+                    logMessage(receiver, `💓 Sending health check pong`, 'health');
+                    sendMessageWithRetry(pong);
+                }, 100);
+            }
+        }
+
+        /**
+         * Start health check ping system
+         */
+        function startHealthCheck() {
+            if (healthCheckInterval) return;
+
+            healthCheckEnabled = true;
+            updateConnectionStatus();
+
+            healthCheckInterval = setInterval(() => {
+                const healthMsg = {
+                    type: MessageTypes.HEALTH_CHECK,
+                    payload: { ping: true, pong: false },
+                    timestamp: Date.now()
+                };
+
+                logMessage('react', `💓 Sending health check ping`, 'health');
+                stats.health++;
+                updateStats();
+                sendMessageWithRetry(healthMsg, 1, 1000);
+            }, 5000);
+        }
+
+        /**
+         * Stop health check system
+         */
+        function stopHealthCheck() {
+            if (healthCheckInterval) {
+                clearInterval(healthCheckInterval);
+                healthCheckInterval = null;
+                healthCheckEnabled = false;
+                updateConnectionStatus();
+            }
+        }
+
+        /**
+         * Toggle health check
+         */
+        function toggleHealthCheck() {
+            if (healthCheckEnabled) {
+                stopHealthCheck();
+                logMessage('react', '💔 Health check stopped', 'health');
+            } else {
+                startHealthCheck();
+                logMessage('react', '💚 Health check started (5s interval)', 'health');
+            }
+        }
+
+        // ===================================================================
+        // MESSAGE SENDERS (Excalidraw Side)
+        // ===================================================================
+
+        function sendLayoutData() {
+            const message = {
+                type: MessageTypes.LAYOUT_DATA,
+                payload: {
+                    storeDimensions: {
+                        width: 1200,
+                        height: 800,
+                        unit: 'inches'
+                    },
+                    fixtures: [
+                        { id: 'fixture-1', type: 'shelf', x: 100, y: 100, width: 400, height: 200, shelves: 4 },
+                        { id: 'fixture-2', type: 'display', x: 600, y: 100, width: 300, height: 400 }
+                    ]
+                },
+                timestamp: Date.now()
+            };
+            sendMessageWithRetry(message);
+        }
+
+        function sendProductList() {
+            const message = {
+                type: MessageTypes.PRODUCT_LIST,
+                payload: {
+                    products: [
+                        { sku: 'PROD-001', name: 'Winter Coat', category: 'Apparel', price: 129.99, margin: 0.45 },
+                        { sku: 'PROD-002', name: 'Scarf', category: 'Accessories', price: 24.99, margin: 0.55 },
+                        { sku: 'PROD-003', name: 'Boots', category: 'Footwear', price: 89.99, margin: 0.40 }
+                    ]
+                },
+                timestamp: Date.now()
+            };
+            sendMessageWithRetry(message);
+        }
+
+        function sendOptimizationRequest() {
+            const message = {
+                type: MessageTypes.OPTIMIZATION_REQUEST,
+                payload: {
+                    methodology: 'Anchor-and-Spokes',
+                    constraints: {
+                        minAisleWidth: 42,
+                        maxShelfWeight: 500,
+                        exitClearance: 36
+                    },
+                    objectives: {
+                        salesPerSqFt: 0.5,
+                        crossSell: 0.3,
+                        visualFlow: 0.2
+                    }
+                },
+                timestamp: Date.now()
+            };
+            sendMessageWithRetry(message);
+        }
+
+        function sendUserAction() {
+            const message = {
+                type: MessageTypes.USER_ACTION,
+                payload: {
+                    action: 'drag',
+                    target: 'product-PROD-001',
+                    position: { x: 250, y: 150 }
+                },
+                timestamp: Date.now()
+            };
+            sendMessageWithRetry(message);
+        }
+
+        function sendInvalidMessage() {
+            const message = {
+                type: 'INVALID_TYPE',
+                payload: { foo: 'bar' }
+            };
+            sendMessageWithRetry(message);
+        }
+
+        // ===================================================================
+        // MESSAGE SENDERS (React Side)
+        // ===================================================================
+
+        function sendOptimizationResult() {
+            const message = {
+                type: MessageTypes.OPTIMIZATION_RESULT,
+                payload: {
+                    placements: [
+                        { sku: 'PROD-001', fixtureId: 'fixture-1', position: { x: 150, y: 120, shelf: 2 }, score: 0.92 },
+                        { sku: 'PROD-002', fixtureId: 'fixture-1', position: { x: 200, y: 120, shelf: 2 }, score: 0.85 },
+                        { sku: 'PROD-003', fixtureId: 'fixture-2', position: { x: 650, y: 200 }, score: 0.88 }
+                    ],
+                    score: 0.883,
+                    metrics: {
+                        estimatedSalesPerSqFt: 45.2,
+                        crossSellOpportunities: 12,
+                        improvementVsBaseline: 0.23
+                    }
+                },
+                timestamp: Date.now()
+            };
+
+            // Send from React perspective
+            logMessage('react', `📤 Sent ${message.type}`, 'sent');
+            displaySchema(message);
+            stats.sent++;
+            updateStats();
+
+            setTimeout(() => {
+                receiveMessage(message, 'excalidraw');
+            }, 500);
+        }
+
+        function sendVisualUpdate() {
+            const message = {
+                type: MessageTypes.VISUAL_UPDATE,
+                payload: {
+                    updates: [
+                        { type: 'highlight', elementId: 'fixture-1', color: '#4caf50', opacity: 0.3 },
+                        { type: 'annotation', x: 300, y: 200, text: 'High traffic zone', color: '#ff9800' }
+                    ]
+                },
+                timestamp: Date.now()
+            };
+
+            logMessage('react', `📤 Sent ${message.type}`, 'sent');
+            displaySchema(message);
+            stats.sent++;
+            updateStats();
+
+            setTimeout(() => {
+                receiveMessage(message, 'excalidraw');
+            }, 500);
+        }
+
+        function sendError() {
+            const message = {
+                type: MessageTypes.ERROR,
+                payload: {
+                    code: 'OPTIMIZATION_FAILED',
+                    message: 'Cannot place all products within constraints',
+                    details: {
+                        failedProducts: ['PROD-004', 'PROD-005'],
+                        reason: 'Insufficient shelf space'
+                    }
+                },
+                timestamp: Date.now()
+            };
+
+            logMessage('react', `📤 Sent ${message.type}`, 'sent');
+            displaySchema(message);
+            stats.sent++;
+            stats.errors++;
+            updateStats();
+
+            setTimeout(() => {
+                receiveMessage(message, 'excalidraw');
+            }, 500);
+        }
+
+        // ===================================================================
+        // UI HELPERS
+        // ===================================================================
+
+        function logMessage(panel, text, type = 'info') {
+            const logElement = document.getElementById(`${panel}-log`);
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+
+            const timestamp = new Date().toLocaleTimeString();
+            entry.innerHTML = `<span class="timestamp">${timestamp}</span> ${text}`;
+
+            logElement.appendChild(entry);
+            logElement.scrollTop = logElement.scrollHeight;
+
+            // Keep only last 50 messages
+            while (logElement.children.length > 50) {
+                logElement.removeChild(logElement.firstChild);
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('stat-sent').textContent = stats.sent;
+            document.getElementById('stat-received').textContent = stats.received;
+            document.getElementById('stat-errors').textContent = stats.errors;
+            document.getElementById('stat-health').textContent = stats.health;
+        }
+
+        function updateConnectionStatus() {
+            const excalidrawStatus = document.getElementById('excalidraw-status');
+            const reactStatus = document.getElementById('react-status');
+
+            if (healthCheckEnabled) {
+                excalidrawStatus.className = 'status-indicator connected';
+                reactStatus.className = 'status-indicator connected';
+            } else {
+                excalidrawStatus.className = 'status-indicator disconnected';
+                reactStatus.className = 'status-indicator disconnected';
+            }
+        }
+
+        function displaySchema(message) {
+            const schemaDisplay = document.getElementById('schema-display');
+            const schema = MessageSchemas[message.type];
+
+            let output = `MESSAGE TYPE: ${message.type}\n\n`;
+            output += `SCHEMA:\n`;
+            output += `  Required fields: ${schema.required.join(', ')}\n`;
+            output += `  Payload fields: ${schema.payload.join(', ')}\n\n`;
+            output += `EXAMPLE MESSAGE:\n`;
+            output += JSON.stringify(message, null, 2);
+
+            schemaDisplay.textContent = output;
+        }
+
+        // Initialize connection status on load
+        updateConnectionStatus();
+
+        // Welcome message
+        logMessage('excalidraw', '🎨 Excalidraw parent window initialized', 'info');
+        logMessage('react', '⚛️ React iframe child initialized', 'info');
+    </script>
+</body>
+</html>
