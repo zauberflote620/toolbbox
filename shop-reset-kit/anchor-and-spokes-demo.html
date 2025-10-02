@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anchor-and-Spokes Methodology Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #1e88e5;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .panel h2 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .product-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .product-card {
+            background: #f9f9f9;
+            border-left: 4px solid #e0e0e0;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .product-card:hover {
+            background: #f0f0f0;
+            transform: translateX(4px);
+        }
+
+        .product-card.anchor {
+            background: #fff3e0;
+            border-left-color: #f57c00;
+            font-weight: 600;
+        }
+
+        .product-card.spoke {
+            background: #e3f2fd;
+            border-left-color: #1976d2;
+        }
+
+        .product-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 4px;
+        }
+
+        .product-meta {
+            font-size: 11px;
+            color: #666;
+            display: flex;
+            gap: 12px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge.high-margin {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .badge.cross-sell {
+            background: #bbdefb;
+            color: #1565c0;
+        }
+
+        .badge.prominent {
+            background: #fff9c4;
+            color: #f57f17;
+        }
+
+        .canvas-container {
+            position: relative;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 600px;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 16px;
+            background: #1e88e5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #1565c0;
+        }
+
+        button.success {
+            background: #43a047;
+        }
+
+        button.success:hover {
+            background: #2e7d32;
+        }
+
+        button.warning {
+            background: #fb8c00;
+        }
+
+        button.warning:hover {
+            background: #e65100;
+        }
+
+        .constraint-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .constraint-item {
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            border-left: 4px solid #e0e0e0;
+        }
+
+        .constraint-item.valid {
+            background: #e8f5e9;
+            border-left-color: #43a047;
+        }
+
+        .constraint-item.warning {
+            background: #fff3e0;
+            border-left-color: #fb8c00;
+        }
+
+        .constraint-item.error {
+            background: #ffebee;
+            border-left-color: #e53935;
+        }
+
+        .constraint-name {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .constraint-status {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .score-value {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .score-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: #f9f9f9;
+            padding: 12px;
+            border-radius: 4px;
+        }
+
+        .metric-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .metric-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1e88e5;
+        }
+
+        .legend {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .legend h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #1976d2;
+            padding: 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚓ Anchor-and-Spokes Methodology</h1>
+        <p class="subtitle">Interactive demonstration of anchor selection, spoke assignment, constraint validation, and quality scoring</p>
+
+        <div class="layout">
+            <!-- Left Panel: Product List -->
+            <div class="panel">
+                <h2>Products</h2>
+                <div class="info-box">
+                    Click "Select Anchors" to automatically identify optimal anchor products based on margin, cross-sell, and prominence criteria.
+                </div>
+                <div class="controls">
+                    <button onclick="selectAnchors()">🎯 Select Anchors</button>
+                    <button onclick="assignSpokes()" class="success">🔗 Assign Spokes</button>
+                    <button onclick="validateConstraints()" class="warning">✓ Validate Layout</button>
+                    <button onclick="calculateScore()">📊 Calculate Score</button>
+                </div>
+                <div class="product-list" id="product-list"></div>
+            </div>
+
+            <!-- Center Panel: Canvas -->
+            <div class="panel">
+                <h2>Store Layout (Top View)</h2>
+                <div class="legend">
+                    <h3>Legend</h3>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #f57c00;"></div>
+                        <span>Anchor Products (High-value, high-visibility)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #1976d2;"></div>
+                        <span>Primary Spokes (Within 5 feet)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #90caf9;"></div>
+                        <span>Secondary Spokes (5-10 feet)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #e0e0e0;"></div>
+                        <span>Unassigned Products</span>
+                    </div>
+                </div>
+                <div class="canvas-container">
+                    <canvas id="layout-canvas"></canvas>
+                </div>
+            </div>
+
+            <!-- Right Panel: Validation & Metrics -->
+            <div class="panel">
+                <h2>Layout Quality</h2>
+                <div class="score-display" id="score-display">
+                    <div class="score-value">--</div>
+                    <div class="score-label">Quality Score</div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Anchors</div>
+                        <div class="metric-value" id="metric-anchors">0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Spokes</div>
+                        <div class="metric-value" id="metric-spokes">0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Cross-Sell Ops</div>
+                        <div class="metric-value" id="metric-crosssell">0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Violations</div>
+                        <div class="metric-value" id="metric-violations" style="color: #e53935;">0</div>
+                    </div>
+                </div>
+
+                <h2 style="margin-top: 20px;">Constraint Validation</h2>
+                <div class="constraint-list" id="constraint-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===================================================================
+        // DATA MODELS
+        // ===================================================================
+
+        const store = {
+            width: 800,
+            height: 600,
+            entrance: { x: 400, y: 580 },
+            fixtures: [
+                { id: 'f1', x: 100, y: 100, width: 200, height: 100, type: 'shelf', weight: 0 },
+                { id: 'f2', x: 400, y: 100, width: 200, height: 100, type: 'shelf', weight: 0 },
+                { id: 'f3', x: 100, y: 300, width: 200, height: 100, type: 'display', weight: 0 },
+                { id: 'f4', x: 400, y: 300, width: 200, height: 100, type: 'shelf', weight: 0 },
+                { id: 'f5', x: 600, y: 200, width: 150, height: 150, type: 'endcap', weight: 0 }
+            ]
+        };
+
+        const products = [
+            { sku: 'PROD-001', name: 'Winter Coat', category: 'Apparel', price: 129.99, margin: 0.50, crossSellWith: ['PROD-002', 'PROD-003'], prominent: true, weight: 5 },
+            { sku: 'PROD-002', name: 'Wool Scarf', category: 'Accessories', price: 34.99, margin: 0.60, crossSellWith: ['PROD-001', 'PROD-004'], prominent: false, weight: 1 },
+            { sku: 'PROD-003', name: 'Leather Gloves', category: 'Accessories', price: 44.99, margin: 0.55, crossSellWith: ['PROD-001'], prominent: false, weight: 1 },
+            { sku: 'PROD-004', name: 'Knit Hat', category: 'Accessories', price: 24.99, margin: 0.65, crossSellWith: ['PROD-001', 'PROD-002'], prominent: false, weight: 1 },
+            { sku: 'PROD-005', name: 'Winter Boots', category: 'Footwear', price: 149.99, margin: 0.45, crossSellWith: ['PROD-001', 'PROD-006'], prominent: true, weight: 8 },
+            { sku: 'PROD-006', name: 'Boot Socks', category: 'Accessories', price: 14.99, margin: 0.70, crossSellWith: ['PROD-005'], prominent: false, weight: 0.5 },
+            { sku: 'PROD-007', name: 'Fleece Sweater', category: 'Apparel', price: 79.99, margin: 0.48, crossSellWith: ['PROD-008'], prominent: true, weight: 3 },
+            { sku: 'PROD-008', name: 'Thermal Leggings', category: 'Apparel', price: 39.99, margin: 0.52, crossSellWith: ['PROD-007'], prominent: false, weight: 2 },
+            { sku: 'PROD-009', name: 'Down Vest', category: 'Apparel', price: 99.99, margin: 0.47, crossSellWith: ['PROD-001'], prominent: false, weight: 4 },
+            { sku: 'PROD-010', name: 'Waterproof Jacket', category: 'Outerwear', price: 179.99, margin: 0.42, crossSellWith: ['PROD-005'], prominent: true, weight: 6 },
+            { sku: 'PROD-011', name: 'Insulated Mittens', category: 'Accessories', price: 29.99, margin: 0.58, crossSellWith: ['PROD-010', 'PROD-001'], prominent: false, weight: 1 },
+            { sku: 'PROD-012', name: 'Neck Warmer', category: 'Accessories', price: 19.99, margin: 0.62, crossSellWith: ['PROD-001', 'PROD-007'], prominent: false, weight: 0.5 }
+        ];
+
+        let anchors = [];
+        let spokes = [];
+        let placements = new Map(); // sku -> {x, y, fixtureId}
+        let constraintResults = [];
+
+        // ===================================================================
+        // ANCHOR SELECTION ALGORITHM
+        // ===================================================================
+
+        /**
+         * Select anchors based on 3 criteria:
+         * 1. High margin (>= 0.45)
+         * 2. Cross-sell potential (>= 2 related products)
+         * 3. Prominent/feature products
+         */
+        function selectAnchors() {
+            anchors = [];
+
+            // Score each product
+            const scored = products.map(product => {
+                let score = 0;
+
+                // Criterion 1: High Margin
+                if (product.margin >= 0.50) score += 3;
+                else if (product.margin >= 0.45) score += 2;
+
+                // Criterion 2: Cross-Sell Potential
+                const crossSellCount = product.crossSellWith.length;
+                if (crossSellCount >= 3) score += 3;
+                else if (crossSellCount >= 2) score += 2;
+                else if (crossSellCount >= 1) score += 1;
+
+                // Criterion 3: Prominent Placement Flag
+                if (product.prominent) score += 3;
+
+                return { product, score };
+            });
+
+            // Sort by score descending
+            scored.sort((a, b) => b.score - a.score);
+
+            // Select top products as anchors (min 1, max 5)
+            const minAnchors = 1;
+            const maxAnchors = 5;
+            const threshold = 4; // Minimum score to be anchor
+
+            for (let i = 0; i < scored.length && anchors.length < maxAnchors; i++) {
+                if (scored[i].score >= threshold || anchors.length < minAnchors) {
+                    anchors.push(scored[i].product);
+                }
+            }
+
+            // Auto-place anchors in high-traffic zones
+            placeAnchorsOptimally();
+            updateProductList();
+            drawLayout();
+
+            console.log('Selected anchors:', anchors.map(a => a.sku));
+            updateMetrics();
+        }
+
+        /**
+         * Place anchors in optimal positions
+         * Priority: Eye-level, high-traffic, near entrance
+         */
+        function placeAnchorsOptimally() {
+            placements.clear();
+
+            // High-value positions (near entrance, endcaps, eye-level zones)
+            const optimalPositions = [
+                { x: 675, y: 275, fixtureId: 'f5' }, // Endcap
+                { x: 500, y: 150, fixtureId: 'f2' }, // Eye-level shelf near entrance
+                { x: 200, y: 150, fixtureId: 'f1' }, // Eye-level shelf left side
+                { x: 500, y: 350, fixtureId: 'f4' }, // Mid-level visible shelf
+                { x: 200, y: 350, fixtureId: 'f3' } // Display area
+            ];
+
+            anchors.forEach((anchor, index) => {
+                if (index < optimalPositions.length) {
+                    const pos = optimalPositions[index];
+                    placements.set(anchor.sku, pos);
+
+                    // Update fixture weight
+                    const fixture = store.fixtures.find(f => f.id === pos.fixtureId);
+                    if (fixture) {
+                        fixture.weight += anchor.weight;
+                    }
+                }
+            });
+        }
+
+        // ===================================================================
+        // SPOKE ASSIGNMENT LOGIC
+        // ===================================================================
+
+        /**
+         * Assign spokes to anchors based on:
+         * - Cross-sell relationships
+         * - Distance (primary <=5ft, secondary 5-10ft)
+         */
+        function assignSpokes() {
+            spokes = [];
+
+            anchors.forEach(anchor => {
+                const anchorPos = placements.get(anchor.sku);
+                if (!anchorPos) return;
+
+                // Find related products via cross-sell
+                anchor.crossSellWith.forEach(spokeSku => {
+                    const spokeProduct = products.find(p => p.sku === spokeSku);
+                    if (!spokeProduct || anchors.includes(spokeProduct)) return;
+
+                    // Calculate spoke position near anchor
+                    const distance = calculateOptimalSpokeDistance(anchor, spokeProduct);
+                    const angle = Math.random() * Math.PI * 2; // Random angle around anchor
+
+                    const spokePos = {
+                        x: anchorPos.x + Math.cos(angle) * distance,
+                        y: anchorPos.y + Math.sin(angle) * distance,
+                        fixtureId: findNearestFixture(
+                            anchorPos.x + Math.cos(angle) * distance,
+                            anchorPos.y + Math.sin(angle) * distance
+                        ),
+                        anchorSku: anchor.sku,
+                        distance: distance,
+                        type: distance <= 60 ? 'primary' : 'secondary' // 5ft = 60px
+                    };
+
+                    placements.set(spokeProduct.sku, spokePos);
+                    spokes.push({
+                        product: spokeProduct,
+                        anchor: anchor,
+                        distance: distance,
+                        type: spokePos.type
+                    });
+
+                    // Update fixture weight
+                    const fixture = store.fixtures.find(f => f.id === spokePos.fixtureId);
+                    if (fixture) {
+                        fixture.weight += spokeProduct.weight;
+                    }
+                });
+            });
+
+            updateProductList();
+            drawLayout();
+            console.log('Assigned spokes:', spokes.length);
+            updateMetrics();
+        }
+
+        function calculateOptimalSpokeDistance(anchor, spoke) {
+            // Primary spokes: within 5 feet (60px)
+            // Secondary spokes: 5-10 feet (60-120px)
+            const primaryDistance = 60;
+            const secondaryDistance = 100;
+
+            // High cross-sell potential = closer
+            if (spoke.crossSellWith.length >= 2) return primaryDistance;
+            return secondaryDistance;
+        }
+
+        function findNearestFixture(x, y) {
+            let nearest = store.fixtures[0];
+            let minDist = Infinity;
+
+            store.fixtures.forEach(fixture => {
+                const centerX = fixture.x + fixture.width / 2;
+                const centerY = fixture.y + fixture.height / 2;
+                const dist = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
+
+                if (dist < minDist) {
+                    minDist = dist;
+                    nearest = fixture;
+                }
+            });
+
+            return nearest.id;
+        }
+
+        // ===================================================================
+        // CONSTRAINT VALIDATION ENGINE
+        // ===================================================================
+
+        const constraints = [
+            {
+                id: 'aisle-width',
+                name: 'Aisle Width (Min 42")',
+                validate: () => {
+                    // Simplified: check fixture spacing
+                    let violations = 0;
+                    const minAisleWidth = 50; // pixels (42 inches)
+
+                    for (let i = 0; i < store.fixtures.length; i++) {
+                        for (let j = i + 1; j < store.fixtures.length; j++) {
+                            const f1 = store.fixtures[i];
+                            const f2 = store.fixtures[j];
+
+                            // Check horizontal spacing
+                            if (Math.abs(f1.y - f2.y) < 100) {
+                                const gap = Math.abs((f1.x + f1.width) - f2.x);
+                                if (gap < minAisleWidth && gap > 0) {
+                                    violations++;
+                                }
+                            }
+                        }
+                    }
+
+                    return {
+                        valid: violations === 0,
+                        status: violations === 0 ? 'valid' : 'error',
+                        message: violations === 0 ?
+                            'All aisles meet minimum width requirement' :
+                            `${violations} aisle(s) too narrow (< 42")`
+                    };
+                }
+            },
+            {
+                id: 'shelf-weight',
+                name: 'Shelf Weight Capacity',
+                validate: () => {
+                    const maxWeight = 500; // pounds per fixture
+                    let violations = 0;
+
+                    store.fixtures.forEach(fixture => {
+                        if (fixture.weight > maxWeight) {
+                            violations++;
+                        }
+                    });
+
+                    return {
+                        valid: violations === 0,
+                        status: violations === 0 ? 'valid' : 'error',
+                        message: violations === 0 ?
+                            'All fixtures within weight capacity' :
+                            `${violations} fixture(s) overweight (> 500 lbs)`
+                    };
+                }
+            },
+            {
+                id: 'exit-clearance',
+                name: 'Exit Clearance (36" min)',
+                validate: () => {
+                    // Check if products/fixtures block entrance
+                    const entranceZone = {
+                        x: store.entrance.x - 50,
+                        y: store.entrance.y - 50,
+                        width: 100,
+                        height: 50
+                    };
+
+                    let blocking = 0;
+                    store.fixtures.forEach(fixture => {
+                        if (rectanglesOverlap(fixture, entranceZone)) {
+                            blocking++;
+                        }
+                    });
+
+                    return {
+                        valid: blocking === 0,
+                        status: blocking === 0 ? 'valid' : 'error',
+                        message: blocking === 0 ?
+                            'Exit clearance maintained' :
+                            `${blocking} fixture(s) blocking exit zone`
+                    };
+                }
+            },
+            {
+                id: 'eye-level',
+                name: 'Eye-Level Placement Preference',
+                validate: () => {
+                    // Check if high-margin products are at eye-level (middle shelves)
+                    let eyeLevelCount = 0;
+                    let highMarginCount = 0;
+
+                    products.forEach(product => {
+                        if (product.margin >= 0.50) {
+                            highMarginCount++;
+                            const pos = placements.get(product.sku);
+                            if (pos && pos.y >= 100 && pos.y <= 400) {
+                                eyeLevelCount++;
+                            }
+                        }
+                    });
+
+                    const ratio = highMarginCount > 0 ? eyeLevelCount / highMarginCount : 0;
+                    const optimal = ratio >= 0.7;
+
+                    return {
+                        valid: optimal,
+                        status: optimal ? 'valid' : 'warning',
+                        message: optimal ?
+                            `${eyeLevelCount}/${highMarginCount} high-margin items at eye-level (optimal)` :
+                            `Only ${eyeLevelCount}/${highMarginCount} high-margin items at eye-level (recommend > 70%)`
+                    };
+                }
+            },
+            {
+                id: 'restricted-placement',
+                name: 'Restricted Product Placement',
+                validate: () => {
+                    // Example: No restricted products (would check actual product flags)
+                    // For demo, all products are allowed
+                    return {
+                        valid: true,
+                        status: 'valid',
+                        message: 'No restricted placement violations'
+                    };
+                }
+            }
+        ];
+
+        function validateConstraints() {
+            constraintResults = constraints.map(c => ({
+                ...c,
+                result: c.validate()
+            }));
+
+            displayConstraints();
+            updateMetrics();
+            console.log('Constraint validation:', constraintResults);
+        }
+
+        function rectanglesOverlap(r1, r2) {
+            return !(r1.x + r1.width < r2.x ||
+                    r2.x + r2.width < r1.x ||
+                    r1.y + r1.height < r2.y ||
+                    r2.y + r2.height < r1.y);
+        }
+
+        // ===================================================================
+        // LAYOUT QUALITY SCORING
+        // ===================================================================
+
+        function calculateScore() {
+            validateConstraints(); // Ensure constraints are up to date
+
+            let score = 0;
+            let maxScore = 100;
+
+            // Component 1: Anchor Placement (30 points)
+            const anchorPlacementScore = (anchors.length / 5) * 30; // Max 5 anchors
+            score += Math.min(anchorPlacementScore, 30);
+
+            // Component 2: Spoke Assignment (25 points)
+            const spokeCoverage = spokes.length / (anchors.length * 3); // Assume avg 3 spokes per anchor
+            score += Math.min(spokeCoverage * 25, 25);
+
+            // Component 3: Constraint Compliance (25 points)
+            const violations = constraintResults.filter(c => c.result.status === 'error').length;
+            const warnings = constraintResults.filter(c => c.result.status === 'warning').length;
+            const constraintScore = Math.max(0, 25 - (violations * 10) - (warnings * 5));
+            score += constraintScore;
+
+            // Component 4: Cross-Sell Opportunities (10 points)
+            const crossSellOps = calculateCrossSellOpportunities();
+            const crossSellScore = Math.min(crossSellOps / 10 * 10, 10); // Max 10 opportunities = 10 points
+            score += crossSellScore;
+
+            // Component 5: Visual Flow (10 points)
+            const flowScore = calculateVisualFlowScore();
+            score += flowScore;
+
+            // Round to integer
+            score = Math.round(score);
+
+            displayScore(score);
+            updateMetrics();
+            console.log('Layout quality score:', score);
+
+            return score;
+        }
+
+        function calculateCrossSellOpportunities() {
+            let opportunities = 0;
+
+            spokes.forEach(spoke => {
+                // Check if spoke is within 10 feet of anchor
+                if (spoke.distance <= 120) { // 10 feet = 120px
+                    opportunities++;
+                }
+            });
+
+            return opportunities;
+        }
+
+        function calculateVisualFlowScore() {
+            // Simplified: Check if anchors create logical path from entrance
+            let score = 0;
+
+            if (anchors.length > 0) {
+                // Check if at least one anchor is near entrance
+                const nearEntrance = anchors.some(anchor => {
+                    const pos = placements.get(anchor.sku);
+                    if (!pos) return false;
+                    const distToEntrance = Math.sqrt(
+                        (pos.x - store.entrance.x) ** 2 +
+                        (pos.y - store.entrance.y) ** 2
+                    );
+                    return distToEntrance < 200; // Within reasonable distance
+                });
+
+                if (nearEntrance) score += 5;
+
+                // Check if anchors are distributed (not clustered)
+                const distributed = checkAnchorDistribution();
+                if (distributed) score += 5;
+            }
+
+            return score;
+        }
+
+        function checkAnchorDistribution() {
+            if (anchors.length < 2) return true;
+
+            // Check average distance between anchors
+            let totalDist = 0;
+            let pairs = 0;
+
+            for (let i = 0; i < anchors.length; i++) {
+                for (let j = i + 1; j < anchors.length; j++) {
+                    const pos1 = placements.get(anchors[i].sku);
+                    const pos2 = placements.get(anchors[j].sku);
+                    if (pos1 && pos2) {
+                        const dist = Math.sqrt(
+                            (pos1.x - pos2.x) ** 2 + (pos1.y - pos2.y) ** 2
+                        );
+                        totalDist += dist;
+                        pairs++;
+                    }
+                }
+            }
+
+            const avgDist = pairs > 0 ? totalDist / pairs : 0;
+            return avgDist > 150; // Reasonable spacing
+        }
+
+        // ===================================================================
+        // CANVAS RENDERING
+        // ===================================================================
+
+        function drawLayout() {
+            const canvas = document.getElementById('layout-canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Set canvas size
+            canvas.width = store.width;
+            canvas.height = store.height;
+
+            // Clear canvas
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw store outline
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(10, 10, store.width - 20, store.height - 20);
+
+            // Draw entrance
+            ctx.fillStyle = '#4caf50';
+            ctx.fillRect(store.entrance.x - 50, store.entrance.y - 10, 100, 20);
+            ctx.fillStyle = '#333';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('ENTRANCE', store.entrance.x, store.entrance.y + 5);
+
+            // Draw fixtures
+            store.fixtures.forEach(fixture => {
+                ctx.fillStyle = '#f0f0f0';
+                ctx.fillRect(fixture.x, fixture.y, fixture.width, fixture.height);
+                ctx.strokeStyle = '#999';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(fixture.x, fixture.y, fixture.width, fixture.height);
+
+                // Label fixture
+                ctx.fillStyle = '#666';
+                ctx.font = '10px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(
+                    `${fixture.type.toUpperCase()} (${Math.round(fixture.weight)}lbs)`,
+                    fixture.x + fixture.width / 2,
+                    fixture.y + fixture.height / 2
+                );
+            });
+
+            // Draw products
+            placements.forEach((pos, sku) => {
+                const product = products.find(p => p.sku === sku);
+                const isAnchor = anchors.find(a => a.sku === sku);
+                const spokeInfo = spokes.find(s => s.product.sku === sku);
+
+                let color = '#e0e0e0'; // Unassigned
+                let size = 15;
+
+                if (isAnchor) {
+                    color = '#f57c00'; // Anchor
+                    size = 25;
+                } else if (spokeInfo) {
+                    color = spokeInfo.type === 'primary' ? '#1976d2' : '#90caf9'; // Primary/Secondary spoke
+                    size = 18;
+                }
+
+                // Draw product circle
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, size, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.fill();
+                ctx.strokeStyle = '#fff';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                // Draw connection line to anchor (for spokes)
+                if (spokeInfo) {
+                    const anchorPos = placements.get(spokeInfo.anchor.sku);
+                    if (anchorPos) {
+                        ctx.beginPath();
+                        ctx.moveTo(pos.x, pos.y);
+                        ctx.lineTo(anchorPos.x, anchorPos.y);
+                        ctx.strokeStyle = spokeInfo.type === 'primary' ? '#1976d2' : '#90caf9';
+                        ctx.lineWidth = 1;
+                        ctx.setLineDash([5, 5]);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                    }
+                }
+
+                // Label product
+                ctx.fillStyle = '#333';
+                ctx.font = 'bold 10px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(sku.split('-')[1], pos.x, pos.y - size - 5);
+            });
+        }
+
+        // ===================================================================
+        // UI UPDATES
+        // ===================================================================
+
+        function updateProductList() {
+            const container = document.getElementById('product-list');
+            container.innerHTML = '';
+
+            products.forEach(product => {
+                const isAnchor = anchors.find(a => a.sku === product.sku);
+                const spokeInfo = spokes.find(s => s.product.sku === product.sku);
+
+                const card = document.createElement('div');
+                card.className = 'product-card' + (isAnchor ? ' anchor' : spokeInfo ? ' spoke' : '');
+
+                let badges = '';
+                if (product.margin >= 0.50) badges += '<span class="badge high-margin">High Margin</span> ';
+                if (product.crossSellWith.length >= 2) badges += '<span class="badge cross-sell">Cross-Sell</span> ';
+                if (product.prominent) badges += '<span class="badge prominent">Prominent</span> ';
+
+                card.innerHTML = `
+                    <div class="product-name">
+                        ${isAnchor ? '⚓ ' : spokeInfo ? '🔗 ' : ''}${product.name}
+                    </div>
+                    <div class="product-meta">
+                        <span>$${product.price}</span>
+                        <span>${Math.round(product.margin * 100)}% margin</span>
+                        ${spokeInfo ? `<span>${spokeInfo.type} spoke</span>` : ''}
+                    </div>
+                    ${badges ? `<div style="margin-top: 6px;">${badges}</div>` : ''}
+                `;
+
+                container.appendChild(card);
+            });
+        }
+
+        function displayConstraints() {
+            const container = document.getElementById('constraint-list');
+            container.innerHTML = '';
+
+            constraintResults.forEach(constraint => {
+                const item = document.createElement('div');
+                item.className = `constraint-item ${constraint.result.status}`;
+                item.innerHTML = `
+                    <div class="constraint-name">${constraint.name}</div>
+                    <div class="constraint-status">${constraint.result.message}</div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function displayScore(score) {
+            const display = document.getElementById('score-display');
+            display.querySelector('.score-value').textContent = score;
+
+            // Update color based on score
+            let gradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'; // Default
+            if (score >= 80) {
+                gradient = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)'; // Green
+            } else if (score >= 60) {
+                gradient = 'linear-gradient(135deg, #f2994a 0%, #f2c94c 100%)'; // Yellow
+            } else {
+                gradient = 'linear-gradient(135deg, #eb3349 0%, #f45c43 100%)'; // Red
+            }
+
+            display.style.background = gradient;
+        }
+
+        function updateMetrics() {
+            document.getElementById('metric-anchors').textContent = anchors.length;
+            document.getElementById('metric-spokes').textContent = spokes.length;
+            document.getElementById('metric-crosssell').textContent = calculateCrossSellOpportunities();
+
+            const violations = constraintResults.filter(c => c.result.status === 'error').length;
+            document.getElementById('metric-violations').textContent = violations;
+        }
+
+        // ===================================================================
+        // INITIALIZATION
+        // ===================================================================
+
+        function init() {
+            updateProductList();
+            drawLayout();
+
+            // Auto-run demo
+            setTimeout(() => {
+                selectAnchors();
+                setTimeout(() => {
+                    assignSpokes();
+                    setTimeout(() => {
+                        validateConstraints();
+                        setTimeout(() => {
+                            calculateScore();
+                        }, 500);
+                    }, 500);
+                }, 500);
+            }, 500);
+        }
+
+        // Run on page load
+        init();
+    </script>
+</body>
+</html>
