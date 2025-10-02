@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Reset Kit - Secure Standalone Version</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';">
+    <style>
+        /* Optimized CSS for maximum compatibility */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f4f7f6 0%, #e8f0fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 { color: #2c3e50; font-size: 2.5rem; margin-bottom: 10px; }
+        .header p { color: #7f8c8d; font-size: 1.1rem; }
+
+        .controls {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #2c3e50; }
+        .form-group textarea, .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group textarea:focus, .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .btn { padding: 12px 24px; border: none; border-radius: 6px; font-size: 16px; cursor: pointer; transition: all 0.3s; }
+        .btn-primary { background: linear-gradient(135deg, #3498db, #2980b9); color: white; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(52,152,219,0.4); }
+
+        .plan-display {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .item {
+            background: white;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+        }
+
+        .priority-high { background: #e74c3c; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .priority-medium { background: #f39c12; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .priority-low { background: #95a5a6; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+
+        .pattern-badge {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .hidden { display: none; }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 10px 0;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🛍️ Shop Reset Kit</h1>
+            <p>Secure Standalone Version - XSS Protected</p>
+        </div>
+
+        <div class="controls">
+            <div class="form-group">
+                <label for="goals">Enter Your Retail Goals:</label>
+                <textarea id="goals" rows="4" placeholder="Example: Increase winter clothing sales by 20%, promote high-margin items, improve customer flow"></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="generatePlan()">🎯 Generate Plan</button>
+        </div>
+
+        <div id="analysisPanel" class="plan-display hidden">
+            <h2>📊 Goal Analysis</h2>
+            <div id="patternBadges"></div>
+        </div>
+
+        <div class="plan-display">
+            <h2>📋 Shop Reset Plan</h2>
+            <p>Last Updated: <span id="lastUpdated">Not generated yet</span></p>
+            <div id="sectionsGrid"></div>
+        </div>
+
+        <div class="plan-display">
+            <h2>💡 Visual Merchandising Recommendations</h2>
+            <ul id="recommendationsList"></ul>
+        </div>
+    </div>
+
+    <script>
+        'use strict';
+
+        // Security: HTML escaping function to prevent XSS
+        // CRITICAL: Never use innerHTML - this properly escapes all HTML entities
+        function escapeHTML(str) {
+            if (typeof str !== 'string') return '';
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#x27;')
+                .replace(/\//g, '&#x2F;');
+        }
+
+        // Security: Create safe DOM element
+        function createSafeElement(tag, text, className) {
+            const el = document.createElement(tag);
+            if (text) el.textContent = text;
+            if (className) el.className = className;
+            return el;
+        }
+
+        let currentPlan = {
+            scenario: "Default Layout",
+            sections: [
+                {
+                    name: "Entrance Zone (Decompression)",
+                    vmZone: "Welcome Area",
+                    items: [
+                        { name: "Featured Seasonal Display (Primary Anchor)", priority: "high", margin: "60%", velocity: "high" },
+                        { name: "New Arrivals Signage", priority: "high" }
+                    ]
+                },
+                {
+                    name: "Power Wall (First Impression)",
+                    vmZone: "Eye-Level Zone",
+                    items: [
+                        { name: "Best-Selling Products (Secondary Anchor)", priority: "high", margin: "55%", velocity: "high" },
+                        { name: "Coordinated Outfits (Spoke)", priority: "medium" }
+                    ]
+                }
+            ],
+            vmRecommendations: [
+                "Place anchors at natural sight lines",
+                "Use the 'triangle' principle for product grouping",
+                "Ensure clear pathways between sections"
+            ],
+            lastUpdated: new Date().toISOString().split('T')[0],
+            generatedBy: "Secure AI Engine"
+        };
+
+        function analyzeGoals(goalsText) {
+            const patterns = [];
+            const text = goalsText.toLowerCase();
+
+            if (text.match(/seasonal|winter|summer|spring|fall|holiday/)) {
+                patterns.push({ type: 'seasonal', weight: 90 });
+            }
+            if (text.match(/profit|margin|revenue|high-margin/)) {
+                patterns.push({ type: 'profitability', weight: 95 });
+            }
+            if (text.match(/new|arrivals|launch|fresh/)) {
+                patterns.push({ type: 'new-arrivals', weight: 80 });
+            }
+            if (text.match(/flow|traffic|navigation|customer journey/)) {
+                patterns.push({ type: 'traffic-optimization', weight: 70 });
+            }
+
+            return patterns;
+        }
+
+        function generatePlan() {
+            const goals = document.getElementById('goals').value;
+            const patterns = analyzeGoals(goals);
+
+            // SECURE: Update analysis panel using DOM methods, not innerHTML
+            const analysisPanel = document.getElementById('analysisPanel');
+            const patternBadges = document.getElementById('patternBadges');
+
+            // Clear existing badges
+            patternBadges.textContent = '';
+
+            if (patterns.length > 0) {
+                analysisPanel.classList.remove('hidden');
+
+                // SECURE: Create badges using DOM methods to prevent XSS
+                patterns.forEach(p => {
+                    const badge = createSafeElement('span', `${p.type.toUpperCase()} (${p.weight}%)`, 'pattern-badge');
+                    patternBadges.appendChild(badge);
+                });
+            }
+
+            // Enhance plan based on patterns
+            if (patterns.some(p => p.type === 'seasonal')) {
+                currentPlan.scenario = "Winter Seasonal Reset";
+                currentPlan.sections[0].items[0].name = "Premium Winter Coats (Primary Anchor)";
+            }
+
+            if (patterns.some(p => p.type === 'profitability')) {
+                currentPlan.scenario = "High-Margin Profitability Focus";
+                currentPlan.sections[1].items[0].name = "Luxury Sweaters (High-Margin Anchor)";
+                currentPlan.sections[1].items[0].margin = "75%";
+            }
+
+            currentPlan.lastUpdated = new Date().toISOString().split('T')[0];
+
+            renderPlan();
+            renderRecommendations();
+        }
+
+        function renderPlan() {
+            // SECURE: Update using textContent
+            document.getElementById('lastUpdated').textContent = currentPlan.lastUpdated;
+
+            const sectionsGrid = document.getElementById('sectionsGrid');
+
+            // Clear existing content
+            sectionsGrid.textContent = '';
+
+            // SECURE: Build DOM tree without innerHTML
+            currentPlan.sections.forEach(section => {
+                const sectionCard = createSafeElement('div', '', 'section-card');
+
+                const sectionHeader = createSafeElement('div', '');
+                const sectionTitle = createSafeElement('h3', `📍 ${section.name}`);
+                sectionTitle.style.color = '#2980b9';
+                sectionTitle.style.margin = '0';
+                sectionHeader.appendChild(sectionTitle);
+
+                if (section.vmZone) {
+                    const zoneBadge = createSafeElement('span', section.vmZone);
+                    zoneBadge.style.background = '#27ae60';
+                    zoneBadge.style.color = 'white';
+                    zoneBadge.style.padding = '4px 8px';
+                    zoneBadge.style.borderRadius = '4px';
+                    zoneBadge.style.fontSize = '12px';
+                    zoneBadge.style.marginLeft = '10px';
+                    sectionHeader.appendChild(zoneBadge);
+                }
+
+                sectionCard.appendChild(sectionHeader);
+
+                // Add items
+                section.items.forEach(item => {
+                    const itemDiv = createSafeElement('div', '', 'item');
+
+                    const itemHeader = createSafeElement('div', '');
+                    itemHeader.style.display = 'flex';
+                    itemHeader.style.justifyContent = 'space-between';
+                    itemHeader.style.alignItems = 'center';
+
+                    const itemName = createSafeElement('span', item.name);
+                    itemName.style.fontWeight = '500';
+                    itemHeader.appendChild(itemName);
+
+                    const priorityBadge = createSafeElement('span', item.priority, `priority-${item.priority}`);
+                    itemHeader.appendChild(priorityBadge);
+
+                    itemDiv.appendChild(itemHeader);
+
+                    if (item.margin || item.velocity) {
+                        const details = createSafeElement('div', '');
+                        details.style.fontSize = '12px';
+                        details.style.color = '#7f8c8d';
+                        details.style.marginTop = '8px';
+
+                        if (item.margin) {
+                            const marginSpan = createSafeElement('span', `Margin: ${item.margin}`);
+                            marginSpan.style.marginRight = '15px';
+                            details.appendChild(marginSpan);
+                        }
+
+                        if (item.velocity) {
+                            const velocitySpan = createSafeElement('span', `Velocity: ${item.velocity}`);
+                            details.appendChild(velocitySpan);
+                        }
+
+                        itemDiv.appendChild(details);
+                    }
+
+                    sectionCard.appendChild(itemDiv);
+                });
+
+                sectionsGrid.appendChild(sectionCard);
+            });
+        }
+
+        function renderRecommendations() {
+            const recommendationsList = document.getElementById('recommendationsList');
+
+            // Clear existing content
+            recommendationsList.textContent = '';
+
+            // SECURE: Build list using DOM methods
+            currentPlan.vmRecommendations.forEach(rec => {
+                const li = createSafeElement('li', rec);
+                li.style.marginBottom = '8px';
+                recommendationsList.appendChild(li);
+            });
+        }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderPlan();
+            renderRecommendations();
+        });
+    </script>
+</body>
+</html>

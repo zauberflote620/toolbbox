@@ -1,0 +1,214 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  firstName String?
+  lastName  String?
+  role      Role     @default(USER)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  stores     Store[]
+  planograms Planogram[]
+
+  @@map("users")
+}
+
+model Store {
+  id               String    @id @default(uuid())
+  name             String
+  address          String?
+  phone            String?
+  storeNumber      String?
+  dimensions       Json      @default("{}")
+  constraints      Json      @default("{}")
+  trafficPatterns  Json      @default("[]")
+  status           String    @default("active")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  createdBy        String
+  creator          User      @relation(fields: [createdBy], references: [id])
+
+  planograms       Planogram[]
+  storeFixtures    StoreFixture[]
+
+  @@map("stores")
+}
+
+model Fixture {
+  id                  String    @id @default(uuid())
+  name                String
+  ulineSku            String?
+  category            String
+  subcategory         String?
+  dimensions          Json
+  capacity            Json      @default("{}")
+  material            String?
+  color               String?
+  specifications      Json      @default("{}")
+  priceCents          Int?
+  availabilityStatus  String    @default("available")
+  isCustom            Boolean   @default(false)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  storeFixtures       StoreFixture[]
+  productPlacements   ProductPlacement[]
+
+  @@map("fixtures")
+}
+
+model StoreFixture {
+  id        String   @id @default(uuid())
+  storeId   String
+  fixtureId String
+  x         Float
+  y         Float
+  rotation  Float    @default(0)
+  vmZone    VmZone
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  store     Store    @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  fixture   Fixture  @relation(fields: [fixtureId], references: [id], onDelete: Cascade)
+
+  productPlacements ProductPlacement[]
+
+  @@unique([storeId, fixtureId])
+  @@map("store_fixtures")
+}
+
+model Product {
+  id           String   @id @default(uuid())
+  name         String
+  sku          String?
+  category     String
+  subcategory  String?
+  brand        String?
+  attributes   Json     @default("{}")
+  dimensions   Json?
+  weightGrams  Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  productPlacements ProductPlacement[]
+
+  @@map("products")
+}
+
+model ProductPlacement {
+  id             String   @id @default(uuid())
+  productId      String
+  fixtureId      String
+  storeFixtureId String
+  position       Int
+  facings        Int      @default(1)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  product      Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  fixture      Fixture      @relation(fields: [fixtureId], references: [id], onDelete: Cascade)
+  storeFixture StoreFixture @relation(fields: [storeFixtureId], references: [id], onDelete: Cascade)
+
+  @@map("product_placements")
+}
+
+model Planogram {
+  id              String           @id @default(uuid())
+  storeId         String
+  name            String
+  version         Int              @default(1)
+  status          PlanogramStatus  @default(DRAFT)
+  analyticsInput  String?
+  parsedInsights  Json             @default("[]")
+  layoutData      Json             @default("{}")
+  notes           String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  approvedAt      DateTime?
+  executedAt      DateTime?
+  createdBy       String
+
+  store           Store            @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  creator         User             @relation(fields: [createdBy], references: [id])
+
+  executionTasks  ExecutionTask[]
+  pickLists       PickList[]
+
+  @@map("planograms")
+}
+
+model ExecutionTask {
+  id           String    @id @default(uuid())
+  planogramId  String
+  title        String
+  description  String?
+  section      String
+  priority     Int       @default(1)
+  estimatedMinutes Int?
+  status       TaskStatus @default(PENDING)
+  assignedTo   String?
+  completedAt  DateTime?
+  photoUrl     String?
+  notes        String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  planogram    Planogram @relation(fields: [planogramId], references: [id], onDelete: Cascade)
+
+  @@map("execution_tasks")
+}
+
+model PickList {
+  id          String   @id @default(uuid())
+  planogramId String
+  name        String
+  section     String
+  items       Json     @default("[]")
+  assignedTo  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  planogram   Planogram @relation(fields: [planogramId], references: [id], onDelete: Cascade)
+
+  @@map("pick_lists")
+}
+
+enum Role {
+  USER
+  ADMIN
+  MANAGER
+}
+
+enum VmZone {
+  EYE
+  REACH
+  STRETCH
+  STOOP
+}
+
+enum PlanogramStatus {
+  DRAFT
+  PENDING_APPROVAL
+  APPROVED
+  IN_EXECUTION
+  COMPLETED
+  ARCHIVED
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  BLOCKED
+}

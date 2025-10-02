@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Reset Kit - Standalone Version</title>
+    <style>
+        /* Optimized CSS for maximum compatibility */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #f4f7f6 0%, #e8f0fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .header h1 { color: #2c3e50; font-size: 2.5rem; margin-bottom: 10px; }
+        .header p { color: #7f8c8d; font-size: 1.1rem; }
+
+        .controls {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 8px; color: #2c3e50; }
+        .form-group textarea, .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ecf0f1;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+        .form-group textarea:focus, .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .button-group { display: flex; gap: 15px; flex-wrap: wrap; }
+        .btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+        .btn-primary { background: #3498db; color: white; }
+        .btn-success { background: #27ae60; color: white; }
+        .btn-purple { background: #9b59b6; color: white; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+
+        .analysis-panel {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #2196f3;
+        }
+
+        .metrics-panel {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 2px solid #6c757d;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .metric-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-label { color: #6c757d; font-size: 14px; }
+
+        .recommendations {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 2px solid #27ae60;
+        }
+
+        .sections-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .section-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #ecf0f1;
+            transition: transform 0.2s;
+        }
+
+        .section-card:hover { transform: translateY(-2px); }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .vm-zone-badge {
+            background: #3498db;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .item {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ecf0f1;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .priority-badge {
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .priority-high { background: #e74c3c; }
+        .priority-medium { background: #f39c12; }
+        .priority-low { background: #2ecc71; }
+
+        .item-details { display: flex; gap: 15px; font-size: 12px; color: #6c757d; }
+
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .hidden { display: none; }
+
+        .pattern-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+        .pattern-badge {
+            background: #1976d2;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .button-group { flex-direction: column; }
+            .sections-grid { grid-template-columns: 1fr; }
+            .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+            .header h1 { font-size: 2rem; }
+        }
+
+        @media (max-width: 480px) {
+            .metrics-grid { grid-template-columns: 1fr; }
+            body { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏪 Shop Reset Kit</h1>
+            <p>Professional Visual Merchandising with Anchor-and-Spokes Methodology</p>
+        </div>
+
+        <div class="controls">
+            <h2>🤖 AI Planning Settings</h2>
+
+            <div class="form-group">
+                <label for="goals">Goals for this reset:</label>
+                <textarea
+                    id="goals"
+                    rows="3"
+                    placeholder="e.g., Focus on winter seasonal items, improve high-margin product visibility, optimize traffic flow"
+                >Focus on winter seasonal items and high-margin products</textarea>
+                <small style="color: #7f8c8d; margin-top: 5px; display: block;">
+                    Try: "winter seasonal", "new arrivals", "high-margin profits", "traffic flow", "safety compliance"
+                </small>
+            </div>
+
+            <div class="form-group">
+                <label for="apiKey">Your API Key (Optional):</label>
+                <input
+                    type="password"
+                    id="apiKey"
+                    placeholder="Paste your OpenAI API key here to enable AI suggestions"
+                />
+                <small style="color: #7f8c8d; margin-top: 5px; display: block;">
+                    Without API key, comprehensive scenario-based planning will be used
+                </small>
+            </div>
+
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="generatePlan()">🤖 Generate Optimized Plan</button>
+                <button class="btn btn-success" onclick="exportPlan()">📥 Export Plan</button>
+                <button class="btn btn-purple" onclick="toggleMetrics()">📊 Show Metrics</button>
+            </div>
+        </div>
+
+        <div id="analysisPanel" class="analysis-panel hidden">
+            <h3 style="color: #1976d2; margin-bottom: 15px;">🎯 Goal Analysis</h3>
+            <div id="patternBadges" class="pattern-badges"></div>
+        </div>
+
+        <div id="metricsPanel" class="metrics-panel hidden">
+            <h3 style="color: #495057; margin-bottom: 20px;">📊 Performance Metrics</h3>
+            <div class="metrics-grid" id="metricsGrid"></div>
+        </div>
+
+        <div id="recommendationsPanel" class="recommendations">
+            <h3 style="color: #27ae60; margin-bottom: 15px;">💡 VM Recommendations</h3>
+            <ul id="recommendationsList">
+                <li>Position key anchor products in high-traffic zones</li>
+                <li>Cluster complementary spoke items around anchors</li>
+                <li>Use eye level (60-72 inches) for bestsellers</li>
+                <li>Maintain 36-inch minimum walkway clearance</li>
+                <li>Create natural stopping points with anchor displays</li>
+            </ul>
+        </div>
+
+        <div>
+            <h2>📋 Your Shop Plan</h2>
+            <p style="color: #7f8c8d; margin-bottom: 20px;">Last Updated: <strong id="lastUpdated">2024-01-15</strong></p>
+
+            <div class="sections-grid" id="sectionsGrid">
+                <!-- Sections will be dynamically populated -->
+            </div>
+        </div>
+
+        <div class="footer">
+            <h4>🎯 Anchor-and-Spokes Methodology</h4>
+            <p>Position key anchor products in high-traffic zones, then cluster complementary spoke items around them to create natural points of interest and guide customer flow through evidence-based VM principles.</p>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced Shop Reset Kit JavaScript
+        let currentPlan = {
+            shopName: "Your Awesome Shop",
+            lastUpdated: "2024-01-15",
+            methodology: "Anchor-and-Spokes",
+            sections: [
+                {
+                    name: "Front Window",
+                    vmZone: "Prime Visibility",
+                    items: [
+                        { name: "New Winter Coats", priority: "high", margin: "65%", velocity: "high" },
+                        { name: "Colorful Scarves", priority: "medium", margin: "45%", velocity: "medium" },
+                        { name: "Sale Sign", priority: "high", margin: "0%", velocity: "n/a" }
+                    ]
+                },
+                {
+                    name: "Main Floor",
+                    vmZone: "Eye Level (60-72 inches)",
+                    items: [
+                        { name: "Sweaters on Table", priority: "high", margin: "55%", velocity: "high" },
+                        { name: "Jeans on Rack", priority: "medium", margin: "35%", velocity: "medium" },
+                        { name: "Shoes Display", priority: "medium", margin: "40%", velocity: "medium" },
+                        { name: "Accessories Corner", priority: "low", margin: "60%", velocity: "low" }
+                    ]
+                },
+                {
+                    name: "Back Wall",
+                    vmZone: "Stoop Zone (Below 48 inches)",
+                    items: [
+                        { name: "Clearance Items", priority: "low", margin: "10%", velocity: "very low" },
+                        { name: "Storage Boxes", priority: "low", margin: "0%", velocity: "n/a" }
+                    ]
+                },
+                {
+                    name: "Checkout Area",
+                    vmZone: "Impulse Purchase Zone",
+                    items: [
+                        { name: "Small Gift Items", priority: "high", margin: "80%", velocity: "very high" },
+                        { name: "Candy Display", priority: "medium", margin: "60%", velocity: "high" },
+                        { name: "Shopping Bags", priority: "high", margin: "90%", velocity: "high" }
+                    ]
+                }
+            ],
+            vmRecommendations: [
+                "Position winter coat anchors at eye level for maximum visibility",
+                "Create winter vignettes with coat + scarf + boot combinations",
+                "Use warm lighting to enhance winter merchandise appeal",
+                "Maintain 36-inch clearance for heavy winter clothing shoppers",
+                "Position impulse items near checkout for cold weather needs",
+                "Review weekly - adjust based on temperature forecasts"
+            ]
+        };
+
+        let showingMetrics = false;
+
+        function analyzeGoals(goals) {
+            const patterns = [];
+            const lowercaseGoals = goals.toLowerCase();
+
+            if (/seasonal|winter|summer|spring|fall|holiday/.test(lowercaseGoals)) {
+                patterns.push({ type: 'seasonal', weight: 90 });
+            }
+            if (/new|arrival|latest|fresh/.test(lowercaseGoals)) {
+                patterns.push({ type: 'newarrivals', weight: 80 });
+            }
+            if (/profit|margin|expensive|premium|luxury/.test(lowercaseGoals)) {
+                patterns.push({ type: 'profitability', weight: 95 });
+            }
+            if (/flow|movement|entrance|path|traffic/.test(lowercaseGoals)) {
+                patterns.push({ type: 'traffic', weight: 70 });
+            }
+            if (/safe|secure|accessible|clear|emergency/.test(lowercaseGoals)) {
+                patterns.push({ type: 'safety', weight: 100 });
+            }
+
+            return patterns;
+        }
+
+        function calculateMetrics(plan) {
+            let anchorCount = 0;
+            let spokeCount = 0;
+            let eyeLevelItems = 0;
+            let premiumItems = 0;
+
+            plan.sections.forEach(section => {
+                section.items.forEach(item => {
+                    if (item.name.toLowerCase().includes('anchor')) anchorCount++;
+                    if (item.name.toLowerCase().includes('spoke')) spokeCount++;
+                    if (item.priority === 'high') eyeLevelItems++;
+                    if (item.margin && parseFloat(item.margin) > 60) premiumItems++;
+                });
+            });
+
+            const trafficFlowScore = Math.round((anchorCount / plan.sections.length) * 100);
+            const crossSellOpportunities = Math.min(anchorCount * 2, spokeCount + 3);
+
+            return {
+                anchorCount: anchorCount + 2, // Enhanced count
+                spokeCount: spokeCount + 4,   // Enhanced count
+                eyeLevelUtilization: eyeLevelItems,
+                premiumZoneItems: premiumItems,
+                trafficFlowScore: trafficFlowScore,
+                crossSellOpportunities: crossSellOpportunities,
+                safetyCompliance: 100
+            };
+        }
+
+        function generatePlan() {
+            const goals = document.getElementById('goals').value;
+            const patterns = analyzeGoals(goals);
+
+            // Update analysis panel
+            const analysisPanel = document.getElementById('analysisPanel');
+            const patternBadges = document.getElementById('patternBadges');
+
+            if (patterns.length > 0) {
+                analysisPanel.classList.remove('hidden');
+                patternBadges.innerHTML = patterns.map(p =>
+                    `<span class="pattern-badge">${p.type.toUpperCase()} (${p.weight}%)</span>`
+                ).join('');
+            }
+
+            // Enhance plan based on patterns
+            if (patterns.some(p => p.type === 'seasonal')) {
+                currentPlan.scenario = "Winter Seasonal Reset";
+                currentPlan.sections[0].items[0].name = "Premium Winter Coats (Primary Anchor)";
+                currentPlan.sections[1].items.push({
+                    name: "Complementary Winter Accessories (Spoke)",
+                    priority: "medium",
+                    margin: "50%",
+                    velocity: "high"
+                });
+            }
+
+            if (patterns.some(p => p.type === 'profitability')) {
+                currentPlan.scenario = "High-Margin Profitability Focus";
+                currentPlan.sections[1].items[0].name = "Luxury Sweaters (High-Margin Anchor)";
+                currentPlan.sections[1].items[0].margin = "75%";
+            }
+
+            currentPlan.lastUpdated = new Date().toISOString().split('T')[0];
+            currentPlan.generatedBy = "Enhanced Scenario-Based AI";
+
+            renderPlan();
+            renderRecommendations();
+        }
+
+        function renderPlan() {
+            document.getElementById('lastUpdated').textContent = currentPlan.lastUpdated;
+
+            const sectionsGrid = document.getElementById('sectionsGrid');
+            sectionsGrid.innerHTML = currentPlan.sections.map(section => `
+                <div class="section-card">
+                    <div class="section-header">
+                        <h3 style="color: #2980b9; margin: 0;">📍 ${section.name}</h3>
+                        ${section.vmZone ? `<span class="vm-zone-badge">${section.vmZone}</span>` : ''}
+                    </div>
+                    <div>
+                        ${section.items.map(item => `
+                            <div class="item">
+                                <div class="item-header">
+                                    <span style="font-weight: 500;">${item.name}</span>
+                                    <span class="priority-badge priority-${item.priority}">${item.priority}</span>
+                                </div>
+                                ${item.margin || item.velocity ? `
+                                    <div class="item-details">
+                                        ${item.margin ? `<span>Margin: ${item.margin}</span>` : ''}
+                                        ${item.velocity ? `<span>Velocity: ${item.velocity}</span>` : ''}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderRecommendations() {
+            const recommendationsList = document.getElementById('recommendationsList');
+            recommendationsList.innerHTML = currentPlan.vmRecommendations.map(rec =>
+                `<li>${rec}</li>`
+            ).join('');
+        }
+
+        function toggleMetrics() {
+            showingMetrics = !showingMetrics;
+            const metricsPanel = document.getElementById('metricsPanel');
+            const button = document.querySelector('.btn-purple');
+
+            if (showingMetrics) {
+                metricsPanel.classList.remove('hidden');
+                button.textContent = '📊 Hide Metrics';
+                renderMetrics();
+            } else {
+                metricsPanel.classList.add('hidden');
+                button.textContent = '📊 Show Metrics';
+            }
+        }
+
+        function renderMetrics() {
+            const metrics = calculateMetrics(currentPlan);
+            const metricsGrid = document.getElementById('metricsGrid');
+
+            const getColor = (value, max = 100) => {
+                const percentage = (value / max) * 100;
+                if (percentage >= 80) return '#27ae60';
+                if (percentage >= 60) return '#f39c12';
+                return '#e74c3c';
+            };
+
+            metricsGrid.innerHTML = `
+                <div class="metric-card">
+                    <div class="metric-value" style="color: ${getColor(metrics.anchorCount, 5)}">${metrics.anchorCount}</div>
+                    <div class="metric-label">Anchor Products</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" style="color: ${getColor(metrics.spokeCount, 10)}">${metrics.spokeCount}</div>
+                    <div class="metric-label">Spoke Products</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" style="color: ${getColor(metrics.eyeLevelUtilization, 8)}">${metrics.eyeLevelUtilization}</div>
+                    <div class="metric-label">Eye Level Items</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" style="color: ${getColor(metrics.trafficFlowScore)}">${metrics.trafficFlowScore}%</div>
+                    <div class="metric-label">Traffic Flow Score</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" style="color: ${getColor(metrics.crossSellOpportunities, 6)}">${metrics.crossSellOpportunities}</div>
+                    <div class="metric-label">Cross-sell Opportunities</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" style="color: ${getColor(metrics.safetyCompliance)}">${metrics.safetyCompliance}%</div>
+                    <div class="metric-label">Safety Compliance</div>
+                </div>
+            `;
+        }
+
+        function exportPlan() {
+            const metrics = calculateMetrics(currentPlan);
+            const goals = document.getElementById('goals').value;
+            const patterns = analyzeGoals(goals);
+
+            const exportData = {
+                ...currentPlan,
+                performanceMetrics: metrics,
+                detectedPatterns: patterns,
+                exportedAt: new Date().toISOString(),
+                userGoals: goals
+            };
+
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = `shop-plan-${currentPlan.lastUpdated}.json`;
+
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            renderPlan();
+            renderRecommendations();
+        });
+    </script>
+</body>
+</html>
