@@ -1,0 +1,14 @@
+{
+  "id": "vm-planogram",
+  "name": "VM Planogram Enhanced",
+  "version": "2.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Professional visual merchandising planogram system with Shop Reset Toolbox integration, precise measurements, compliance validation, and PDF export",
+  "author": "VM System Enhanced",
+  "authorUrl": "",
+  "isDesktopOnly": false,
+  "fundingUrl": "",
+  "keywords": ["visual-merchandising", "planogram", "retail", "shop-reset", "compliance"],
+  "hasSettingTab": true,
+  "requiredApiVersion": "0.15.0"
+}

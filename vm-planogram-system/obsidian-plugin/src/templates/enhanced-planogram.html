@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VM Planogram Canvas - Enhanced v2.0</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 15px;
+            background-color: var(--background-primary);
+            color: var(--text-normal);
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 100%;
+            background: var(--background-primary);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        h1 {
+            color: var(--text-accent);
+            margin: 0 0 15px 0;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .plugin-badge {
+            background: var(--interactive-accent);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .toolbar {
+            margin: 10px 0;
+            padding: 12px;
+            background: var(--background-secondary);
+            border-radius: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+            border: 1px solid var(--background-modifier-border);
+        }
+
+        .toolbar-section {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            padding: 0 8px;
+            border-right: 1px solid var(--background-modifier-border);
+        }
+
+        .toolbar-section:last-child {
+            border-right: none;
+        }
+
+        .toolbar-section label {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-right: 4px;
+        }
+
+        button {
+            background: var(--interactive-accent);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            background: var(--interactive-accent-hover);
+        }
+
+        button:disabled {
+            background: var(--background-modifier-border);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .mode-button.active {
+            background: var(--color-green);
+        }
+
+        .snap-button.active {
+            background: var(--color-red);
+        }
+
+        .warning-button.active {
+            background: var(--color-orange);
+        }
+
+        input[type="range"] {
+            width: 80px;
+            height: 20px;
+        }
+
+        input[type="color"] {
+            width: 32px;
+            height: 24px;
+            border: 1px solid var(--background-modifier-border);
+            border-radius: 4px;
+            cursor: pointer;
+            background: none;
+        }
+
+        select {
+            padding: 4px 8px;
+            border: 1px solid var(--background-modifier-border);
+            border-radius: 4px;
+            font-size: 12px;
+            background: var(--background-primary);
+            color: var(--text-normal);
+        }
+
+        #planogram-canvas {
+            border: 2px solid var(--background-modifier-border);
+            background: var(--background-primary);
+            cursor: crosshair;
+            display: block;
+            margin: 15px 0;
+            box-shadow: var(--shadow);
+            border-radius: 4px;
+        }
+
+        .canvas-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .measurement-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .ruler-h, .ruler-v {
+            position: absolute;
+            background: var(--background-secondary);
+            border: 1px solid var(--background-modifier-border);
+            font-size: 10px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ruler-h {
+            height: 20px;
+            top: -21px;
+            border-bottom: none;
+        }
+
+        .ruler-v {
+            width: 30px;
+            left: -31px;
+            writing-mode: vertical-rl;
+            border-right: none;
+        }
+
+        .canvas-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 12px;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .info-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .compliance-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .compliance-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .compliance-dot.good { background: var(--color-green); }
+        .compliance-dot.warning { background: var(--color-orange); }
+        .compliance-dot.error { background: var(--color-red); }
+
+        .fixture-properties {
+            margin-top: 15px;
+            padding: 12px;
+            background: var(--background-secondary);
+            border-radius: 6px;
+            border: 1px solid var(--background-modifier-border);
+            display: none;
+        }
+
+        .fixture-properties.show {
+            display: block;
+        }
+
+        .fixture-properties h4 {
+            margin: 0 0 10px 0;
+            color: var(--text-accent);
+        }
+
+        .property-group {
+            display: flex;
+            gap: 12px;
+            margin: 8px 0;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .property-group label {
+            display: flex;
+            flex-direction: column;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-normal);
+        }
+
+        .property-group input, .property-group select {
+            margin-top: 4px;
+            padding: 4px 6px;
+            border: 1px solid var(--background-modifier-border);
+            border-radius: 4px;
+            font-size: 12px;
+            background: var(--background-primary);
+            color: var(--text-normal);
+        }
+
+        .vm-zone-legend {
+            margin-top: 15px;
+            padding: 12px;
+            background: var(--background-secondary);
+            border-radius: 6px;
+            border: 1px solid var(--background-modifier-border);
+        }
+
+        .vm-zone-legend h4 {
+            margin: 0 0 10px 0;
+            color: var(--text-accent);
+            font-size: 14px;
+        }
+
+        .zone-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 8px;
+        }
+
+        .zone-item {
+            display: flex;
+            align-items: center;
+            padding: 4px;
+            border-radius: 4px;
+            background: var(--background-primary);
+        }
+
+        .zone-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            margin-right: 8px;
+            border: 1px solid var(--background-modifier-border);
+        }
+
+        .zone-text {
+            font-size: 12px;
+            color: var(--text-normal);
+        }
+
+        .status-bar {
+            margin-top: 15px;
+            padding: 10px;
+            background: var(--background-secondary);
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--text-muted);
+            border: 1px solid var(--background-modifier-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-left, .status-right {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .help-text {
+            margin-top: 12px;
+            padding: 10px;
+            background: var(--background-secondary);
+            border-radius: 4px;
+            font-size: 12px;
+            color: var(--text-muted);
+            border-left: 3px solid var(--interactive-accent);
+        }
+
+        .snap-indicator {
+            position: absolute;
+            pointer-events: none;
+            border: 2px dashed var(--color-red);
+            background: rgba(var(--color-red-rgb), 0.1);
+            display: none;
+            z-index: 5;
+        }
+
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .measurement-guide {
+            position: absolute;
+            background: var(--background-primary);
+            border: 1px solid var(--interactive-accent);
+            color: var(--interactive-accent);
+            font-size: 10px;
+            padding: 2px 4px;
+            border-radius: 2px;
+            pointer-events: none;
+            z-index: 15;
+        }
+
+        .fixture-selected {
+            outline: 2px solid var(--interactive-accent);
+            outline-offset: 1px;
+        }
+
+        .fixture-highlight {
+            box-shadow: 0 0 8px var(--interactive-accent);
+        }
+
+        .compliance-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 8;
+        }
+
+        .compliance-violation {
+            border: 2px solid var(--color-red);
+            background: rgba(var(--color-red-rgb), 0.1);
+        }
+
+        .compliance-warning {
+            border: 2px solid var(--color-orange);
+            background: rgba(var(--color-orange-rgb), 0.1);
+        }
+
+        /* Dark mode compatibility */
+        .theme-dark {
+            --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-light {
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .toolbar-section {
+                border-right: none;
+                border-bottom: 1px solid var(--background-modifier-border);
+                padding: 8px 0;
+                justify-content: center;
+            }
+
+            .toolbar-section:last-child {
+                border-bottom: none;
+            }
+        }
+
+        /* Animation classes */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .pulse {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <span>Enhanced VM Planogram Canvas</span>
+            <span class="plugin-badge">v2.0</span>
+        </h1>
+
+        <div class="toolbar">
+            <div class="toolbar-section">
+                <button id="selectMode" class="mode-button active">Select</button>
+                <button id="addMode" class="mode-button">Add Fixture</button>
+                <button id="measureMode" class="mode-button">Measure</button>
+            </div>
+
+            <div class="toolbar-section">
+                <button id="toggleGrid">Grid</button>
+                <button id="snapToGrid" class="snap-button">Snap</button>
+                <button id="showRulers">Rulers</button>
+                <label>Grid:</label>
+                <input type="range" id="gridSize" min="5" max="50" value="12" title="Grid Size">
+            </div>
+
+            <div class="toolbar-section">
+                <button id="toggleCompliance" class="warning-button">Compliance</button>
+                <button id="validateNow">Validate</button>
+                <button id="exportPDF">Export PDF</button>
+            </div>
+
+            <div class="toolbar-section">
+                <label>Fixture:</label>
+                <select id="fixtureType">
+                    <option value="gondola">Gondola</option>
+                    <option value="endcap">Endcap</option>
+                    <option value="wall">Wall Unit</option>
+                    <option value="table">Table</option>
+                    <option value="rack">Rack</option>
+                    <option value="tower">Tower</option>
+                </select>
+            </div>
+
+            <div class="toolbar-section">
+                <label>Color:</label>
+                <input type="color" id="fixtureColor" value="#3b82f6">
+                <label>Height:</label>
+                <input type="range" id="fixtureHeight" min="12" max="96" value="72" title="Height in inches">
+            </div>
+        </div>
+
+        <div class="canvas-info">
+            <div class="info-group">
+                <span>Store: <span id="storeName">Default Store</span></span>
+                <span>Scale: <span id="scaleDisplay">1:12</span></span>
+                <span>Unit: <span id="unitDisplay">feet</span></span>
+            </div>
+            <div class="info-group">
+                <div class="compliance-indicator">
+                    <div class="compliance-dot good" id="complianceDot"></div>
+                    <span id="complianceText">Compliant</span>
+                </div>
+                <span>Fixtures: <span id="fixtureCount">0</span></span>
+                <span>Selected: <span id="selectedInfo">None</span></span>
+            </div>
+        </div>
+
+        <div class="canvas-container">
+            <canvas id="planogram-canvas" width="800" height="600"></canvas>
+            <div class="grid-overlay" id="gridOverlay"></div>
+            <div class="measurement-overlay" id="measurementOverlay"></div>
+            <div class="compliance-overlay" id="complianceOverlay"></div>
+            <div class="snap-indicator" id="snapIndicator"></div>
+        </div>
+
+        <div class="fixture-properties" id="fixtureProperties">
+            <h4>Fixture Properties</h4>
+            <div class="property-group">
+                <label>
+                    Name:
+                    <input type="text" id="fixtureName" placeholder="Fixture name">
+                </label>
+                <label>
+                    Type:
+                    <select id="selectedFixtureType">
+                        <option value="gondola">Gondola</option>
+                        <option value="endcap">Endcap</option>
+                        <option value="wall">Wall Unit</option>
+                        <option value="table">Table</option>
+                        <option value="rack">Rack</option>
+                        <option value="tower">Tower</option>
+                    </select>
+                </label>
+                <label>
+                    Section:
+                    <select id="fixtureSection">
+                        <option value="entrance">Entrance Zone</option>
+                        <option value="main">Main Floor</option>
+                        <option value="back">Back Wall</option>
+                        <option value="pos">POS Area</option>
+                    </select>
+                </label>
+            </div>
+            <div class="property-group">
+                <label>
+                    Width (ft):
+                    <input type="number" id="fixtureWidth" min="1" max="20" step="0.5" value="4">
+                </label>
+                <label>
+                    Depth (ft):
+                    <input type="number" id="fixtureDepth" min="1" max="10" step="0.5" value="2">
+                </label>
+                <label>
+                    Height (in):
+                    <input type="number" id="selectedFixtureHeight" min="12" max="96" step="6" value="72">
+                </label>
+                <label>
+                    VM Zone:
+                    <select id="vmZone">
+                        <option value="eye">Eye Level (60-72")</option>
+                        <option value="reach">Reach Zone (48-60")</option>
+                        <option value="stretch">Stretch Zone (72"+)</option>
+                        <option value="stoop">Stoop Zone (<48")</option>
+                    </select>
+                </label>
+            </div>
+            <div class="property-group">
+                <button id="applyProperties">Apply Changes</button>
+                <button id="deleteFixture">Delete Fixture</button>
+                <button id="duplicateFixture">Duplicate</button>
+            </div>
+        </div>
+
+        <div class="vm-zone-legend">
+            <h4>VM Zone Legend</h4>
+            <div class="zone-grid">
+                <div class="zone-item">
+                    <div class="zone-color" style="background: #10b981;"></div>
+                    <span class="zone-text">Eye Level (60-72") - Best sellers</span>
+                </div>
+                <div class="zone-item">
+                    <div class="zone-color" style="background: #3b82f6;"></div>
+                    <span class="zone-text">Reach Zone (48-60") - Everyday items</span>
+                </div>
+                <div class="zone-item">
+                    <div class="zone-color" style="background: #f59e0b;"></div>
+                    <span class="zone-text">Stretch Zone (72"+) - Premium items</span>
+                </div>
+                <div class="zone-item">
+                    <div class="zone-color" style="background: #6b7280;"></div>
+                    <span class="zone-text">Stoop Zone (<48") - Bulk/value items</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-left">
+                <span>Mode: <span id="currentMode">Select</span></span>
+                <span>Zoom: <span id="zoomLevel">100%</span></span>
+                <span id="mousePosition">0, 0</span>
+            </div>
+            <div class="status-right">
+                <span>Last saved: <span id="lastSaved">Never</span></span>
+                <span id="performanceInfo">Ready</span>
+            </div>
+        </div>
+
+        <div class="help-text">
+            <strong>Tips:</strong> Click and drag to select fixtures. Hold Shift to select multiple.
+            Use the grid and snap features for precise placement. Export to PDF for printing at scale.
+        </div>
+    </div>
+
+    <script>
+        // Enhanced planogram functionality will be injected here by the plugin
+        console.log('Enhanced VM Planogram Canvas v2.0 loaded');
+
+        // Basic initialization placeholder
+        window.planogramReady = true;
+
+        // Event delegation for better performance
+        document.addEventListener('click', function(event) {
+            const target = event.target;
+
+            // Handle toolbar button clicks
+            if (target.matches('button[id]')) {
+                console.log('Button clicked:', target.id);
+                // Button handling will be implemented by the plugin
+            }
+        });
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            if (event.ctrlKey || event.metaKey) {
+                switch(event.key) {
+                    case 'z':
+                        event.preventDefault();
+                        console.log('Undo triggered');
+                        break;
+                    case 'y':
+                        event.preventDefault();
+                        console.log('Redo triggered');
+                        break;
+                    case 's':
+                        event.preventDefault();
+                        console.log('Save triggered');
+                        break;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

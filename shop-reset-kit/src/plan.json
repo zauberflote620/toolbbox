@@ -1,0 +1,38 @@
+{
+  "shopName": "Your Awesome Shop",
+  "lastUpdated": "2024-01-15",
+  "sections": [
+    {
+      "name": "Front Window",
+      "items": [
+        { "name": "New Winter Coats", "priority": "high" },
+        { "name": "Colorful Scarves", "priority": "medium" },
+        { "name": "Sale Sign", "priority": "high" }
+      ]
+    },
+    {
+      "name": "Main Floor",
+      "items": [
+        { "name": "Sweaters on Table", "priority": "high" },
+        { "name": "Jeans on Rack", "priority": "medium" },
+        { "name": "Shoes Display", "priority": "medium" },
+        { "name": "Accessories Corner", "priority": "low" }
+      ]
+    },
+    {
+      "name": "Back Wall",
+      "items": [
+        { "name": "Clearance Items", "priority": "low" },
+        { "name": "Storage Boxes", "priority": "low" }
+      ]
+    },
+    {
+      "name": "Checkout Area",
+      "items": [
+        { "name": "Small Gift Items", "priority": "high" },
+        { "name": "Candy Display", "priority": "medium" },
+        { "name": "Shopping Bags", "priority": "high" }
+      ]
+    }
+  ]
+}

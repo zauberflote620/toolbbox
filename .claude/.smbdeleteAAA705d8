@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Volumes/pi_ext_drive/obsidian/**)",
+      "Bash(npm install)",
+      "Bash(npm test:*)",
+      "Bash(npm ls:*)",
+      "Bash(npm run test:*)",
+      "Bash(open standalone-secure.html)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
