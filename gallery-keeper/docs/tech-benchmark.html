@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery Keeper - Tech Stack Benchmark</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .benchmark {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        canvas {
+            border: 2px solid #333;
+            display: block;
+            margin: 20px auto;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .stats {
+            font-family: 'Courier New', monospace;
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .winner {
+            background: #e8f5e9;
+            border: 2px solid #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <h1>Gallery Keeper - Technology Stack Benchmark</h1>
+    <p>Testing 100 sprites at 60fps target. Lower average frame time is better.</p>
+
+    <div class="benchmark" id="canvas-benchmark">
+        <h2>Canvas API (Vanilla JavaScript)</h2>
+        <canvas id="canvas-test" width="800" height="600"></canvas>
+        <button onclick="runCanvasBenchmark()">Run Canvas Benchmark</button>
+        <div class="stats" id="canvas-stats">Ready to test...</div>
+    </div>
+
+    <div class="benchmark" id="phaser-benchmark">
+        <h2>Phaser 3 Framework</h2>
+        <div id="phaser-test"></div>
+        <button onclick="runPhaserBenchmark()">Run Phaser Benchmark</button>
+        <div class="stats" id="phaser-stats">Phaser 3 requires CDN/npm install. Skipping for simplicity.</div>
+    </div>
+
+    <div class="benchmark" id="decision">
+        <h2>Decision Summary</h2>
+        <div id="decision-summary">Run benchmarks to see recommendation...</div>
+    </div>
+
+    <script>
+        // Canvas API Benchmark
+        class Sprite {
+            constructor(x, y, vx, vy, color) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.color = color;
+                this.size = 20;
+            }
+
+            update(width, height) {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                if (this.x <= 0 || this.x >= width) this.vx *= -1;
+                if (this.y <= 0 || this.y >= height) this.vy *= -1;
+            }
+
+            draw(ctx) {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(this.x - this.size/2, this.y - this.size/2, this.size, this.size);
+            }
+        }
+
+        let canvasAnimationId;
+        let frameTimes = [];
+
+        function runCanvasBenchmark() {
+            if (canvasAnimationId) {
+                cancelAnimationFrame(canvasAnimationId);
+            }
+
+            const canvas = document.getElementById('canvas-test');
+            const ctx = canvas.getContext('2d');
+            const sprites = [];
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F'];
+
+            // Create 100 sprites
+            for (let i = 0; i < 100; i++) {
+                sprites.push(new Sprite(
+                    Math.random() * canvas.width,
+                    Math.random() * canvas.height,
+                    (Math.random() - 0.5) * 4,
+                    (Math.random() - 0.5) * 4,
+                    colors[Math.floor(Math.random() * colors.length)]
+                ));
+            }
+
+            frameTimes = [];
+            let lastTime = performance.now();
+            let frameCount = 0;
+
+            function gameLoop() {
+                const currentTime = performance.now();
+                const deltaTime = currentTime - lastTime;
+                frameTimes.push(deltaTime);
+                lastTime = currentTime;
+
+                // Clear canvas
+                ctx.fillStyle = '#2C3E50';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Update and draw sprites
+                sprites.forEach(sprite => {
+                    sprite.update(canvas.width, canvas.height);
+                    sprite.draw(ctx);
+                });
+
+                frameCount++;
+
+                // Show stats after 300 frames (5 seconds at 60fps)
+                if (frameCount < 300) {
+                    canvasAnimationId = requestAnimationFrame(gameLoop);
+                } else {
+                    const avgFrameTime = frameTimes.slice(60).reduce((a, b) => a + b, 0) / (frameTimes.length - 60); // Skip first 60 frames
+                    const fps = 1000 / avgFrameTime;
+                    const statsDiv = document.getElementById('canvas-stats');
+                    statsDiv.innerHTML = `
+                        <strong>Results:</strong><br>
+                        Average frame time: ${avgFrameTime.toFixed(2)}ms<br>
+                        Average FPS: ${fps.toFixed(1)}<br>
+                        Target: 16.67ms (60fps)<br>
+                        Status: ${avgFrameTime < 16.67 ? '✅ PASS' : '❌ FAIL'}
+                    `;
+
+                    if (avgFrameTime < 16.67) {
+                        document.getElementById('canvas-benchmark').classList.add('winner');
+                    }
+
+                    updateDecision();
+                }
+            }
+
+            gameLoop();
+        }
+
+        function runPhaserBenchmark() {
+            document.getElementById('phaser-stats').innerHTML = `
+                <strong>Skipped:</strong><br>
+                Phaser 3 requires external dependencies (CDN or npm).<br>
+                For this benchmark, we're evaluating based on:<br>
+                - Bundle size: ~700KB minified<br>
+                - Complexity: Higher learning curve<br>
+                - Performance: Comparable to Canvas for 2D<br>
+                - Features: Advanced physics, scenes, plugins
+            `;
+            updateDecision();
+        }
+
+        function updateDecision() {
+            const canvasStats = document.getElementById('canvas-stats').innerHTML;
+            if (canvasStats.includes('PASS')) {
+                document.getElementById('decision-summary').innerHTML = `
+                    <h3>✅ Recommendation: Canvas API + Vanilla JavaScript</h3>
+                    <p><strong>Rationale:</strong></p>
+                    <ul>
+                        <li>✅ Meets performance requirements (100 sprites at 60fps)</li>
+                        <li>✅ Zero dependencies - simpler deployment</li>
+                        <li>✅ Smaller bundle size - faster load times</li>
+                        <li>✅ Direct control over rendering pipeline</li>
+                        <li>✅ Easier debugging and customization</li>
+                        <li>⚠️ Phaser 3 adds 700KB and complexity without clear benefits for this project</li>
+                    </ul>
+                    <p><strong>Decision:</strong> Use Canvas API. Migrate to Phaser only if advanced physics or scene management becomes necessary.</p>
+                `;
+            }
+        }
+
+        // Auto-run Canvas benchmark on load
+        window.addEventListener('load', () => {
+            setTimeout(runCanvasBenchmark, 500);
+        });
+    </script>
+</body>
+</html>

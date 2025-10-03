@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retail Planning Toolbox - Visual-First Tools & Learning Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .tool-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .tool-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .tool-card h2 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+        }
+
+        .tool-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-complete {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-development {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .tool-description {
+            color: #4a5568;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .tool-features {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .tool-features li {
+            color: #718096;
+            padding: 5px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .tool-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .tool-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            transform: scale(1.02);
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+            flex: 1;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            opacity: 0.8;
+            margin-top: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Retail Planning Toolbox</h1>
+            <p>Visual-first tools and learning games for retail professionals</p>
+        </div>
+
+        <div class="tools-grid">
+            <!-- Shop Reset Kit -->
+            <div class="tool-card">
+                <div class="tool-icon">🛍️</div>
+                <h2>Shop Reset Kit</h2>
+                <span class="tool-status status-complete">Complete</span>
+                <p class="tool-description">
+                    A comprehensive visual toolkit for planning and executing retail shop resets using the
+                    Anchor-and-Spokes methodology. Perfect for optimizing store layouts and improving customer flow.
+                </p>
+                <ul class="tool-features">
+                    <li>Anchor-and-Spokes methodology</li>
+                    <li>AI-powered layout optimization</li>
+                    <li>Visual priority mapping</li>
+                    <li>CSV import/export</li>
+                    <li>Drag-and-drop interface</li>
+                </ul>
+                <div class="tool-actions">
+                    <a href="shop-reset-kit/standalone-secure.html" class="btn btn-primary">Launch Tool</a>
+                    <a href="shop-reset-kit/" class="btn btn-secondary">View Docs</a>
+                </div>
+            </div>
+
+            <!-- Gallery Keeper -->
+            <div class="tool-card">
+                <div class="tool-icon">🎨</div>
+                <h2>Gallery Keeper</h2>
+                <span class="tool-status status-development">In Development</span>
+                <p class="tool-description">
+                    A cozy museum management game that secretly teaches AI interaction concepts through
+                    satisfying drag-and-drop gameplay. Learn prompt engineering, optimization, and validation
+                    by serving virtual visitors.
+                </p>
+                <ul class="tool-features">
+                    <li>4 unique levels with historical mentors</li>
+                    <li>Invisible learning (AI concepts emerge naturally)</li>
+                    <li>Accessible to non-gamers</li>
+                    <li>Cozy, relaxing gameplay</li>
+                    <li>Based on real museum principles</li>
+                </ul>
+                <div class="tool-actions">
+                    <button class="btn btn-primary" disabled>Coming Soon</button>
+                    <a href="_KANBAN_Gallery_Keeper.md" class="btn btn-secondary">View Progress</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Built with care for retail professionals and lifelong learners</p>
+        </div>
+    </div>
+
+    <script>
+        // Add simple analytics (optional)
+        console.log('🎨 Retail Planning Toolbox - Ready');
+
+        // Check if Gallery Keeper is ready
+        fetch('gallery-keeper/index.html')
+            .then(response => {
+                if (response.ok) {
+                    const btn = document.querySelector('.tool-card:last-child .btn-primary');
+                    btn.disabled = false;
+                    btn.textContent = 'Launch Game';
+                    btn.onclick = () => window.location.href = 'gallery-keeper/index.html';
+
+                    const status = document.querySelector('.status-development');
+                    status.textContent = 'Ready to Play';
+                    status.classList.remove('status-development');
+                    status.classList.add('status-complete');
+                }
+            })
+            .catch(() => {
+                // Gallery Keeper not ready yet
+            });
+    </script>
+</body>
+</html>
