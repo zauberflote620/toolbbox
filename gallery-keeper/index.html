@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery Keeper - A Cozy Museum Management Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2C3E50;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7F8C8D;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            border: 3px solid #2C3E50;
+            border-radius: 8px;
+            display: block;
+            cursor: crosshair;
+        }
+
+        .controls {
+            margin-top: 20px;
+            text-align: center;
+            color: #2C3E50;
+        }
+
+        .controls p {
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            background: #ECF0F1;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #4ECDC4;
+            color: white;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin: 2px;
+        }
+
+        .badge.phase-1 { background: #4ECDC4; }
+        .badge.complete { background: #45B7D1; }
+
+        .instructions {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .instructions h2 {
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .instructions ol {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        .instructions strong {
+            color: #FFD700;
+        }
+
+        .tip {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 15px;
+            border-left: 4px solid #FFD700;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎨 Gallery Keeper</h1>
+        <p class="subtitle">Phase 1: Core Engine Demo</p>
+
+        <div class="instructions">
+            <h2>⚠️ This is a Tech Demo (Not the Full Game Yet!)</h2>
+            <p style="margin-bottom: 15px;">
+                This demonstrates the <strong>core engine</strong> only. There's no gameplay goal here - just testing that
+                all 7 systems work together smoothly. The actual <strong>museum management gameplay</strong> comes in Phase 2+.
+            </p>
+
+            <h3 style="font-size: 16px; margin-bottom: 10px;">📖 What You Can Test:</h3>
+            <ol>
+                <li><strong>Click anywhere</strong> on the canvas to spawn museum visitors (sparkle effects!)</li>
+                <li><strong>Drag visitors or artifacts</strong> around - they show hearts and leave particle trails</li>
+                <li><strong>Watch the score</strong> increase (top-left) as you interact</li>
+                <li><strong>Check FPS performance</strong> (top-left) - should stay at 60fps with 100+ sprites</li>
+                <li><strong>Try the controls:</strong>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li><strong>Space or P</strong> = Pause menu</li>
+                        <li><strong>Sound button</strong> (top-right) = Toggle audio</li>
+                        <li><strong>Pause button</strong> (top-right) = Open pause menu</li>
+                    </ul>
+                </li>
+            </ol>
+            <div class="tip">
+                💡 <strong>What's Next:</strong> Phase 2 adds the first real level - Carnegie's Greeting Hall where you route visitors to doors based on their needs (teaches AI prompt classification). The cute sounds and smooth interactions you're seeing will make gameplay super satisfying!
+            </div>
+        </div>
+
+        <canvas id="gameCanvas" width="800" height="600"></canvas>
+
+        <div class="controls">
+            <p><strong>What you're seeing:</strong> 6 visitor types (👨‍🦰👵🧒🧑‍🎨👨‍💼👩‍🦱) • 6 artifact types (🖼️🗿🏺📜🎭⚱️) • Particle effects • Procedural audio</p>
+        </div>
+
+        <div class="status">
+            <span class="badge phase-1">Phase 1 Complete</span>
+            <span class="badge complete">Game Loop ✓</span>
+            <span class="badge complete">Sprites ✓</span>
+            <span class="badge complete">Input ✓</span>
+            <span class="badge complete">Particles ✓</span>
+            <span class="badge complete">Audio ✓</span>
+            <span class="badge complete">UI ✓</span>
+            <span class="badge complete">Save/Load ✓</span>
+        </div>
+    </div>
+
+    <!-- Core Engine Scripts -->
+    <script src="core/engine.js"></script>
+    <script src="core/sprites.js"></script>
+    <script src="core/input.js"></script>
+    <script src="core/particles.js"></script>
+    <script src="core/audio.js"></script>
+    <script src="core/ui.js"></script>
+    <script src="core/storage.js"></script>
+
+    <!-- Main Game Script -->
+    <script>
+        // Initialize systems
+        const engine = new GameEngine('gameCanvas', 800, 600);
+        const audio = new AudioManager();
+        const ui = new UI(engine.canvas, engine, audio);
+        const particles = new ParticleSystem(500);
+        const input = new InputManager(engine.canvas, engine);
+        const storage = new SaveManager('gallery-keeper');
+
+        // Add systems to engine
+        engine.addEntity(particles);
+        engine.addEntity(ui);
+
+        // Setup custom update callback
+        engine.onUpdate((dt) => {
+            ui.update(dt);
+        });
+
+        // Setup custom render callback for particles
+        engine.onRender((ctx) => {
+            // Particles render automatically as they're entities
+        });
+
+        // Handle input
+        input.onClick((x, y) => {
+            // Check UI clicks first
+            if (ui.handleClick(x, y)) {
+                return;
+            }
+
+            // Spawn visitor on canvas click
+            const visitorTypes = ['default', 'elder', 'child', 'artist', 'scholar', 'tourist'];
+            const randomType = visitorTypes[Math.floor(Math.random() * visitorTypes.length)];
+            const visitor = SpriteFactory.createVisitor(x, y, randomType);
+
+            engine.addEntity(visitor);
+            particles.emitSparkles(x, y);
+            audio.playSFX('pickup');
+
+            ui.addScore(10);
+        });
+
+        // Handle drag start
+        input.onDragStart((sprite) => {
+            particles.emitHearts(sprite.x, sprite.y);
+            audio.playSFX('pickup');
+        });
+
+        // Handle drag
+        input.onDrag((sprite, x, y) => {
+            // Optional: emit trail particles
+            if (Math.random() < 0.3) {
+                particles.emitTrail(sprite.x, sprite.y, sprite.color);
+            }
+        });
+
+        // Handle drag end
+        input.onDragEnd((sprite, x, y) => {
+            particles.emitSparkles(sprite.x, sprite.y);
+            audio.playSFX('drop');
+        });
+
+        // Initialize audio on first user interaction
+        engine.canvas.addEventListener('click', () => {
+            if (!audio.initialized) {
+                audio.init();
+                ui.showMessage('🔊 Audio Initialized!', 1.5);
+            }
+        }, { once: true });
+
+        // Create some initial sprites
+        function createInitialSprites() {
+            const types = ['default', 'elder', 'child', 'artist', 'scholar', 'tourist'];
+
+            for (let i = 0; i < 5; i++) {
+                const x = 150 + i * 120;
+                const y = 300;
+                const type = types[i % types.length];
+                const visitor = SpriteFactory.createVisitor(x, y, type);
+                engine.addEntity(visitor);
+            }
+
+            // Add some artifacts
+            const artifacts = ['painting', 'sculpture', 'vase', 'scroll', 'mask', 'urn'];
+            for (let i = 0; i < 3; i++) {
+                const x = 200 + i * 200;
+                const y = 150;
+                const artifact = SpriteFactory.createArtifact(x, y, artifacts[i]);
+                engine.addEntity(artifact);
+            }
+        }
+
+        createInitialSprites();
+
+        // Welcome message
+        ui.showMessage('Welcome to Gallery Keeper! 🎨', 3.0);
+
+        // Load saved settings
+        const settings = storage.loadSettings();
+        audio.setSFXVolume(settings.sfxVolume);
+        audio.setMusicVolume(settings.musicVolume);
+        if (settings.muted) {
+            audio.toggleMute();
+        }
+
+        // Save settings on page unload
+        window.addEventListener('beforeunload', () => {
+            storage.saveSettings({
+                sfxVolume: audio.sfxVolume,
+                musicVolume: audio.musicVolume,
+                muted: audio.muted
+            });
+        });
+
+        // Start the game!
+        engine.start();
+
+        console.log('🎮 Gallery Keeper - Phase 1 Core Engine Demo');
+        console.log('📊 Storage Info:', storage.getStorageInfo());
+        console.log('⚙️ Settings:', settings);
+    </script>
+</body>
+</html>
