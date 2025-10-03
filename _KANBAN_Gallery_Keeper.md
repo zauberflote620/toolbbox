@@ -3,9 +3,10 @@ kanban-plugin: board
 date: 2025-10-03
 last-modified: 2025-10-03
 project: Gallery Keeper
-status: phase-0-complete
+status: phase-1-complete
 estimated-hours: 30
-time-spent: 0.67
+time-spent: 2.5
+time-banked: 6.17
 ---
 
 ## Backlog

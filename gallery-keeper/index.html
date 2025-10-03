@@ -120,12 +120,12 @@
 <body>
     <div class="game-container">
         <h1>🎨 Gallery Keeper</h1>
-        <p class="subtitle">Phase 1: Core Engine Demo</p>
+        <p class="subtitle">Phase 1: Core Engine Demo - Now with Modern Visuals!</p>
 
         <div class="instructions">
             <h2>⚠️ This is a Tech Demo (Not the Full Game Yet!)</h2>
             <p style="margin-bottom: 15px;">
-                This demonstrates the <strong>core engine</strong> only. There's no gameplay goal here - just testing that
+                This demonstrates the <strong>core engine with upgraded visuals</strong>. There's no gameplay goal here - just testing that
                 all 7 systems work together smoothly. The actual <strong>museum management gameplay</strong> comes in Phase 2+.
             </p>
 
@@ -144,20 +144,29 @@
                 </li>
             </ol>
             <div class="tip">
-                💡 <strong>What's Next:</strong> Phase 2 adds the first real level - Carnegie's Greeting Hall where you route visitors to doors based on their needs (teaches AI prompt classification). The cute sounds and smooth interactions you're seeing will make gameplay super satisfying!
+                💡 <strong>Ready to Play?</strong> Level 1 is now available! Try Carnegie's Greeting Hall where you route visitors to doors based on their needs (teaches AI prompt classification).
+            </div>
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="level1.html" style="display: inline-block; background: #FFD700; color: #2C3E50; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: bold; transition: transform 0.2s;">
+                    🏛️ Play Level 1: Greeting Hall
+                </a>
             </div>
         </div>
 
         <canvas id="gameCanvas" width="800" height="600"></canvas>
 
         <div class="controls">
-            <p><strong>What you're seeing:</strong> 6 visitor types (👨‍🦰👵🧒🧑‍🎨👨‍💼👩‍🦱) • 6 artifact types (🖼️🗿🏺📜🎭⚱️) • Particle effects • Procedural audio</p>
+            <p><strong>What you're seeing:</strong> Modern hand-drawn sprites with detailed characters, realistic museum artifacts, shadows, and smooth idle animations • Particle effects • Procedural audio</p>
+            <p style="margin-top: 8px; font-size: 12px; color: #7F8C8D;">
+                <strong>Visual Upgrade:</strong> Custom-drawn visitors (Elder with cane & glasses, Child with backpack, Artist with palette, Scholar with book, Tourist with camera) •
+                Detailed artifacts (Ornate painting frames, Stone sculptures, Ancient vases, Historical scrolls, Ceremonial masks, Classic urns)
+            </p>
         </div>
 
         <div class="status">
             <span class="badge phase-1">Phase 1 Complete</span>
             <span class="badge complete">Game Loop ✓</span>
-            <span class="badge complete">Sprites ✓</span>
+            <span class="badge complete">Modern Sprites ✓</span>
             <span class="badge complete">Input ✓</span>
             <span class="badge complete">Particles ✓</span>
             <span class="badge complete">Audio ✓</span>
@@ -168,7 +177,7 @@
 
     <!-- Core Engine Scripts -->
     <script src="core/engine.js"></script>
-    <script src="core/sprites.js"></script>
+    <script src="core/sprites-modern.js"></script>
     <script src="core/input.js"></script>
     <script src="core/particles.js"></script>
     <script src="core/audio.js"></script>
@@ -177,6 +186,10 @@
 
     <!-- Main Game Script -->
     <script>
+        // Use modern sprite aliases for compatibility
+        const Sprite = ModernSprite;
+        const SpriteFactory = ModernSpriteFactory;
+
         // Initialize systems
         const engine = new GameEngine('gameCanvas', 800, 600);
         const audio = new AudioManager();

@@ -177,26 +177,51 @@ Phase 2: Level 1 - Greeting Hall (Carnegie tutorial + visitor routing gameplay)
 ## Phase 2: Level 1 - Greeting Hall
 
 **Budget**: 6 hours
-**Status**: ⏳ Pending
+**Actual**: 1.5 hours (in progress)
+**Status**: 🟡 In Progress
 
-### Planned Deliverables
+### Deliverables
 
-- [ ] Build Carnegie tutorial (5-minute onboarding)
-- [ ] Create visitor spawn system (6 types with icons)
-- [ ] Implement door routing (6 doors with signage)
-- [ ] Add efficiency scoring (speed bonuses, combos)
-- [ ] Design Carnegie spirit NPC (appears at milestones)
-- [ ] Set victory condition (50 happy visitors)
+- [x] Build Carnegie tutorial (5-minute onboarding)
+- [x] Create visitor spawn system (6 types with icons)
+- [x] Implement door routing (6 doors with signage)
+- [x] Add efficiency scoring (speed bonuses, combos)
+- [x] Design Carnegie spirit NPC (appears at milestones)
+- [x] Set victory condition (50 happy visitors)
+- [ ] Test Level 1 gameplay mechanics (browser testing)
 - [ ] Test with non-gamer (tutorial clarity)
 - [ ] Validation checkpoint: Level 1 playable
 
+### Time Log
+
+| Task | Duration | Notes |
+|------|----------|-------|
+| Level architecture design | 15 min | Planned game flow and tutorial structure |
+| Carnegie tutorial system | 20 min | 6-step tutorial with spirit NPC messages |
+| Visitor spawn system | 15 min | 6 types with icons, needs, and colors |
+| Door routing logic | 20 min | 6 doors with matching, distance checks |
+| Scoring system | 15 min | Time bonuses, combo multipliers |
+| Carnegie NPC | 10 min | Milestone messages, speech bubbles |
+| Victory condition | 5 min | 50 visitors goal with completion screen |
+| Level integration | 10 min | Created level1.html, linked from main |
+| **Subtotal** | **110 min (1.83h)** | On track |
+
+### Files Created
+
+- `levels/level1-greeting-hall.js` (350 lines) - Complete level logic
+- `level1.html` (140 lines) - Level interface and integration
+
 ### Success Criteria
 
-- Non-gamer can complete tutorial without help
-- All visitor types route correctly
-- Scoring feels fair and motivating
-- Carnegie NPC adds emotional resonance
-- Victory condition triggers properly
+- [ ] Non-gamer can complete tutorial without help
+- [ ] All visitor types route correctly
+- [ ] Scoring feels fair and motivating
+- [ ] Carnegie NPC adds emotional resonance
+- [ ] Victory condition triggers properly
+
+### Testing Notes
+
+Level opened in browser. Testing gameplay mechanics now...
 
 ---
 

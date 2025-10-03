@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery Keeper - Level 1: Greeting Hall</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 900px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2C3E50;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7F8C8D;
+            margin-bottom: 20px;
+        }
+
+        canvas {
+            border: 3px solid #2C3E50;
+            border-radius: 8px;
+            display: block;
+            cursor: grab;
+        }
+
+        canvas:active {
+            cursor: grabbing;
+        }
+
+        .level-info {
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .level-info h2 {
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .level-info p {
+            font-size: 14px;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+
+        .objective {
+            background: #ECF0F1;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .objective h3 {
+            color: #2C3E50;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .objective ul {
+            margin-left: 20px;
+            color: #34495e;
+            font-size: 13px;
+        }
+
+        .objective li {
+            margin: 4px 0;
+        }
+
+        .controls-bar {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            font-size: 14px;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #ECF0F1;
+            color: #2C3E50;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🏛️ Gallery Keeper: Greeting Hall</h1>
+        <p class="subtitle">Level 1 - Carnegie's Routing Challenge</p>
+
+        <div class="level-info">
+            <h2>📜 Carnegie's Story</h2>
+            <p>
+                In 1850, young Andrew Carnegie worked as a telegraph messenger boy, learning to route messages
+                quickly and accurately across Pittsburgh. This skill - understanding what people need and directing
+                them to the right place - helped him build 2,509 libraries that served millions.
+            </p>
+            <div class="objective">
+                <h3>🎯 Your Mission:</h3>
+                <ul>
+                    <li>Visitors walk down and spread out - match their icons to doors</li>
+                    <li>Drag them to matching colored circles before hall fills up!</li>
+                    <li>Serve 25 visitors to win (gets faster with each success)</li>
+                    <li>After 3 visitors, wave mode activates (2 at once!)</li>
+                    <li>If 8+ visitors pile up, you lose - route quickly!</li>
+                </ul>
+            </div>
+        </div>
+
+        <canvas id="gameCanvas" width="850" height="600"></canvas>
+
+        <div class="controls-bar">
+            <button id="restartBtn" class="btn btn-primary">🔄 Restart Level</button>
+            <a href="index.html" class="btn btn-secondary">← Back to Gallery</a>
+        </div>
+    </div>
+
+    <!-- Core Engine Scripts -->
+    <script src="core/engine.js"></script>
+    <script src="core/sprites-modern.js"></script>
+    <script src="core/input.js"></script>
+    <script src="core/particles.js"></script>
+    <script src="core/audio.js"></script>
+    <script src="core/ui.js"></script>
+    <script src="core/storage.js"></script>
+
+    <!-- Level Script -->
+    <script src="levels/level1-greeting-hall.js"></script>
+
+    <!-- Main Game Script -->
+    <script>
+        // Use modern sprite aliases
+        const Sprite = ModernSprite;
+        const SpriteFactory = ModernSpriteFactory;
+
+        // Initialize systems
+        const engine = new GameEngine('gameCanvas', 850, 600);
+        const audio = new AudioManager();
+        const ui = new UI(engine.canvas, engine, audio);
+        const particles = new ParticleSystem(500);
+        const input = new InputManager(engine.canvas, engine);
+        const storage = new SaveManager('gallery-keeper');
+
+        // Initialize level
+        const level = new GreetingHall(engine, ui, audio, particles);
+
+        // Add systems to engine
+        engine.addEntity(particles);
+        engine.addEntity(ui);
+
+        // Add level to engine update/render
+        engine.onUpdate((dt) => {
+            ui.update(dt);
+            level.update(dt);
+        });
+
+        engine.onRender((ctx) => {
+            level.render(ctx);
+        });
+
+        // Setup input handlers
+        input.onClick((x, y) => {
+            // Check UI clicks first
+            if (ui.handleClick(x, y)) {
+                return;
+            }
+
+            // Tutorial advancement on click
+            if (level.tutorialActive) {
+                level.showTutorial();
+            }
+        });
+
+        input.onDragStart((sprite) => {
+            if (sprite.isVisitor) {
+                particles.emitHearts(sprite.x, sprite.y);
+                audio.playSFX('pickup');
+            }
+        });
+
+        input.onDrag((sprite, x, y) => {
+            if (sprite.isVisitor && Math.random() < 0.3) {
+                particles.emitTrail(sprite.x, sprite.y, sprite.color);
+            }
+        });
+
+        input.onDragEnd((sprite, x, y) => {
+            if (sprite.isVisitor) {
+                level.onDragEnd(sprite, x, y);
+            }
+        });
+
+        // Initialize audio on first user interaction
+        engine.canvas.addEventListener('click', () => {
+            if (!audio.initialized) {
+                audio.init();
+            }
+        }, { once: true });
+
+        // Load saved settings
+        const settings = storage.loadSettings();
+        audio.setSFXVolume(settings.sfxVolume);
+        audio.setMusicVolume(settings.musicVolume);
+        if (settings.muted) {
+            audio.toggleMute();
+        }
+
+        // Save settings on page unload
+        window.addEventListener('beforeunload', () => {
+            storage.saveSettings({
+                sfxVolume: audio.sfxVolume,
+                musicVolume: audio.musicVolume,
+                muted: audio.muted
+            });
+        });
+
+        // Initialize and start level
+        level.init();
+        engine.start();
+
+        // Restart button handler
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            location.reload();
+        });
+
+        console.log('🏛️ Level 1: Greeting Hall - Carnegie\'s Routing Challenge');
+    </script>
+</body>
+</html>
