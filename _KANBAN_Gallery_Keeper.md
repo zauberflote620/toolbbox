@@ -1,4 +1,5 @@
 ---
+
 kanban-plugin: board
 date: 2025-10-03
 last-modified: 2025-10-03
@@ -7,6 +8,7 @@ status: phase-1-complete
 estimated-hours: 30
 time-spent: 2.5
 time-banked: 6.17
+
 ---
 
 ## Backlog
@@ -20,7 +22,6 @@ time-banked: 6.17
 
 ## Planning (Phase 0 - 3h)
 
-(All Phase 0 tasks moved to Done)
 
 
 ## Core Engine (Phase 1 - 6h)
@@ -37,26 +38,29 @@ time-banked: 6.17
 
 ## Level 1 - Greeting Hall (Phase 2 - 6h)
 
-- [ ] Build Carnegie tutorial (5-minute onboarding)
-- [ ] Create visitor spawn system (6 types with icons)
-- [ ] Implement door routing (6 doors with signage)
-- [ ] Add efficiency scoring (speed bonuses, combos)
-- [ ] Design Carnegie spirit NPC (appears at milestones)
-- [ ] Set victory condition (50 happy visitors)
+- [x] Build Carnegie tutorial (5-minute onboarding)
+- [x] Create visitor spawn system (6 types with icons)
+- [x] Implement door routing (6 doors with signage)
+- [x] Add efficiency scoring (speed bonuses, combos)
+- [x] Design Carnegie spirit NPC (appears at milestones)
+- [x] Set victory condition (25 happy visitors)
+- [x] Add progressive difficulty (speed increases, wave mode)
+- [x] Visual polish (clean door markers, natural movement)
 - [ ] Test with non-gamer (tutorial clarity)
-- [ ] Validation checkpoint: Level 1 playable
+- [x] Validation checkpoint: Level 1 playable
 
 
 ## Level 2 - Arrangement Room (Phase 3 - 6h)
 
-- [ ] Build Bach tutorial (arrangement mechanics)
-- [ ] Create artwork inventory system (20 pieces)
-- [ ] Implement wall grid (snap-to-grid, 6x4)
-- [ ] Add visitor preference system (visual auras)
-- [ ] Build harmony scoring (color/style matching)
-- [ ] Enable rearrangement mechanic (drag to new positions)
-- [ ] Design Bach spirit NPC (musical chimes)
-- [ ] Set victory condition (20 satisfied visitors)
+- [x] Build Bach tutorial (arrangement mechanics)
+- [x] Create artwork inventory system (8 types, progressive 1-4)
+- [x] Implement drag-and-drop artwork placement
+- [x] Add visitor preference system (colored glow reactions)
+- [x] Build harmony scoring (color/style matching)
+- [x] Design Bach spirit NPC (musical chimes)
+- [x] Set victory condition (20 satisfied visitors)
+- [ ] Fix rendering bug (canvas shows but no elements visible)
+- [ ] Test drag-and-drop functionality
 - [ ] Validation checkpoint: Level 2 playable
 
 
@@ -124,10 +128,17 @@ time-banked: 6.17
 - [x] Phase 0: Set up time tracking system (PROGRESS.md)
 - [x] Phase 0: Create PROGRESS.md for phase tracking
 - [x] Phase 0: Validation checkpoint passed (40min / 3h budget)
+- [x] Level 1: Complete implementation (visitor routing, Carnegie NPC, progressive difficulty)
+- [x] Level 1: Victory condition and game over states
+- [x] Level 1: Task handoff document created
+- [x] Level 2: Core implementation (Bach tutorial, artwork system, harmony scoring)
+- [x] Level 2: File structure created (level2.html, level2-arrangement-room.js)
+- [x] Shop-reset-kit documentation cleanup
 
 
 ## Blocked / Issues
 
+- [!] Level 2 rendering bug: Canvas shows but game elements not visible (needs browser console debugging)
 - [ ] Need asset sources finalized (OpenGameArt vs custom)
 - [ ] Playtester recruitment (need 3 non-gamers)
 - [ ] Mobile testing devices (iPhone/Android access)
