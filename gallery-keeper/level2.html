@@ -176,13 +176,25 @@
 
     <script>
         const canvas = document.getElementById('gameCanvas');
+        console.log('Canvas:', canvas);
+
         const engine = new GameEngine(canvas);
+        console.log('Engine created:', engine);
+
         const ui = new UISystem(canvas);
+        console.log('UI created:', ui);
+
         const audio = new AudioSystem();
+        console.log('Audio created:', audio);
+
         const particles = new ParticleSystem();
+        console.log('Particles created:', particles);
 
         // Initialize Level 2
         const level = new ArrangementRoom(engine, ui, audio, particles);
+        console.log('Level created:', level);
+        console.log('Bach visible:', level.bach.visible);
+        console.log('Bach message:', level.bach.message);
 
         // Drag and drop state
         let draggedArtwork = null;

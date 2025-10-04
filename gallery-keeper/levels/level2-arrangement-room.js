@@ -339,6 +339,14 @@ class ArrangementRoom {
         ctx.fillStyle = '#F5E6D3'; // Warm gallery beige
         ctx.fillRect(0, 0, this.engine.canvas.width, this.engine.canvas.height);
 
+        // DEBUG: Test rendering
+        ctx.fillStyle = '#FF0000';
+        ctx.fillRect(100, 100, 100, 100);
+        ctx.fillStyle = '#000';
+        ctx.font = '20px Arial';
+        ctx.fillText('DEBUG: Render working', 250, 150);
+        console.log('Rendering... walls:', this.walls.length, 'current artworks:', this.currentArtworks.length);
+
         // Render walls
         this.walls.forEach(wall => {
             ctx.fillStyle = '#D2B48C'; // Tan wall
