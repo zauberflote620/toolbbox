@@ -88,6 +88,11 @@ class ArrangementRoom {
             this.bach.messageTimer = 5000;
             this.ui.showMessage(message, 5.0);
             this.tutorialStep++;
+
+            // Auto-advance to next tutorial message after delay
+            setTimeout(() => {
+                this.showTutorial();
+            }, 5000);
         } else if (this.tutorialStep === this.tutorialMessages.length) {
             // Tutorial complete, start first round
             this.tutorialStep++;
