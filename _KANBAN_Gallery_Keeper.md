@@ -18,7 +18,52 @@ time-banked: 6.17
 - [ ] Post-30h: Feature additions (speedrun mode, leaderboards)
 - [ ] Post-30h: Mobile optimization (touch controls, responsive)
 - [ ] Post-30h: Educational extensions (teacher mode, quiz system)
+- [ ] 
 
+## Bugs / todo
+- [ ] lvl 1 rm circles around "doors"
+- [ ] Additional planning tools (TBD)
+- [ ] refactor long files (levels)
+
+## Level 2 UI/UX Improvements (Oct 4) - IN PROGRESS
+
+### Asset Integration (Code Complete)
+- [x] Add shadow to Bach character
+- [x] Remove PNG frames - reverted to clean look (user preferred)
+- [x] Rotate visitor characters each round (14 characters: robots + stick figures)
+- [x] Use bubble-thinking-duo.png for visitor thought bubbles
+- [x] Use banner-red.png for Bach speech with text overlay
+- [x] Add 5 new stick figure characters to visitor pool
+- [x] Organize assets into directories (shapes/, nature/, objects/, symbols/, frames/)
+- [x] Move Bach speech bubble down to avoid overlap with character
+
+### Visual Polish (Code Complete)
+- [x] Add gradient backgrounds (body, canvas, buttons)
+- [x] Add glassmorphism effect to HUD
+- [x] Remove yellow circle outline (replaced with animated sparkle effect)
+- [x] Improve text contrast in thought bubbles (dark red/blue on cream background)
+- [x] Add shadows to all major elements
+
+### Critical Bugs to Debug
+- [ ] Figure out PNG transparency issue (white boxes around icons in paintings)
+  - Code changed to skip colored background when PNG present
+  - Need to test if icons (branches, clouds, toolbox, people) now show transparently
+  - If still broken, may need to check PNG files themselves
+- [ ] Verify all images loading correctly (check browser console for errors)
+- [ ] Verify PNG paths correct for organized directories
+
+### Testing & Validation Needed
+- [ ] Test drag-and-drop with new layout and spacing
+- [ ] Verify all animations working (sparkles, glow, floating, bobbing)
+- [ ] Test visitor character rotation (should change each round)
+- [ ] Verify speech bubbles display text correctly
+- [ ] Verify 3 paintings show correctly (not just 1)
+
+### Additional Polish (Not Started)
+- [ ] Overall layout and spacing refinement
+- [ ] Color scheme review and adjustments
+- [ ] Additional shadows and depth where needed
+- [ ] Performance optimization if needed
 
 ## Planning (Phase 0 - 3h)
 
@@ -59,8 +104,12 @@ time-banked: 6.17
 - [x] Build harmony scoring (color/style matching)
 - [x] Design Bach spirit NPC (musical chimes)
 - [x] Set victory condition (20 satisfied visitors)
-- [ ] Fix rendering bug (canvas shows but no elements visible)
-- [ ] Test drag-and-drop functionality
+- [ ] Fix rendering bugs in level2-new.html (only 1 painting shows, robots not visible)
+- [ ] Debug image loading (PNG paths, console errors)
+- [ ] Modernize UI/UX (see "Level 2 UI/UX Improvements" section - IN PROGRESS)
+- [ ] Test drag-and-drop functionality with new PNG assets
+- [ ] Verify all images loading correctly
+- [ ] Replace old level2.html with level2-new.html when bugs fixed
 - [ ] Validation checkpoint: Level 2 playable
 
 
@@ -133,12 +182,17 @@ time-banked: 6.17
 - [x] Level 1: Task handoff document created
 - [x] Level 2: Core implementation (Bach tutorial, artwork system, harmony scoring)
 - [x] Level 2: File structure created (level2.html, level2-arrangement-room.js)
+- [x] Level 2: UI/UX modernization STARTED (Oct 4) - level2-new.html created but has critical bugs
+- [x] Assets: Organized into thematic directories (shapes/, nature/, objects/, symbols/, frames/, robots/)
 - [x] Shop-reset-kit documentation cleanup
 
 
 ## Blocked / Issues
 
-- [!] Level 2 rendering bug: Canvas shows but game elements not visible (needs browser console debugging)
+- [x] Level 2 rendering bug: RESOLVED - rebuilt as level2-new.html with modern architecture
+- [ ] Level 2: Waiting for conversation bubble assets for speech
+- [ ] Level 2: Need to verify PNG transparency (branches, clouds, toolbox, people)
+- [ ] Level 2: Test robots showing up correctly (check browser console logs)
 - [ ] Need asset sources finalized (OpenGameArt vs custom)
 - [ ] Playtester recruitment (need 3 non-gamers)
 - [ ] Mobile testing devices (iPhone/Android access)
