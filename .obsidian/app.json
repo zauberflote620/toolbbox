@@ -3,9 +3,10 @@
   "showFrontmatter": true,
   "foldHeading": true,
   "foldIndent": true,
-  "showLineNumber": false,
+  "showLineNumber": true,
   "readableLineLength": true,
   "strictLineBreaks": false,
   "spellcheck": false,
-  "showUnsupportedFiles": false
+  "showUnsupportedFiles": true,
+  "alwaysUpdateLinks": true
 }

@@ -5,9 +5,10 @@ kanban-plugin: board
 ---
 
 ## Backlog
-
+- [ ] rm circles around "doors"
 - [ ] Additional planning tools (TBD)
-
+- [ ] replace componenets with compoenents in excalidraw library
+- 
 
 ## In Progress
 
