@@ -108,21 +108,25 @@ time-banked: 6.17
 - [x] Validation checkpoint: Level 1 playable
 
 
-## Level 2 - Arrangement Room (Phase 3 - 6h)
+## Level 2 - Arrangement Room (Phase 3 - 6h) - ✅ COMPLETE (Oct 4, 2025)
 
 - [x] Build Bach tutorial (arrangement mechanics)
-- [x] Create artwork inventory system (8 types, progressive 1-4)
+- [x] Create artwork inventory system (12 types - 4 themes × 3 styles including jazz)
 - [x] Implement drag-and-drop artwork placement
-- [x] Add visitor preference system (colored glow reactions)
-- [x] Build harmony scoring (color/style matching)
+- [x] Add visitor preference system with weighted matching (25% perfect, 75% partial)
+- [x] Build weighted scoring system (Style 60pts > Theme 40pts)
 - [x] Design Bach spirit NPC (musical chimes)
 - [x] Set victory condition (20 satisfied visitors)
-- [x] Fix rendering bugs in level2.html (fixed duplicate pause button)
-- [ ] Debug image loading (PNG paths, console errors)
-- [ ] Modernize UI/UX (see "Level 2 UI/UX Improvements" section - IN PROGRESS)
-- [ ] Test drag-and-drop functionality with new PNG assets
-- [ ] Verify all images loading correctly
-- [ ] Validation checkpoint: Level 2 playable
+- [x] Fix rendering bugs (duplicate pause button, image paths, CSS background)
+- [x] Debug image loading (fixed brain.png, music_notes.png paths to subdirectories)
+- [x] Modernize UI/UX (start screen, canvas buttons, hover effects, victory screen)
+- [x] Test drag-and-drop functionality with PNG assets
+- [x] Verify all images loading correctly
+- [x] Add time-based scoring (patience bonus up to +50 points)
+- [x] Add jazz as rare 3rd style (10% chance)
+- [x] Create start screen with user-initiated gameplay
+- [x] Implement canvas-based UI controls (restart upper left, pause upper right)
+- [x] Validation checkpoint: Level 2 MVP COMPLETE AND PLAYABLE
 
 
 ## Level 3 - Living Gallery (Phase 4 - 5h)
