@@ -170,6 +170,8 @@
             feynmanMessage: '',
             messageTimer: 0,
             tutorialComplete: false,
+            tutorialTimeout: null,
+            tutorialMessageBounds: null,
 
             // Plant system (6 plant zones around the central branch)
             plants: [],
@@ -203,7 +205,7 @@
             // Cleanliness system
             dirtSpots: [],
             dirtSpawnTimer: 0,
-            dirtSpawnInterval: 20, // Spawn dirt every 20 seconds (more forgiving)
+            dirtSpawnInterval: 30, // Spawn dirt every 30 seconds (more forgiving)
 
             // Visitor AI
             visitors: [],
@@ -273,7 +275,7 @@
             chickenSpawned: false,
             thunderCloud: null,
             cloudTimer: 0,
-            cloudSpawnInterval: 45, // Cloud appears every ~45 seconds
+            cloudSpawnInterval: 90, // Cloud appears every ~90 seconds (less frequent)
 
             // Helper character (stick_hands_hip)
             helper: {
@@ -379,6 +381,12 @@
         function showTutorial() {
             game.tutorialStarted = true; // Mark tutorial as started
 
+            // Clear any existing timeout
+            if (game.tutorialTimeout) {
+                clearTimeout(game.tutorialTimeout);
+                game.tutorialTimeout = null;
+            }
+
             const messages = [
                 "Welcome to the Living Gallery! I'm Richard Feynman.",
                 "Your goal: create an environment where visitors feel happy.",
@@ -395,15 +403,18 @@
 
                 if (game.tutorialStep >= messages.length) {
                     game.tutorialComplete = true;
-                    setTimeout(() => {
+                    game.tutorialTimeout = setTimeout(() => {
                         game.gameStarted = true;
+                        // Clear tutorial message when game starts
+                        game.feynmanMessage = '';
+                        game.messageTimer = 0;
                         // Move helper to Feynman position
                         game.helper.targetX = game.feynmanX;
                         game.helper.targetY = game.feynmanY;
                         game.helper.moving = true;
                     }, 3000);
                 } else {
-                    setTimeout(() => showTutorial(), 3000);
+                    game.tutorialTimeout = setTimeout(() => showTutorial(), 3000);
                 }
             }
         }
@@ -460,7 +471,7 @@
         function updatePlants(dt) {
             game.plants.forEach(plant => {
                 // Water evaporates over time (much slower, very forgiving)
-                let decayRate = 0.35; // Base decay (plants last ~4.7 minutes)
+                let decayRate = 0.25; // Base decay (plants last ~6.7 minutes)
 
                 // Groot bonus: decay even slower when Groot is active
                 if (game.grootPopup && game.grootPopupTimer < 2.5) {
@@ -523,7 +534,7 @@
 
         function updateBranchAura(dt) {
             // Branch itself needs watering
-            let branchDecayRate = 0.45; // Base decay (slower than before)
+            let branchDecayRate = 0.30; // Base decay (lasts ~5.5 minutes)
 
             // Groot bonus: branch decay slower too
             if (game.grootPopup && game.grootPopupTimer < 2.5) {
@@ -651,7 +662,8 @@
 
                     // Water plant when cloud is directly over it (within 60px)
                     if (distFromPlant < 60 && !game.thunderCloud.wateredPlants.includes(index)) {
-                        plant.waterLevel = 100; // Fill up completely
+                        plant.waterLevel += 40; // Add water, don't fill completely
+                        if (plant.waterLevel > 100) plant.waterLevel = 100;
                         game.thunderCloud.wateredPlants.push(index);
 
                         // Rain particles on plant
@@ -671,7 +683,8 @@
                 // Water branch when cloud passes over it
                 const distFromBranch = Math.abs(game.thunderCloud.x - game.branchX);
                 if (distFromBranch < 60 && !game.thunderCloud.wateredBranch) {
-                    game.branchWaterLevel = 100; // Fill up completely
+                    game.branchWaterLevel += 40; // Add water, don't fill completely
+                    if (game.branchWaterLevel > 100) game.branchWaterLevel = 100;
                     game.thunderCloud.wateredBranch = true;
 
                     // Rain particles on branch
@@ -2119,7 +2132,7 @@
         }
 
         function drawGrootPopup() {
-            const centerX = canvas.width / 2;
+            const centerX = canvas.width / 2 + 67; // Move right by 1/3 of Groot width (200/3 ≈ 67)
             const centerY = canvas.height / 2;
 
             if (game.imagesLoaded && game.images.groot && game.images.groot.complete) {
@@ -2214,9 +2227,12 @@
                 const helperWidth = 63;  // 1.25x larger than 50
                 const helperHeight = 75; // 1.25x larger than 60
 
+                // Move figure to the right by its own width during tutorial
+                const tutorialOffset = !game.tutorialComplete ? 63 : 0;
+
                 ctx.drawImage(
                     game.images.stick_hands_hip,
-                    game.helper.x - helperWidth / 2,
+                    game.helper.x - helperWidth / 2 + tutorialOffset,
                     game.helper.y - helperHeight / 2 + helperBob,
                     helperWidth,
                     helperHeight
@@ -2230,19 +2246,27 @@
             const msgW = 400;
             const msgH = 80;
 
-            // Message box
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
-            ctx.strokeStyle = '#2E7D32';
-            ctx.lineWidth = 3;
-            roundRect(ctx, msgX, msgY, msgW, msgH, 12);
-            ctx.fill();
-            ctx.stroke();
+            // Store bounds for click detection
+            game.tutorialMessageBounds = { x: msgX, y: msgY, w: msgW, h: msgH };
 
-            // Text
+            // Text with shadow (no box)
             ctx.font = 'bold 16px Kalam, cursive';
             ctx.textAlign = 'center';
+
+            // Shadow
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+            ctx.shadowBlur = 4;
+            ctx.shadowOffsetX = 2;
+            ctx.shadowOffsetY = 2;
+
             ctx.fillStyle = '#333';
             wrapText(ctx, game.feynmanMessage, msgX + msgW / 2, msgY + 25, msgW - 20, 20);
+
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
         }
 
         function drawVictoryScreen() {
@@ -2438,7 +2462,7 @@
             const y = e.clientY - rect.top;
 
             // Start screen button
-            if (!game.gameStarted && !game.tutorialComplete) {
+            if (!game.gameStarted && !game.tutorialComplete && !game.tutorialStarted) {
                 const btnX = canvas.width / 2 - 100;
                 const btnY = canvas.height / 2;
                 const btnW = 200;
@@ -2448,6 +2472,12 @@
                     // Start tutorial when button clicked
                     showTutorial();
                 }
+                return;
+            }
+
+            // Tutorial advancement - click anywhere to advance
+            if (game.tutorialStarted && !game.tutorialComplete && !game.gameStarted) {
+                showTutorial();
                 return;
             }
 
