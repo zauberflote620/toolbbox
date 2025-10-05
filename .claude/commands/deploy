@@ -1,0 +1,34 @@
+---
+description: Deploy application with safety checks
+arguments: [environment] [--auto|--ask]
+---
+
+# Deploy Application
+
+**Output Format: Inline MD text only. NEVER create MD files.**
+
+**Default**: `/deploy [env]` = Deploy with confirmation prompts
+- `/deploy --auto` = No prompts, full automation
+- `/deploy [env] --ask` = Confirm each deployment step
+
+## Pre-deployment Checks ✅
+- [ ] All tests passing
+- [ ] Quality pipeline complete
+- [ ] Security scan passed
+- [ ] Database migrations ready
+- [ ] Environment variables set
+
+## Deployment Status 🚀
+**Environment**: [staging/production]
+**Version**: [git hash/tag]
+**Health**: [HEALTHY/DEGRADED/DOWN]
+
+## Critical Issues 🔴
+- [Deployment blockers]
+
+## Next Commands (Confidence: High/Medium/Low)
+**If HEALTHY**: `/monitor` → `/task-handoff`
+**If ISSUES**: `/debug` → `/health` → `/deploy --ask`
+
+**Recommended Next**: `/[specific-command]` (Confidence: [High/Medium/Low])
+**Run next command automatically?** [Y/n]

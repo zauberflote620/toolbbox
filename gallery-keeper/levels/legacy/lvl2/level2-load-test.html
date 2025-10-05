@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Level 2 Load Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #2C3E50;
+            color: white;
+            padding: 20px;
+        }
+        canvas {
+            display: block;
+            background: #F5E6D3;
+            margin: 20px auto;
+            border: 2px solid red;
+        }
+        #debug {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            font-family: monospace;
+            margin: 20px auto;
+            max-width: 900px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error { color: #f00; }
+        .success { color: #0f0; }
+    </style>
+</head>
+<body>
+    <h1>Level 2 Load Test</h1>
+    <canvas id="gameCanvas" width="900" height="650"></canvas>
+    <div id="debug">Loading scripts...\n</div>
+
+    <script>
+        const debugDiv = document.getElementById('debug');
+        function log(msg, isError = false) {
+            const span = document.createElement('span');
+            span.className = isError ? 'error' : 'success';
+            span.textContent = msg + '\n';
+            debugDiv.appendChild(span);
+            console.log(msg);
+        }
+
+        window.onerror = function(msg, url, line, col, error) {
+            log('JAVASCRIPT ERROR: ' + msg + ' at line ' + line, true);
+            return false;
+        };
+
+        log('Starting load test...');
+    </script>
+
+    <!-- Load core game engine -->
+    <script src="core/engine.js" onerror="log('FAILED to load engine.js', true)" onload="log('✓ engine.js loaded')"></script>
+    <script src="core/sprites.js" onerror="log('FAILED to load sprites.js', true)" onload="log('✓ sprites.js loaded')"></script>
+    <script src="core/input.js" onerror="log('FAILED to load input.js', true)" onload="log('✓ input.js loaded')"></script>
+    <script src="core/particles.js" onerror="log('FAILED to load particles.js', true)" onload="log('✓ particles.js loaded')"></script>
+    <script src="core/audio.js" onerror="log('FAILED to load audio.js', true)" onload="log('✓ audio.js loaded')"></script>
+    <script src="core/ui.js" onerror="log('FAILED to load ui.js', true)" onload="log('✓ ui.js loaded')"></script>
+
+    <!-- Load Level 2 -->
+    <script src="levels/level2-arrangement-room.js" onerror="log('FAILED to load level2-arrangement-room.js', true)" onload="log('✓ level2-arrangement-room.js loaded')"></script>
+
+    <script>
+        log('\n--- Testing Class Definitions ---');
+        log('GameEngine: ' + (typeof GameEngine !== 'undefined' ? 'DEFINED' : 'UNDEFINED'));
+        log('UISystem: ' + (typeof UISystem !== 'undefined' ? 'DEFINED' : 'UNDEFINED'));
+        log('AudioSystem: ' + (typeof AudioSystem !== 'undefined' ? 'DEFINED' : 'UNDEFINED'));
+        log('ParticleSystem: ' + (typeof ParticleSystem !== 'undefined' ? 'DEFINED' : 'UNDEFINED'));
+        log('ArrangementRoom: ' + (typeof ArrangementRoom !== 'undefined' ? 'DEFINED' : 'UNDEFINED'));
+
+        log('\n--- Attempting Initialization ---');
+        try {
+            log('Creating GameEngine...');
+            const engine = new GameEngine('gameCanvas', 900, 650);
+            log('✓ GameEngine created, canvas: ' + (engine.canvas ? 'OK' : 'NULL'));
+
+            log('Creating UISystem...');
+            const ui = new UISystem(engine.canvas);
+            log('✓ UISystem created');
+
+            log('Creating AudioSystem...');
+            const audio = new AudioSystem();
+            log('✓ AudioSystem created');
+
+            log('Creating ParticleSystem...');
+            const particles = new ParticleSystem();
+            log('✓ ParticleSystem created');
+
+            log('Creating ArrangementRoom...');
+            const level = new ArrangementRoom(engine, ui, audio, particles);
+            log('✓ ArrangementRoom created');
+            log('Bach visible: ' + level.bach.visible);
+            log('Bach message: ' + level.bach.message);
+            log('Tutorial step: ' + level.tutorialStep);
+            log('Walls count: ' + level.walls.length);
+
+            log('\n--- Testing Render ---');
+            const ctx = engine.canvas.getContext('2d');
+            level.render(ctx);
+            log('✓ Render called - check canvas above!');
+
+        } catch (error) {
+            log('ERROR: ' + error.message, true);
+            log('Stack: ' + error.stack, true);
+        }
+    </script>
+</body>
+</html>

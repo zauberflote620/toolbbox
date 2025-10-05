@@ -5,7 +5,92 @@ All notable changes to the Gallery Keeper project will be documented in this fil
 ## [Unreleased]
 
 ### Known Issues
-- Level 2: Rendering bug - canvas shows but game elements not visible (debugging in progress)
+- None - Level 2 MVP complete and playable
+
+## [2025-10-04] - Level 2 Complete MVP + Major Game Mechanics Overhaul
+
+### Added
+- **Start Screen with User-Initiated Gameplay**
+  - Large title screen with "Arrangement Room" and "Bach's Harmony Challenge"
+  - Animated "Start Game" button with hover effects (scale, glow, color change)
+  - Preview instructions on start screen
+  - Images load only after user clicks start (better UX)
+
+- **On-Screen UI Controls**
+  - Restart button (upper left corner) - circular arrow icon, always visible
+  - Pause button (upper right corner) - play/pause icons with state changes
+  - Both buttons have rounded corners, gold borders, hover effects
+  - Removed HTML buttons in favor of canvas-based UI
+
+- **Jazz Style as Rare 3rd Aesthetic** (10% chance)
+  - Added "jazz" style alongside classical and modern
+  - Weighted appearance: 45% classical, 45% modern, 10% jazz
+  - 12 total artwork types (4 themes × 3 styles)
+  - Special message when matching jazz preferences
+
+- **Victory Screen Improvements**
+  - Clickable restart button on victory screen
+  - Letter grades (S/A/B/C) based on performance
+  - Stats display with stars, satisfaction percentage, final score
+  - Confetti and fireworks celebration effects
+
+### Changed
+- **Game Mechanics Redesign - Style > Theme Philosophy**
+  - **Flipped scoring weights**: Style match (60pts) > Theme match (40pts)
+  - Rationale: Style preference is deeper knowledge (like knowing someone's music taste)
+  - Theme = surface observation (easy to see), Style = aesthetic understanding (valuable)
+  - Teaches AI concept: deeper pattern recognition yields better recommendations
+
+- **Weighted Matching System** (25% perfect / 75% partial)
+  - Only 25% of rounds include perfect match artwork
+  - 75% of rounds have partial matches only (theme OR style, not both)
+  - Creates meaningful challenge and decision-making
+  - Previous system: 100% perfect matches always available
+
+- **Time-Based Scoring** (Patience Factor)
+  - Bonus points for faster matches: up to +50 based on remaining patience
+  - Formula: patienceBonus = Math.floor(patience * 0.5)
+  - Rewards confident, quick decisions
+  - Teaches speed/accuracy balance
+
+- **Improved Scoring Breakdown**
+  - Perfect match (theme + style): 100 base + patience bonus + combo bonus
+  - Style match only: 60 base + patience bonus
+  - Theme match only: 40 base + patience bonus
+  - No match: 10 base + patience bonus
+
+### Fixed
+- **Critical Rendering Bugs**
+  - Fixed duplicate pause button issue (removed HTML button, kept canvas button)
+  - Fixed broken image paths (brain.png, music_notes.png moved to subdirectories)
+  - Fixed CSS background from neon purple/pink to soft pastels
+  - Fixed `const` reassignment error in visitor artwork selection
+  - Fixed broken restartBtn event listener causing game crash on load
+
+- **Canvas Background**
+  - Changed from bright neon gradient to soft pastels (matching in-game background)
+  - Fallback CSS now matches JavaScript-rendered background
+
+### Technical
+- Renamed level2-new.html → level2.html (consolidated files)
+  - Moved old level2.html to levels/legacy/
+  - Updated all references and imports
+  - Cleaned up kanban board references
+
+- Added safety checks for missing artwork combinations
+- Improved hover detection for all canvas buttons
+- Refactored artwork selection logic with weighted probability
+
+### Documentation
+- Updated kanban with completed tasks and refactor notes
+- Added suggestions for component library system (.excalidrawlib files)
+- Created Gallery_Keeper_Overview.excalidraw visual documentation
+
+### Performance
+- Game loads instantly but waits for user interaction
+- 18 image assets load on demand (after start button click)
+- 60fps maintained throughout gameplay
+- No memory leaks detected
 
 ## [2025-10-03] - Level 2 Initial Implementation
 

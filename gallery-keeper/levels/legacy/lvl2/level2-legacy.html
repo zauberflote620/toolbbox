@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 2: Arrangement Room - Gallery Keeper</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #2C3E50;
+            color: #ECF0F1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #FFD700;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #BDC3C7;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .game-container {
+            background: #34495E;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 940px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .level-info {
+            background: #2C3E50;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .level-info h2 {
+            color: #FFD700;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        canvas {
+            display: block;
+            background: #F5E6D3;
+            border-radius: 8px;
+            margin: 0 auto 20px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        .controls-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: #3498DB;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980B9;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #95A5A6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7F8C8D;
+            transform: translateY(-2px);
+        }
+
+        .instructions {
+            background: #1A252F;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .instructions h3 {
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Gallery Keeper: Arrangement Room</h1>
+        <p class="subtitle">Level 2 - Bach's Harmony Challenge</p>
+
+        <div class="level-info">
+            <h2>Bach's Story</h2>
+            <p>
+                Johann Sebastian Bach (1685-1750) was a music director who organized performances
+                for audiences with varied tastes. From royalty to commoners, each listener had
+                different preferences. Bach's genius was creating harmony - where many different
+                voices came together, each beautiful on its own but even better as a whole.
+            </p>
+        </div>
+
+        <canvas id="gameCanvas" width="900" height="650"></canvas>
+
+        <div class="controls-bar">
+            <button id="restartBtn" class="btn btn-primary">Restart Level</button>
+            <a href="index.html" class="btn btn-secondary">Back to Gallery</a>
+        </div>
+
+        <div class="instructions">
+            <h3>How to Play</h3>
+            <ul>
+                <li>Drag artworks from the left side to the gallery walls</li>
+                <li>Watch the visitor's reaction (colored glow: green = happy, yellow = neutral, red = unhappy)</li>
+                <li>Try to make visitors happy by finding good arrangements</li>
+                <li>Grouping similar artworks together often helps</li>
+                <li>Click "Confirm" when you're satisfied with your arrangement</li>
+                <li>Earn stars for happy visitors - 20 stars to complete the level</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Load core game engine -->
+    <script src="core/engine.js"></script>
+    <script src="core/sprites.js"></script>
+    <script src="core/input.js"></script>
+    <script src="core/particles.js"></script>
+    <script src="core/audio.js"></script>
+    <script src="core/ui.js"></script>
+
+    <!-- Load Level 2 -->
+    <script src="levels/level2-arrangement-room.js"></script>
+
+    <script>
+        const engine = new GameEngine('gameCanvas', 900, 650);
+        const canvas = engine.canvas;
+        const ui = new UI(canvas, engine, null);
+        const audio = new AudioManager();
+        const particles = new ParticleSystem();
+
+        // Initialize Level 2 - pass audio to UI after creation
+        ui.audio = audio;
+        const level = new ArrangementRoom(engine, ui, audio, particles);
+
+        // Disable UI system's rendering completely for Level 2 (we have Bach's messages)
+        ui.render = function(ctx) {
+            // Don't render anything - Level 2 has its own UI via Bach
+        };
+
+        // Drag and drop state
+        let draggedArtwork = null;
+        let dragOffsetX = 0;
+        let dragOffsetY = 0;
+
+        // Mouse/touch event handlers
+        canvas.addEventListener('mousedown', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Check if clicking on unplaced artwork
+            const unplacedArtworks = level.currentArtworks.filter(
+                art => !level.placedArtworks.find(p => p.id === art.id)
+            );
+
+            unplacedArtworks.forEach((artwork, index) => {
+                const artX = 50;
+                const artY = 150 + (index * 140);
+
+                if (x >= artX && x <= artX + 80 && y >= artY && y <= artY + 120) {
+                    draggedArtwork = artwork;
+                    dragOffsetX = x - artX;
+                    dragOffsetY = y - artY;
+                }
+            });
+
+            // Check if clicking on placed artwork
+            level.placedArtworks.forEach(artwork => {
+                if (x >= artwork.x && x <= artwork.x + 80 &&
+                    y >= artwork.y && y <= artwork.y + 120) {
+                    draggedArtwork = artwork;
+                    dragOffsetX = x - artwork.x;
+                    dragOffsetY = y - artwork.y;
+                }
+            });
+
+            // Check if clicking confirm button
+            if (level.placedArtworks.length === level.currentArtworks.length &&
+                level.currentArtworks.length > 0) {
+                if (x >= 700 && x <= 820 && y >= 500 && y <= 540) {
+                    level.confirmArrangement();
+                }
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (draggedArtwork) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                // Visual feedback while dragging (could render preview)
+                canvas.style.cursor = 'grabbing';
+            } else {
+                canvas.style.cursor = 'pointer';
+            }
+        });
+
+        canvas.addEventListener('mouseup', (e) => {
+            if (draggedArtwork) {
+                const rect = canvas.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                // Check which wall was dropped on
+                level.walls.forEach(wall => {
+                    if (x >= wall.x && x <= wall.x + wall.width &&
+                        y >= wall.y && y <= wall.y + wall.height) {
+                        level.placeArtwork(draggedArtwork, wall);
+                    }
+                });
+
+                draggedArtwork = null;
+                canvas.style.cursor = 'pointer';
+            }
+        });
+
+        // Restart button
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            location.reload();
+        });
+
+        // Game loop
+        function gameLoop(timestamp) {
+            const dt = 1 / 60; // Fixed timestep
+
+            // Update
+            level.update(dt);
+            ui.update(dt);
+            particles.update(dt);
+
+            // Render
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            level.render(ctx);
+            particles.render(ctx);
+            ui.render(ctx);
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>

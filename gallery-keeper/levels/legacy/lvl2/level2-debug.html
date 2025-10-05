@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Level 2 Debug</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #2C3E50;
+            color: white;
+            padding: 20px;
+        }
+        #status {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin: 20px 0;
+        }
+        .error { color: #f00; }
+    </style>
+</head>
+<body>
+    <h1>Level 2 Debug</h1>
+    <div id="status">Checking...</div>
+
+    <script>
+        const status = document.getElementById('status');
+        function log(msg, isError = false) {
+            const span = document.createElement('span');
+            span.className = isError ? 'error' : '';
+            span.textContent = msg + '\n';
+            status.appendChild(span);
+            console.log(msg);
+        }
+
+        window.onerror = function(msg, url, line) {
+            log('ERROR: ' + msg + ' at line ' + line, true);
+            return false;
+        };
+
+        log('1. Checking file paths...');
+
+        const files = [
+            'core/engine.js',
+            'core/ui.js',
+            'core/audio.js',
+            'core/particles.js',
+            'levels/level2-arrangement-room.js'
+        ];
+
+        let loadCount = 0;
+        files.forEach(file => {
+            const script = document.createElement('script');
+            script.src = file;
+            script.onload = () => {
+                log('✓ Loaded: ' + file);
+                loadCount++;
+                if (loadCount === files.length) {
+                    log('\n2. All files loaded, testing classes...');
+                    testClasses();
+                }
+            };
+            script.onerror = () => {
+                log('✗ FAILED: ' + file, true);
+            };
+            document.head.appendChild(script);
+        });
+
+        function testClasses() {
+            log('GameEngine: ' + (typeof GameEngine !== 'undefined' ? 'OK' : 'MISSING'));
+            log('UI: ' + (typeof UI !== 'undefined' ? 'OK' : 'MISSING'));
+            log('AudioManager: ' + (typeof AudioManager !== 'undefined' ? 'OK' : 'MISSING'));
+            log('ParticleSystem: ' + (typeof ParticleSystem !== 'undefined' ? 'OK' : 'MISSING'));
+            log('ArrangementRoom: ' + (typeof ArrangementRoom !== 'undefined' ? 'OK' : 'MISSING'));
+
+            if (typeof ArrangementRoom === 'undefined') {
+                log('\nCHECK: Is level2-arrangement-room.js in the levels/ folder?', true);
+                return;
+            }
+
+            log('\n3. Testing instantiation...');
+            try {
+                // Create test canvas
+                const testCanvas = document.createElement('canvas');
+                testCanvas.id = 'testCanvas';
+                testCanvas.width = 900;
+                testCanvas.height = 650;
+                document.body.appendChild(testCanvas);
+
+                const engine = new GameEngine('testCanvas', 900, 650);
+                log('✓ GameEngine created');
+
+                const ui = new UI(engine.canvas, engine, null);
+                log('✓ UI created');
+
+                const audio = new AudioManager();
+                log('✓ AudioManager created');
+
+                const particles = new ParticleSystem();
+                log('✓ ParticleSystem created');
+
+                ui.audio = audio;
+                const level = new ArrangementRoom(engine, ui, audio, particles);
+                log('✓ ArrangementRoom created');
+                log('  Bach visible: ' + level.bach.visible);
+                log('  Tutorial step: ' + level.tutorialStep);
+                log('  Walls: ' + level.walls.length);
+
+                log('\n4. Testing render...');
+                const ctx = testCanvas.getContext('2d');
+                level.render(ctx);
+                log('✓ Render completed without errors');
+
+                log('\n✅ ALL TESTS PASSED - Level 2 should work!');
+                log('If level2.html is still blank, try hard refresh (Cmd+Shift+R)');
+
+            } catch (error) {
+                log('\n❌ ERROR during instantiation:', true);
+                log(error.message, true);
+                log(error.stack, true);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+---
+description: Comprehensive dependency security and compatibility audit
+arguments: [--fix] [--auto|--ask]
+---
+
+# Dependency Audit
+
+**Output Format: Inline MD text only. NEVER create MD files.**
+
+**Default**: `/dependency-audit` = Audit with confirmation for updates
+- `/dependency-audit --auto` = Auto-update safe dependencies
+- `/dependency-audit --fix` = Fix vulnerabilities automatically
+
+USE SUBAGENT /dependency-manager:
+Analyze dependencies for security vulnerabilities, compatibility issues, and outdated packages.
+
+## Audit Process
+
+### Python Dependencies
+```bash
+echo "=== PYTHON DEPENDENCY AUDIT ==="
+# Security vulnerabilities
+pip-audit --format=json --output=- | python -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    vulns = data.get('vulnerabilities', [])
+    print(f'Found {len(vulns)} vulnerabilities')
+    for vuln in vulns[:5]:
+        print(f\"❌ {vuln['package']} {vuln['installed_version']}: {vuln['id']} (Fix: {vuln.get('fix_versions', 'N/A')})\")
+except Exception as e:
+    print('✅ No vulnerabilities found')
+"
+
+# Outdated packages
+pip list --outdated --format=json | python -c "
+import json, sys
+data = json.load(sys.stdin)
+print(f'Outdated packages: {len(data)}')
+for pkg in data[:5]:
+    print(f\"⚠️ {pkg['name']}: {pkg['version']} → {pkg['latest_version']}\")
+"
+
+# License compatibility check
+pip-licenses --format=json | python -c "
+import json, sys
+data = json.load(sys.stdin)
+restrictive = [p for p in data if p['License'] in ['GPL', 'AGPL', 'LGPL']]
+print(f'Restrictive licenses: {len(restrictive)}')
+"
+```
+
+### Node Dependencies
+```bash
+echo "=== NODE DEPENDENCY AUDIT ==="
+if [ -f "package.json" ]; then
+  # Security audit
+  pnpm audit --audit-level moderate --json | head -20
+  
+  # Outdated packages
+  pnpm outdated | head -10
+  
+  # Bundle analysis
+  if [ -f "ui/monsteros_observatory_ui/package.json" ]; then
+    cd ui/monsteros_observatory_ui
+    npx webpack-bundle-analyzer build/static/js/*.js --mode=static --report=false --open=false | head -5
+  fi
+fi
+```
+
+### Dependency Health Check
+```bash
+echo "=== DEPENDENCY HEALTH CHECK ==="
+# Check for conflicting versions
+python -c "
+import pkg_resources
+try:
+    pkg_resources.require(open('requirements.txt').read().splitlines())
+    print('✅ All Python dependencies compatible')
+except Exception as e:
+    print(f'❌ Dependency conflict: {e}')
+"
+
+# Check import health
+python -c "
+import sys
+failed_imports = []
+critical_packages = ['fastapi', 'sqlalchemy', 'redis', 'qdrant_client', 'streamlit']
+for package in critical_packages:
+    try:
+        __import__(package)
+    except ImportError:
+        failed_imports.append(package)
+if failed_imports:
+    print(f'❌ Failed imports: {failed_imports}')
+else:
+    print('✅ All critical packages importable')
+"
+```
+
+## Dependency Audit Report
+
+**Python Packages**: XX total, X vulnerable, XX outdated
+**Node Packages**: XX total, X vulnerable, XX outdated
+**Security Score**: XX/100
+**Compatibility**: [GOOD/ISSUES/CRITICAL]
+
+### Critical Vulnerabilities 🔴
+```
+package-name v1.2.3 - CVE-2023-XXXX (High)
+  Fix: Upgrade to v1.2.4+
+  Command: pip install package-name>=1.2.4
+```
+
+### Recommended Updates ⚠️
+```bash
+# High priority security fixes
+pip install package1>=2.1.0 package2>=1.5.2
+
+# Node security fixes  
+pnpm update package3@latest package4@^3.0.0
+```
+
+### Next Commands (Confidence: High/Medium/Low)
+**If SECURE**: `/test` → `/quality-pipeline`
+**If VULNERABLE**: `/dependency-audit --fix` → `/test`
+**If CONFLICTS**: `/debug` → `/dependency-audit --fix`
+
+**Recommended Next**: `/[specific-command]` (Confidence: [High/Medium/Low])
+**Run next command automatically?** [Y/n]
+
+✅ Dependency audit complete. Next: /test

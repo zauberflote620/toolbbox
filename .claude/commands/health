@@ -1,0 +1,32 @@
+---
+description: Check system health
+arguments: optional service name or "all"
+---
+
+# System Health Check
+
+Checking health for $ARGUMENTS.
+
+**Output Format: Inline MD text only. NEVER create MD files.**
+
+## Service Status 🚦
+| Service | Status | Memory | CPU |
+|---------|--------|--------|-----|
+| API | 🟢 UP | XXMb | XX% |
+| DB | 🟢 UP | XXMb | XX% |
+| Redis | 🟢 UP | XXMb | XX% |
+| Qdrant | 🔴 DOWN | - | - |
+
+## Critical Alerts ⚠️
+- [Active issues]
+
+## Performance Metrics 📊
+**Response Time**: XXms avg
+**Error Rate**: X.X%
+**Uptime**: XX.X%
+
+## Action Items 🔧
+1. [Required fixes]
+2. [Optimizations]
+
+**Overall Health**: [HEALTHY/DEGRADED/CRITICAL]

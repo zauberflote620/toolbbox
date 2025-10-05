@@ -14,7 +14,14 @@ time-banked: 6.17
 ## Backlog
 
 - [ ] Post-30h: Polish pass (upgrade pixel art, more particle effects)
-- [ ] Post-30h: Content expansion (Einstein level, more artifacts)
+- [ ] Post-30h: Content expansion (more artifacts, additional visitor types)
+- [ ] Post-30h: Level 5 - Exhibition Hall (Einstein mentor: experimentation & discovery)
+  - Sandbox laboratory feel - try wild exhibit combinations
+  - Hidden connection discovery system (combo unlocks)
+  - Multi-perspective mechanics (same exhibit, different value per visitor type)
+  - "Breakthrough moment" rewards with visual effects
+  - NO tutorial feeling - pure experimentation and surprise
+  - Teaching: cross-selling, unexpected correlations, context-dependent optimization
 - [ ] Post-30h: Feature additions (speedrun mode, leaderboards)
 - [ ] Post-30h: Mobile optimization (touch controls, responsive)
 - [ ] Post-30h: Educational extensions (teacher mode, quiz system)
@@ -24,6 +31,12 @@ time-banked: 6.17
 - [ ] lvl 1 rm circles around "doors"
 - [ ] Additional planning tools (TBD)
 - [ ] refactor long files (levels)
+- [ ] REFACTOR: level2.html is 1300+ lines - split into modules (rendering, game logic, assets)
+- [ ] REFACTOR: Create shared component library system for Excalidraw assets across levels
+- [ ] Create Excalidraw library files (.excalidrawlib) instead of individual PNG exports
+  - gallery-keeper-components.excalidrawlib (all game components)
+  - ui-elements.excalidrawlib (buttons, frames, panels)
+  - characters.excalidrawlib (stick figures, robots, etc.)
 
 ## Level 2 UI/UX Improvements (Oct 4) - IN PROGRESS
 
@@ -104,12 +117,11 @@ time-banked: 6.17
 - [x] Build harmony scoring (color/style matching)
 - [x] Design Bach spirit NPC (musical chimes)
 - [x] Set victory condition (20 satisfied visitors)
-- [ ] Fix rendering bugs in level2-new.html (only 1 painting shows, robots not visible)
+- [x] Fix rendering bugs in level2.html (fixed duplicate pause button)
 - [ ] Debug image loading (PNG paths, console errors)
 - [ ] Modernize UI/UX (see "Level 2 UI/UX Improvements" section - IN PROGRESS)
 - [ ] Test drag-and-drop functionality with new PNG assets
 - [ ] Verify all images loading correctly
-- [ ] Replace old level2.html with level2-new.html when bugs fixed
 - [ ] Validation checkpoint: Level 2 playable
 
 
@@ -182,14 +194,14 @@ time-banked: 6.17
 - [x] Level 1: Task handoff document created
 - [x] Level 2: Core implementation (Bach tutorial, artwork system, harmony scoring)
 - [x] Level 2: File structure created (level2.html, level2-arrangement-room.js)
-- [x] Level 2: UI/UX modernization STARTED (Oct 4) - level2-new.html created but has critical bugs
+- [x] Level 2: UI/UX modernization STARTED (Oct 4) - level2.html modernized with new UI
 - [x] Assets: Organized into thematic directories (shapes/, nature/, objects/, symbols/, frames/, robots/)
 - [x] Shop-reset-kit documentation cleanup
 
 
 ## Blocked / Issues
 
-- [x] Level 2 rendering bug: RESOLVED - rebuilt as level2-new.html with modern architecture
+- [x] Level 2 rendering bug: RESOLVED - rebuilt as level2.html with modern architecture
 - [ ] Level 2: Waiting for conversation bubble assets for speech
 - [ ] Level 2: Need to verify PNG transparency (branches, clouds, toolbox, people)
 - [ ] Level 2: Test robots showing up correctly (check browser console logs)

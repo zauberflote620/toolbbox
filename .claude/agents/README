@@ -1,0 +1,96 @@
+Testing Pipeline:
+
+ AvailableAgents:
+
+1. unit-test-engineer - 
+    Creates/updates unit tests, analyzes changes, ensures coverage
+2. test-coverage-enforcer - 
+    Analyzes coverage gaps, generates missing tests, ensures standards
+3. quality-pipeline-orchestrator - Runs comprehensive quality checks (linting,
+  review, testing)
+4. code-quality-guardian - Reviews code quality
+5. lint-fixer - Analyzes and fixes linting issues
+6. debug-detective - Diagnoses and fixes bugs, errors, test failures
+
+  Optimal Agent Chain Orchestration:
+
+  Phase 1: Test Creation (Parallel)
+
+  ┌─────────────────────┐
+  │ unit-test-engineer  │ → Creates
+  test_diagnostics.py
+  ├─────────────────────┤
+  │ unit-test-engineer  │ → Creates 
+  test_backend_client.py  
+  ├─────────────────────┤
+  │ unit-test-engineer  │ → Creates 
+  test_error_decorator.py
+  └─────────────────────┘
+
+  Phase 2: Quality & Coverage
+
+  │
+  ▼
+  ┌──────────────────────┐
+  │ test-coverage-enforcer│ → Ensures all
+  methods are tested
+  └──────────────────────┘
+  │
+  ▼
+  ┌─────────────────────┐
+  │ lint-fixer          │ → Fixes any style
+   issues in tests
+  └─────────────────────┘
+
+  Phase 3: Validation
+
+  │
+  ▼
+  ┌──────────────────────────┐
+  │ quality-pipeline-orchestrator │ → Runs
+  all tests & validates
+  └──────────────────────────────┘
+
+  Phase 4: Debugging (if needed)
+
+  │ (if failures)
+  ▼
+  ┌─────────────────────┐
+  │ debug-detective     │ → Fixes any test
+  failures
+  └─────────────────────┘
+
+  Recommended Execution:
+
+⏺ Update Todos
+  ⎿ ☐ Create unit test for                 
+      StreamlitDiagnostics class methods 
+      (test_diagnostics.py)
+    ☐ Create unit test for backend client
+      timeout and error handling
+      (test_backend_client.py)
+    ☐ Create unit test for
+      handle_streamlit_error decorator
+      (test_error_decorator.py)
+    ☐ Integration test: diagnostics page
+      with backend running
+    ☐ Integration test: diagnostics page
+      with backend down
+    ☐ Integration test: error handling
+      fallback to mock data
+    ☐ Integration test: health check
+      functionality
+    ☐ Manual test: Navigate to Diagnostics
+      page via sidebar
+    ☐ Manual test: Verify service health
+      checks display correctly
+    ☐ Manual test: Test with backend
+      services stopped
+    ☐ Manual test: Verify troubleshooting
+      guides are accessible
+    ☐ Manual test: Test error handling on
+      agents page with backend down
+
+⏺ Instead of creating many intermediate
+  files, I'll use a streamlined approach.
+  Let me start with the unit-test-engineer

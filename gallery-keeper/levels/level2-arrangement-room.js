@@ -47,8 +47,8 @@ class ArrangementRoom {
 
         // Bach mentor NPC
         this.bach = {
-            x: 100,
-            y: 100,
+            x: 450,
+            y: 80,
             visible: true,
             message: '',
             messageTimer: 0
@@ -86,7 +86,6 @@ class ArrangementRoom {
             const message = this.tutorialMessages[this.tutorialStep];
             this.bach.message = message;
             this.bach.messageTimer = 5000;
-            this.ui.showMessage(message, 5.0);
             this.tutorialStep++;
 
             // Auto-advance to next tutorial message after delay
@@ -143,8 +142,6 @@ class ArrangementRoom {
         } else if (this.round === 16) {
             this.showBachMessage("Four artworks. Balance is key, as in a fugue.");
         }
-
-        this.ui.showMessage(`Round ${this.round}/${this.maxRounds}: Arrange ${artworkCount} artwork${artworkCount > 1 ? 's' : ''}`, 3.0);
     }
 
     spawnVisitor() {
@@ -166,7 +163,7 @@ class ArrangementRoom {
 
     evaluateArrangement() {
         if (this.placedArtworks.length === 0) {
-            this.visitorReaction = 'waiting';
+            this.visitorReaction = 'neutral';
             this.currentVisitor.satisfaction = 0;
             return;
         }
@@ -240,7 +237,7 @@ class ArrangementRoom {
                 this.audio.playTone(659.25, 0.2); // E5
             }, 150);
 
-            this.ui.showMessage('Visitor satisfied! Star earned.', 2.0);
+            this.showBachMessage("Excellent! The visitor is pleased with your arrangement.");
 
             // Start next round after delay
             setTimeout(() => {
@@ -250,7 +247,6 @@ class ArrangementRoom {
         } else if (this.visitorReaction === 'neutral') {
             // Acceptable, but no star
             this.score += 50;
-            this.ui.showMessage('Visitor is okay with this. Try again or continue?', 2.0);
             this.showBachMessage("The audience is polite. You could try rearranging.");
 
             // Auto-continue after delay (cozy - no punishment)
@@ -261,7 +257,6 @@ class ArrangementRoom {
         } else {
             // Unhappy, but still can continue (cozy - can't fail)
             this.score += 10;
-            this.ui.showMessage('Visitor seems confused. Rearrange or try next visitor?', 2.0);
             this.showBachMessage("Perhaps group similar themes together?");
 
             // Auto-continue (cozy approach)
@@ -302,16 +297,10 @@ class ArrangementRoom {
     }
 
     handleVictory() {
-        this.ui.showMessage(`Level Complete! ${this.starsEarned}/20 stars earned. Score: ${this.score}`, 5.0);
-
         this.bach.message = "Wonderful! Like a complete composition - each artwork found its voice in the harmony.";
         this.bach.messageTimer = 8000;
 
-        // Victory stats
-        setTimeout(() => {
-            const accuracy = Math.round((this.starsEarned / this.maxRounds) * 100);
-            this.ui.showMessage(`Visitor Satisfaction: ${accuracy}%`, 5.0);
-        }, 3000);
+        // Victory stats shown in HUD
     }
 
     handleInput(event) {
@@ -339,14 +328,6 @@ class ArrangementRoom {
         ctx.fillStyle = '#F5E6D3'; // Warm gallery beige
         ctx.fillRect(0, 0, this.engine.canvas.width, this.engine.canvas.height);
 
-        // DEBUG: Test rendering
-        ctx.fillStyle = '#FF0000';
-        ctx.fillRect(100, 100, 100, 100);
-        ctx.fillStyle = '#000';
-        ctx.font = '20px Arial';
-        ctx.fillText('DEBUG: Render working', 250, 150);
-        console.log('Rendering... walls:', this.walls.length, 'current artworks:', this.currentArtworks.length);
-
         // Render walls
         this.walls.forEach(wall => {
             ctx.fillStyle = '#D2B48C'; // Tan wall
@@ -372,11 +353,13 @@ class ArrangementRoom {
             ctx.fillStyle = artwork.color;
             ctx.fillRect(artwork.x, artwork.y, 80, 120);
 
-            // Label
+            // Label with properties
             ctx.fillStyle = '#FFF';
-            ctx.font = '10px Arial';
+            ctx.font = 'bold 9px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(artwork.label, artwork.x + 40, artwork.y + 60);
+            ctx.fillText(artwork.theme.toUpperCase(), artwork.x + 40, artwork.y + 50);
+            ctx.font = '8px Arial';
+            ctx.fillText(artwork.style, artwork.x + 40, artwork.y + 62);
         });
 
         // Render available artworks (not yet placed)
@@ -396,11 +379,13 @@ class ArrangementRoom {
             ctx.fillStyle = artwork.color;
             ctx.fillRect(x, y, 80, 120);
 
-            // Label
+            // Label with properties
             ctx.fillStyle = '#FFF';
-            ctx.font = '10px Arial';
+            ctx.font = 'bold 9px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText(artwork.label, x + 40, y + 60);
+            ctx.fillText(artwork.theme.toUpperCase(), x + 40, y + 50);
+            ctx.font = '8px Arial';
+            ctx.fillText(artwork.style, x + 40, y + 62);
         });
 
         // Render visitor
@@ -478,6 +463,28 @@ class ArrangementRoom {
                 ctx.arc(this.currentVisitor.x + 20, this.currentVisitor.y + 32, 8, 0, Math.PI, true);
                 ctx.stroke();
             }
+
+            // Show visitor preferences
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.strokeStyle = '#8B4513';
+            ctx.lineWidth = 2;
+            const prefWidth = 140;
+            const prefHeight = 50;
+            const prefX = this.currentVisitor.x + 60;
+            const prefY = this.currentVisitor.y - 10;
+
+            this.roundRect(ctx, prefX, prefY, prefWidth, prefHeight, 8);
+            ctx.fill();
+            ctx.stroke();
+
+            // Preference text
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText('Prefers:', prefX + 8, prefY + 18);
+            ctx.font = '11px Arial';
+            ctx.fillText(this.currentVisitor.preferredTheme.toUpperCase(), prefX + 8, prefY + 32);
+            ctx.fillText(this.currentVisitor.preferredStyle.toUpperCase(), prefX + 8, prefY + 44);
         }
 
         // Render Bach
@@ -497,32 +504,39 @@ class ArrangementRoom {
 
             // Message bubble
             if (this.bach.message) {
-                const lines = this.wrapText(ctx, this.bach.message, 300);
-                const bubbleHeight = lines.length * 20 + 20;
+                const lines = this.wrapText(ctx, this.bach.message, 380);
+                const bubbleHeight = lines.length * 22 + 30;
+                const bubbleWidth = 400;
 
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
                 ctx.strokeStyle = '#2C3E50';
                 ctx.lineWidth = 2;
-                this.roundRect(ctx, this.bach.x - 160, this.bach.y - 80, 320, bubbleHeight, 10);
+                this.roundRect(ctx, this.bach.x - bubbleWidth/2, this.bach.y + 40, bubbleWidth, bubbleHeight, 10);
                 ctx.fill();
                 ctx.stroke();
 
                 ctx.fillStyle = '#000';
-                ctx.font = '14px Arial';
+                ctx.font = '15px Arial';
                 ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
                 lines.forEach((line, i) => {
-                    ctx.fillText(line, this.bach.x, this.bach.y - 70 + (i * 20));
+                    ctx.fillText(line, this.bach.x, this.bach.y + 55 + (i * 22));
                 });
             }
         }
 
-        // Render HUD
-        ctx.fillStyle = '#000';
-        ctx.font = '18px Arial';
+        // Render HUD in bottom left corner
+        const hudY = this.engine.canvas.height - 90;
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(5, hudY - 5, 200, 85);
+
+        ctx.fillStyle = '#FFD700';
+        ctx.font = 'bold 16px Arial';
         ctx.textAlign = 'left';
-        ctx.fillText(`Round: ${this.round}/${this.maxRounds}`, 10, 30);
-        ctx.fillText(`Stars: ${this.starsEarned}/20`, 10, 55);
-        ctx.fillText(`Score: ${this.score}`, 10, 80);
+        ctx.fillText(`Round: ${this.round}/${this.maxRounds}`, 15, hudY + 15);
+        ctx.fillText(`Stars: ${this.starsEarned}/20`, 15, hudY + 40);
+        ctx.fillStyle = '#FFF';
+        ctx.fillText(`Score: ${this.score}`, 15, hudY + 65);
 
         // Render confirm button if all artworks placed
         if (this.placedArtworks.length === this.currentArtworks.length && this.currentArtworks.length > 0) {

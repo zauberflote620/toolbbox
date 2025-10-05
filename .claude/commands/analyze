@@ -1,0 +1,30 @@
+---
+description: Analyze project structure, architecture, codebase
+arguments: optional focus area (e.g., "security", "performance", "architecture")
+---
+
+# Analyze Project
+
+Analyzing $ARGUMENTS.
+
+**Output Format: Inline MD text only. NEVER create MD files.**
+
+## Structure Overview
+**Type**: [Project type/framework]
+**Size**: [LOC/files]
+**Stack**: [Key technologies]
+
+## Key Findings 🔍
+- [Critical observations]
+- [Architecture patterns]
+- [Notable dependencies]
+
+## Issues Found ⚠️
+1. [Priority issues]
+2. [Technical debt]
+
+## Recommendations 💡
+- **Immediate**: [Quick wins]
+- **Strategic**: [Long-term improvements]
+
+**Focus Area**: [Primary concern to address]

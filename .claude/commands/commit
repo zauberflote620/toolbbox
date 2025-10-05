@@ -1,0 +1,31 @@
+---
+description: Create a git commit with generated message
+arguments: optional commit type (feat/fix/chore/docs/test/perf/style)
+---
+
+# Create Git Commit
+
+Creating commit for $ARGUMENTS changes.
+
+**Output Format: Inline MD text only. NEVER create MD files.**
+
+## Changes Summary 📝
+**Files**: [X modified, Y added, Z deleted]
+**Type**: [feat/fix/chore/etc]
+**Scope**: [Component/module affected]
+
+## Commit Message
+```
+[type] brief description
+
+- Detail 1
+- Detail 2
+```
+
+## Pre-commit Checks ✅
+- [ ] Linting passed
+- [ ] Tests passed
+- [ ] No secrets exposed
+
+**Status**: [COMMITTED/BLOCKED]
+**Hash**: [commit hash if successful]

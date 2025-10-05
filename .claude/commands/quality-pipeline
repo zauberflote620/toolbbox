@@ -1,0 +1,127 @@
+---
+description: Run comprehensive quality assurance pipeline
+arguments: [--fix] [--incremental] [specific paths] [--auto|--ask]
+thinking: extended
+---
+
+# Quality Pipeline
+
+**Output Format: Inline MD text only. NEVER create MD files.**
+
+**Default**: `/quality-pipeline` = Full pipeline with confirmation prompts
+- `/quality-pipeline --auto` = No prompts, full automation
+- `/quality-pipeline --fix` = Auto-fix issues during pipeline
+- `/quality-pipeline --incremental` = Changed files only
+
+## Process
+1. Check completion status of workflow steps:
+   - Look for "✅ Linting complete" - If not found: suggest "/lint first"
+   - Look for "✅ Code review complete" - If not found: suggest "/review-code next"  
+   - Look for "✅ Testing complete" - If not found: suggest "/test next"
+   - Look for "✅ Dependency audit complete" - If not found: suggest "/dependency-audit" 
+2. If all steps completed: Run comprehensive quality validation
+3. Generate final quality report IN MESSAGE not md
+
+Use PROACTIVELY corresponding agent for each part of the process:
+Use these claude subagents:
+- /blind-validator --validate completion of all items on ticket
+- /lint-fixer (run up to 5 in parallel at a time)
+- /code-reviewer (1)
+- /test-guardian
+- /test-coverage-enforcer
+- /unit-test-engineer
+- /test-orchestrator
+- /debug-detective
+- /dependency-manager
+- /deployment-validator
+- /security-auditor
+- /security-hardener
+
+## Pipeline Phases
+
+### Phase 1: Analysis & Linting
+```bash
+echo "=== PHASE 1: LINTING ==="
+# Python files
+black app/ tests/ scripts/ --check || echo "❌ Black formatting needed"
+isort app/ tests/ scripts/ --check-only || echo "❌ Import sorting needed"
+flake8 app/ tests/ scripts/ --count --statistics
+mypy app/ --ignore-missing-imports
+
+# JavaScript/TypeScript
+if [ -d "ui/" ]; then
+  cd ui/monsteros_observatory_ui
+  pnpm lint --quiet || echo "❌ ESLint issues found"
+  pnpm type-check || echo "❌ TypeScript errors found"
+fi
+```
+
+### Phase 2: Testing & Validation
+```bash
+echo "=== PHASE 2: TESTING ==="
+# Python tests
+pytest tests/ -v --tb=short --cov=app --cov-report=term-missing
+pytest tests/unit/ -v --tb=short
+pytest tests/integration/ -v --tb=short
+
+# JavaScript tests
+if [ -d "ui/" ]; then
+  cd ui/monsteros_observatory_ui
+  pnpm test --coverage --watchAll=false
+fi
+```
+
+### Phase 3: Security Scan
+```bash
+echo "=== PHASE 3: SECURITY ==="
+bandit -r app/ -f json | python -c "
+import json, sys
+data = json.load(sys.stdin)
+issues = data.get('results', [])
+for issue in issues[:5]:
+    print(f\"❌ {issue['issue_severity']}: {issue['issue_text']} at {issue['filename']}:{issue['line_number']}\")
+"
+
+# Check for secrets
+grep -r "password\|secret\|token\|api_key" --include="*.py" --include="*.js" --include="*.ts" . | grep -E "=\s*[\"'][^\"']+[\"']" | head -5
+```
+
+### Phase 4: Dependency Check
+```bash
+echo "=== PHASE 4: DEPENDENCIES ==="
+# Python dependencies
+pip-audit --format=json | python -c "
+import json, sys
+try:
+    data = json.load(sys.stdin)
+    vulns = data.get('vulnerabilities', [])
+    for vuln in vulns[:3]:
+        print(f\"❌ {vuln['package']} {vuln['installed_version']}: {vuln['id']}\")
+except:
+    print('✅ No vulnerabilities found')
+"
+
+# Node dependencies
+if [ -f "package.json" ]; then
+  pnpm audit --audit-level moderate | head -10
+fi
+```
+
+## Final Quality Report
+
+**Quality Score**: XX/100 points
+**Pass Rate**: X/Y checks passed
+**Coverage**: XX%
+**Security Issues**: X found
+**Ready to Commit**: [YES/NO]
+
+### Critical Issues 🔴
+- [file:line - specific issue with evidence]
+
+### Next Commands (Confidence: High/Medium/Low)
+**If PASS**: `/commit` → `/push`
+**If FAIL**: `/lint --fix` → `/test` → `/quality-pipeline --auto`
+**If SECURITY**: `/security-hardener` → `/quality-pipeline --auto`
+
+**Recommended Next**: `/[specific-command]` (Confidence: [High/Medium/Low])
+**Run next command automatically?** [Y/n]

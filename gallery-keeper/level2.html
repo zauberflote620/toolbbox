@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Level 2: Arrangement Room - Gallery Keeper</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,7 +16,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #2C3E50;
+            background: linear-gradient(135deg, #2C3E50 0%, #34495E 100%);
             color: #ECF0F1;
             display: flex;
             flex-direction: column;
@@ -42,38 +45,27 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             max-width: 940px;
             width: 100%;
-            margin: 0 auto;
-        }
-
-        .level-info {
-            background: #2C3E50;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-
-        .level-info h2 {
-            color: #FFD700;
-            margin-bottom: 10px;
-            font-size: 1.2em;
         }
 
         canvas {
             display: block;
-            background: #F5E6D3;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #E8EAF6 0%, #F3E5F5 50%, #E1F5FE 100%);
+            border-radius: 12px;
             margin: 0 auto 20px;
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            max-width: 100%;
-            height: auto;
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            cursor: grab;
         }
 
-        .controls-bar {
+        canvas:active {
+            cursor: grabbing;
+        }
+
+        .controls {
             display: flex;
             justify-content: space-between;
-            align-items: center;
             gap: 10px;
             margin-top: 15px;
         }
@@ -86,28 +78,38 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
         }
 
         .btn-primary {
-            background: #3498DB;
+            background: linear-gradient(135deg, #3498DB 0%, #2980B9 100%);
             color: white;
+            box-shadow:
+                0 4px 12px rgba(52, 152, 219, 0.4),
+                0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .btn-primary:hover {
-            background: #2980B9;
+            background: linear-gradient(135deg, #2980B9 0%, #21618C 100%);
             transform: translateY(-2px);
+            box-shadow:
+                0 6px 16px rgba(52, 152, 219, 0.5),
+                0 3px 6px rgba(0, 0, 0, 0.3);
         }
 
         .btn-secondary {
-            background: #95A5A6;
+            background: linear-gradient(135deg, #95A5A6 0%, #7F8C8D 100%);
             color: white;
+            box-shadow:
+                0 4px 12px rgba(149, 165, 166, 0.3),
+                0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .btn-secondary:hover {
-            background: #7F8C8D;
+            background: linear-gradient(135deg, #7F8C8D 0%, #5D6D7E 100%);
             transform: translateY(-2px);
+            box-shadow:
+                0 6px 16px rgba(149, 165, 166, 0.4),
+                0 3px 6px rgba(0, 0, 0, 0.3);
         }
 
         .instructions {
@@ -133,175 +135,1464 @@
         <h1>Gallery Keeper: Arrangement Room</h1>
         <p class="subtitle">Level 2 - Bach's Harmony Challenge</p>
 
-        <div class="level-info">
-            <h2>Bach's Story</h2>
-            <p>
-                Johann Sebastian Bach (1685-1750) was a music director who organized performances
-                for audiences with varied tastes. From royalty to commoners, each listener had
-                different preferences. Bach's genius was creating harmony - where many different
-                voices came together, each beautiful on its own but even better as a whole.
-            </p>
-        </div>
-
         <canvas id="gameCanvas" width="900" height="650"></canvas>
 
-        <div class="controls-bar">
-            <button id="restartBtn" class="btn btn-primary">Restart Level</button>
-            <a href="index.html" class="btn btn-secondary">Back to Gallery</a>
+        <div class="controls">
+            <a href="index.html" class="btn btn-secondary" style="text-decoration: none;">Back to Gallery</a>
         </div>
 
         <div class="instructions">
             <h3>How to Play</h3>
             <ul>
-                <li>Drag artworks from the left side to the gallery walls</li>
-                <li>Watch the visitor's reaction (colored glow: green = happy, yellow = neutral, red = unhappy)</li>
-                <li>Try to make visitors happy by finding good arrangements</li>
-                <li>Grouping similar artworks together often helps</li>
-                <li>Click "Confirm" when you're satisfied with your arrangement</li>
-                <li>Earn stars for happy visitors - 20 stars to complete the level</li>
+                <li><strong>Goal:</strong> Match artworks to visitor preferences</li>
+                <li><strong>Choose wisely:</strong> You have 3 artworks to pick from each round</li>
+                <li><strong>Drag</strong> your chosen artwork onto the display wall</li>
+                <li><strong>Watch</strong> the visitor's reaction (green = happy, yellow = neutral, red = unhappy)</li>
+                <li><strong>Match both</strong> theme AND style for perfect matches (stars)</li>
+                <li><strong>Goal:</strong> Earn 15 stars to complete the level!</li>
             </ul>
         </div>
     </div>
 
-    <!-- Load core game engine -->
-    <script src="core/engine.js"></script>
-    <script src="core/sprites.js"></script>
-    <script src="core/input.js"></script>
-    <script src="core/particles.js"></script>
-    <script src="core/audio.js"></script>
-    <script src="core/ui.js"></script>
-
-    <!-- Load Level 2 -->
-    <script src="levels/level2-arrangement-room.js"></script>
-
     <script>
         const canvas = document.getElementById('gameCanvas');
-        console.log('Canvas:', canvas);
+        const ctx = canvas.getContext('2d');
 
-        const engine = new GameEngine(canvas);
-        console.log('Engine created:', engine);
+        // Game state
+        const game = {
+            round: 0,
+            maxRounds: 15,
+            stars: 0,
+            score: 0,
 
-        const ui = new UISystem(canvas);
-        console.log('UI created:', ui);
+            // Current round state
+            shelfArtworks: [], // 3 artworks to choose from
+            currentVisitor: null,
+            placedArtwork: null,
 
-        const audio = new AudioSystem();
-        console.log('Audio created:', audio);
+            // Tutorial
+            tutorialStep: 0,
+            bachMessage: '',
+            messageTimer: 0,
 
-        const particles = new ParticleSystem();
-        console.log('Particles created:', particles);
+            // Drag state
+            dragging: false,
+            dragOffsetX: 0,
+            dragOffsetY: 0,
 
-        // Initialize Level 2
-        const level = new ArrangementRoom(engine, ui, audio, particles);
-        console.log('Level created:', level);
-        console.log('Bach visible:', level.bach.visible);
-        console.log('Bach message:', level.bach.message);
+            // Animation
+            time: 0,
+            particles: [],
 
-        // Drag and drop state
-        let draggedArtwork = null;
-        let dragOffsetX = 0;
-        let dragOffsetY = 0;
+            // Images
+            images: {},
+            imagesLoaded: false,
 
-        // Mouse/touch event handlers
+            // Game state
+            gameStarted: false,
+            startButtonHover: false,
+
+            // Visitor character pool (robots, stick figures, and octos)
+            visitorCharacters: [
+                'robotGuide', 'robotHappy', 'robotFrustrated', 'robotWorried', 'robotSilly', 'robotAngry',
+                'stickLooking', 'stickConfused', 'stickHat', 'stickMustache', 'stickUnsure',
+                'octoBlue', 'octoGreen', 'octoOrange'
+            ],
+            currentVisitorCharacter: null,
+
+            // Artwork definitions (only files that exist now)
+            artworkTypes: [
+                { theme: 'NATURE', style: 'classical', color: '#8B7355', icon: '🌿', iconImg: 'branches' },
+                { theme: 'NATURE', style: 'modern', color: '#87CEEB', icon: '🌿', iconImg: 'branches' },
+                { theme: 'NATURE', style: 'jazz', color: '#9B59B6', icon: '🌿', iconImg: 'branches' },
+                { theme: 'PEOPLE', style: 'classical', color: '#8B4513', icon: '👥', iconImg: null },
+                { theme: 'PEOPLE', style: 'modern', color: '#A0522D', icon: '👥', iconImg: null },
+                { theme: 'PEOPLE', style: 'jazz', color: '#E67E22', icon: '👥', iconImg: null },
+                { theme: 'SHAPES', style: 'classical', color: '#4169E1', icon: '⬡', iconImg: 'shapesMulti' },
+                { theme: 'SHAPES', style: 'modern', color: '#FF4500', icon: '⬢', iconImg: 'shapesMulti' },
+                { theme: 'SHAPES', style: 'jazz', color: '#F39C12', icon: '⬢', iconImg: 'shapesMulti' },
+                { theme: 'OBJECTS', style: 'classical', color: '#8B7355', icon: '📁', iconImg: 'binder' },
+                { theme: 'OBJECTS', style: 'modern', color: '#FFD700', icon: '🛒', iconImg: 'shopping' },
+                { theme: 'OBJECTS', style: 'jazz', color: '#E74C3C', icon: '🛒', iconImg: 'shopping' }
+            ],
+
+            // Positions
+            shelfX: 50,
+            shelfY: 130,
+            shelfSpacing: 160, // spacing between artworks
+            wallX: 430,
+            wallY: 250,
+            wallWidth: 260,
+            wallHeight: 280,
+            visitorX: 130, // moved right by frame width (80px)
+            visitorY: 555,
+
+            // Gameplay enhancements
+            patience: 100, // patience meter
+            patienceDecay: 0.15, // base patience drains per frame (increases with rounds)
+            comboCount: 0, // consecutive perfect matches
+            screenShake: 0,
+            roundInProgress: true, // flag to prevent multiple round starts
+            victoryState: false, // celebration mode
+            victoryTimer: 0,
+            confetti: [], // victory confetti particles
+            paused: false, // pause state
+
+            // In-game pause button
+            pauseButtonX: 820,
+            pauseButtonY: 20,
+            pauseButtonSize: 50
+        };
+
+        // Tutorial messages (shorter now - 2 seconds each = 8 seconds total)
+        const tutorialMessages = [
+            "Welcome! I am Bach, your arrangement guide.",
+            "Each round: Choose 1 artwork from 3 options.",
+            "Match the visitor's theme AND style for best results!",
+            "Let's begin..."
+        ];
+
+        // Load images (only files that currently exist)
+        function loadImages() {
+            const imagesToLoad = {
+                bach: '../Excalidraw/assets/stick_figures/stick_explaining_1.png',
+                brain: '../Excalidraw/assets/objects/brain.png',
+                musicNotes: '../Excalidraw/assets/shapes/music_notes.png',
+
+                // Visitor character pool (all existing robots and stick figures)
+                robotGuide: '../Excalidraw/assets/robots/robot_guide.png',
+                robotHappy: '../Excalidraw/assets/robots/robot_happy.png',
+                robotFrustrated: '../Excalidraw/assets/robots/robot_frustrated.png',
+                robotWorried: '../Excalidraw/assets/robots/robot_worried.png',
+                robotSilly: '../Excalidraw/assets/robots/robot_silly.png',
+                robotAngry: '../Excalidraw/assets/robots/robot_angry.png',
+                stickLooking: '../Excalidraw/assets/stick_figures/stick_looking.png',
+                stickConfused: '../Excalidraw/assets/stick_figures/stick_confused.png',
+                stickHat: '../Excalidraw/assets/stick_ppl/stick_hat.png',
+                stickMustache: '../Excalidraw/assets/stick_ppl/stick_mustache.png',
+                stickUnsure: '../Excalidraw/assets/stick_figures/stick_unsure.png',
+                octoBlue: '../Excalidraw/assets/creatures/octo-blue.png',
+                octoGreen: '../Excalidraw/assets/creatures/octo-green.png',
+                octoOrange: '../Excalidraw/assets/creatures/octo-orange.png',
+
+                // Artwork icons (only files that exist)
+                branches: '../Excalidraw/assets/nature/branches.png',
+                shapesMulti: '../Excalidraw/assets/shapes/shapes-multicolor.png',
+                shopping: '../Excalidraw/assets/objects/shopping_basket.png',
+                binder: '../Excalidraw/assets/objects/binder.png'
+            };
+
+            let loaded = 0;
+            const total = Object.keys(imagesToLoad).length;
+
+            Object.keys(imagesToLoad).forEach(key => {
+                const img = new Image();
+                img.onload = () => {
+                    console.log(`✓ Loaded ${key}`);
+                    loaded++;
+                    if (loaded === total) {
+                        console.log('✓ All images loaded successfully');
+                        game.imagesLoaded = true;
+                        showTutorial();
+                    }
+                };
+                img.onerror = () => {
+                    console.error(`Failed to load ${key} from ${imagesToLoad[key]}`);
+                    loaded++;
+                    if (loaded === total) {
+                        console.log('All images loaded (some may have failed)');
+                        game.imagesLoaded = true;
+                        showTutorial();
+                    }
+                };
+                img.src = imagesToLoad[key];
+                game.images[key] = img;
+            });
+        }
+
+        // Initialize
+        function init() {
+            // Don't load images automatically - wait for user to click start
+        }
+
+        function startGame() {
+            game.gameStarted = true;
+            loadImages();
+        }
+
+        function showTutorial() {
+            if (game.tutorialStep < tutorialMessages.length) {
+                game.bachMessage = tutorialMessages[game.tutorialStep];
+                game.messageTimer = 2;
+                game.tutorialStep++;
+
+                setTimeout(() => {
+                    showTutorial();
+                }, 2000);
+            } else {
+                startNextRound();
+            }
+        }
+
+        function startNextRound() {
+            console.log(`startNextRound called, current round: ${game.round}, maxRounds: ${game.maxRounds}`);
+
+            game.round++;
+
+            if (game.round > game.maxRounds) {
+                console.log('Game complete!');
+                handleVictory();
+                return;
+            }
+
+            console.log(`Starting round ${game.round}`);
+
+            // Visitor with weighted style preferences AND random character
+            // Theme: random (equal probability)
+            const themes = ['NATURE', 'PEOPLE', 'SHAPES', 'OBJECTS'];
+            const visitorTheme = themes[Math.floor(Math.random() * themes.length)];
+
+            // Style: weighted (45% classical, 45% modern, 10% jazz)
+            const styleRoll = Math.random();
+            let visitorStyle;
+            if (styleRoll < 0.45) {
+                visitorStyle = 'classical';
+            } else if (styleRoll < 0.90) {
+                visitorStyle = 'modern';
+            } else {
+                visitorStyle = 'jazz'; // Rare! 10% chance
+            }
+
+            // Find the artwork matching this theme+style combination
+            let visitorArtwork = game.artworkTypes.find(art =>
+                art.theme === visitorTheme && art.style === visitorStyle
+            );
+
+            // Safety check - if artwork doesn't exist, fall back to first available
+            if (!visitorArtwork) {
+                console.error(`No artwork found for ${visitorTheme}/${visitorStyle}, using fallback`);
+                visitorArtwork = game.artworkTypes[0];
+            }
+
+            game.currentVisitorCharacter = game.visitorCharacters[Math.floor(Math.random() * game.visitorCharacters.length)];
+
+            // Weighted match system: 25% perfect matches, 75% partial matches
+            const perfectMatchChance = Math.random();
+            let selectedArtworks;
+
+            if (perfectMatchChance < 0.25) {
+                // 25% chance: Include perfect match
+                const otherArtworks = game.artworkTypes.filter(art =>
+                    !(art.theme === visitorArtwork.theme && art.style === visitorArtwork.style)
+                );
+                const shuffledOthers = [...otherArtworks].sort(() => Math.random() - 0.5);
+                selectedArtworks = [shuffledOthers[0], shuffledOthers[1], visitorArtwork];
+            } else {
+                // 75% chance: Only partial matches (theme OR style, not both)
+                // Prioritize theme matches over style matches
+                const themeMatches = game.artworkTypes.filter(art =>
+                    art.theme === visitorArtwork.theme && art.style !== visitorArtwork.style
+                );
+                const styleMatches = game.artworkTypes.filter(art =>
+                    art.theme !== visitorArtwork.theme && art.style === visitorArtwork.style
+                );
+                const noMatches = game.artworkTypes.filter(art =>
+                    art.theme !== visitorArtwork.theme && art.style !== visitorArtwork.style
+                );
+
+                // Build selection: prefer 2 theme matches + 1 style match if possible
+                selectedArtworks = [];
+                if (themeMatches.length >= 2) {
+                    selectedArtworks.push(themeMatches[0], themeMatches[1]);
+                    if (styleMatches.length > 0) {
+                        selectedArtworks.push(styleMatches[0]);
+                    } else if (noMatches.length > 0) {
+                        selectedArtworks.push(noMatches[0]);
+                    }
+                } else if (themeMatches.length === 1) {
+                    selectedArtworks.push(themeMatches[0]);
+                    if (styleMatches.length >= 2) {
+                        selectedArtworks.push(styleMatches[0], styleMatches[1]);
+                    } else if (styleMatches.length === 1 && noMatches.length > 0) {
+                        selectedArtworks.push(styleMatches[0], noMatches[0]);
+                    } else if (noMatches.length >= 2) {
+                        selectedArtworks.push(noMatches[0], noMatches[1]);
+                    }
+                } else {
+                    // No theme matches, use style matches or random
+                    if (styleMatches.length >= 3) {
+                        selectedArtworks.push(styleMatches[0], styleMatches[1], styleMatches[2]);
+                    } else if (styleMatches.length >= 1) {
+                        selectedArtworks.push(...styleMatches);
+                        const needed = 3 - selectedArtworks.length;
+                        selectedArtworks.push(...noMatches.slice(0, needed));
+                    } else {
+                        selectedArtworks.push(...noMatches.slice(0, 3));
+                    }
+                }
+            }
+
+            // Shuffle so correct/best answer isn't predictable
+            const finalArtworks = selectedArtworks.sort(() => Math.random() - 0.5);
+
+            game.shelfArtworks = [
+                { ...finalArtworks[0], x: game.shelfX, y: game.shelfY, index: 0 },
+                { ...finalArtworks[1], x: game.shelfX, y: game.shelfY + game.shelfSpacing, index: 1 },
+                { ...finalArtworks[2], x: game.shelfX, y: game.shelfY + game.shelfSpacing * 2, index: 2 }
+            ];
+            console.log(`Round ${game.round}: Created ${game.shelfArtworks.length} artworks (includes correct match)`, game.shelfArtworks);
+
+            game.currentVisitor = {
+                preferredTheme: visitorArtwork.theme,
+                preferredStyle: visitorArtwork.style,
+                reaction: 'neutral'
+            };
+
+            console.log(`Round ${game.round}: Visitor is ${game.currentVisitorCharacter}, wants ${visitorArtwork.theme}/${visitorArtwork.style}`);
+
+            game.placedArtwork = null;
+            game.patience = 100; // Reset patience for new visitor
+            game.bachMessage = `Round ${game.round}/${game.maxRounds}`;
+            game.messageTimer = 2;
+
+            // Re-enable round progression
+            game.roundInProgress = true;
+            console.log('Round setup complete, roundInProgress:', game.roundInProgress);
+        }
+
+        function evaluatePlacement() {
+            console.log('evaluatePlacement called');
+            if (!game.placedArtwork || !game.currentVisitor) {
+                console.log('No placed artwork or visitor, returning');
+                return;
+            }
+            if (!game.roundInProgress) {
+                console.log('Round not in progress, returning');
+                return; // Already ending, don't evaluate again
+            }
+
+            // Mark round as ending to prevent patience timeout from also firing
+            game.roundInProgress = false;
+            console.log('Evaluating placement, roundInProgress set to false');
+
+            const art = game.placedArtwork;
+            const vis = game.currentVisitor;
+
+            // Calculate match quality (STYLE weighted higher - it's deeper knowledge!)
+            const themeMatch = art.theme === vis.preferredTheme;
+            const styleMatch = art.style === vis.preferredStyle;
+
+            // Time bonus: reward faster matches (patience remaining)
+            const patienceBonus = Math.floor(game.patience * 0.5); // Up to 50 bonus points for fast matches
+
+            let baseScore = 0;
+            let matchType = 'none';
+
+            if (themeMatch && styleMatch) {
+                // Perfect match
+                matchType = 'perfect';
+                baseScore = 100;
+                vis.reaction = 'happy';
+                game.stars++;
+                game.comboCount++;
+            } else if (styleMatch) {
+                // Style match (weighted HIGHER) - deeper knowledge, more valuable!
+                matchType = 'style';
+                baseScore = 60;
+                vis.reaction = 'neutral';
+                game.comboCount = 0; // Partial match breaks combo
+            } else if (themeMatch) {
+                // Theme match (weighted lower) - surface observation
+                matchType = 'theme';
+                baseScore = 40;
+                vis.reaction = 'neutral';
+                game.comboCount = 0;
+            } else {
+                // No match
+                matchType = 'none';
+                baseScore = 10;
+                vis.reaction = 'unhappy';
+                game.comboCount = 0;
+            }
+
+            // Calculate final score
+            const comboBonus = matchType === 'perfect' ? game.comboCount * 50 : 0;
+            const totalScore = baseScore + patienceBonus + comboBonus;
+            game.score += totalScore;
+
+            // Set message based on match type
+            if (matchType === 'perfect') {
+                game.bachMessage = game.comboCount > 1
+                    ? `PERFECT! ${game.comboCount}x COMBO! +${totalScore} points!`
+                    : `Perfect harmony! +${totalScore} points!`;
+                game.screenShake = 10 + (game.comboCount * 5);
+
+                // Happy particles (green/gold sparkles)
+                const particleCount = 20 + (game.comboCount * 10);
+                for (let i = 0; i < particleCount; i++) {
+                    game.particles.push({
+                        x: game.visitorX + 20 + (Math.random() - 0.5) * 100,
+                        y: game.visitorY + 20 + (Math.random() - 0.5) * 100,
+                        vy: Math.random() * 4 + 1,
+                        size: Math.random() * 6 + 2,
+                        alpha: 1,
+                        color: game.comboCount > 2 ? '#FFD700' : '#00FF00'
+                    });
+                }
+            } else if (matchType === 'style') {
+                // Style match is MORE valuable - you know them well!
+                const styleMsg = vis.preferredStyle === 'jazz'
+                    ? `Jazz lover! Excellent taste! +${totalScore}`
+                    : `You know their style! +${totalScore}`;
+                game.bachMessage = styleMsg;
+            } else if (matchType === 'theme') {
+                game.bachMessage = `Right category, but... +${totalScore}`;
+            } else {
+                game.bachMessage = `Not quite right... +${totalScore}`;
+                game.screenShake = 8;
+
+                // Red particles for disappointment
+                for (let i = 0; i < 10; i++) {
+                    game.particles.push({
+                        x: game.visitorX + 20 + (Math.random() - 0.5) * 80,
+                        y: game.visitorY + 20 + (Math.random() - 0.5) * 80,
+                        vy: Math.random() * 2 + 0.5,
+                        size: Math.random() * 4 + 1,
+                        alpha: 1,
+                        color: '#FF0000'
+                    });
+                }
+            }
+
+            game.messageTimer = 1.5;
+
+            // Auto-advance to next round
+            console.log('Scheduling next round in 1.5 seconds...');
+            setTimeout(() => {
+                console.log('setTimeout fired, calling startNextRound');
+                startNextRound();
+            }, 1500);
+        }
+
+        function handleVictory() {
+            console.log('VICTORY!');
+            game.victoryState = true;
+            game.victoryTimer = 0;
+
+            const percentage = Math.round((game.stars / game.maxRounds) * 100);
+            game.bachMessage = `LEVEL COMPLETE!`;
+            game.messageTimer = 999;
+
+            // Big celebratory screen shake (decays quickly)
+            game.screenShake = 20;
+
+            // Generate 200 confetti particles
+            for (let i = 0; i < 200; i++) {
+                game.confetti.push({
+                    x: Math.random() * canvas.width,
+                    y: -20 - Math.random() * 100,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: Math.random() * 3 + 2,
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.2,
+                    size: Math.random() * 10 + 5,
+                    color: ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'][Math.floor(Math.random() * 8)],
+                    alpha: 1
+                });
+            }
+
+            // Generate continuous fireworks
+            game.fireworksInterval = setInterval(() => {
+                if (game.victoryTimer < 5) {
+                    const x = Math.random() * canvas.width;
+                    const y = Math.random() * canvas.height * 0.6;
+
+                    // Create burst of particles
+                    for (let i = 0; i < 30; i++) {
+                        const angle = (Math.PI * 2 * i) / 30;
+                        const speed = Math.random() * 5 + 3;
+                        game.particles.push({
+                            x: x,
+                            y: y,
+                            vx: Math.cos(angle) * speed,
+                            vy: Math.sin(angle) * speed - 2,
+                            size: Math.random() * 4 + 2,
+                            alpha: 1,
+                            color: ['#FFD700', '#FF69B4', '#00FF00', '#00FFFF', '#FF1493'][Math.floor(Math.random() * 5)]
+                        });
+                    }
+                }
+            }, 400);
+        }
+
+        // Rendering
+        function render() {
+            // Clear with modern gradient background
+            const bgGradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            bgGradient.addColorStop(0, '#E8EAF6');
+            bgGradient.addColorStop(0.5, '#F3E5F5');
+            bgGradient.addColorStop(1, '#E1F5FE');
+            ctx.fillStyle = bgGradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // START SCREEN - show before game starts
+            if (!game.gameStarted) {
+                // Title
+                ctx.textAlign = 'center';
+                ctx.font = 'bold 72px Kalam, cursive';
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 8;
+                ctx.fillStyle = '#FFD700';
+                ctx.strokeText('Arrangement Room', canvas.width / 2, 180);
+                ctx.fillText('Arrangement Room', canvas.width / 2, 180);
+
+                // Subtitle
+                ctx.font = 'bold 32px Kalam, cursive';
+                ctx.fillStyle = '#5E35B1';
+                ctx.fillText("Bach's Harmony Challenge", canvas.width / 2, 240);
+
+                // Start button
+                const startBtnX = canvas.width / 2 - 120;
+                const startBtnY = 320;
+                const startBtnW = 240;
+                const startBtnH = 70;
+
+                // Apply hover effect - scale up and add glow
+                if (game.startButtonHover) {
+                    ctx.save();
+                    const centerX = startBtnX + startBtnW / 2;
+                    const centerY = startBtnY + startBtnH / 2;
+
+                    // Move to center, scale, move back
+                    ctx.translate(centerX, centerY);
+                    ctx.scale(1.05, 1.05);
+                    ctx.translate(-centerX, -centerY);
+
+                    // Add glow
+                    ctx.shadowColor = '#FFD700';
+                    ctx.shadowBlur = 20;
+                }
+
+                // Button background
+                ctx.fillStyle = game.startButtonHover ? '#2E86C1' : '#3498DB';
+                ctx.strokeStyle = '#FFD700';
+                ctx.lineWidth = game.startButtonHover ? 5 : 4;
+                roundRect(ctx, startBtnX, startBtnY, startBtnW, startBtnH, 15);
+                ctx.fill();
+                ctx.stroke();
+
+                // Reset shadow
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+
+                // Button text
+                ctx.font = 'bold 36px Kalam, cursive';
+                ctx.fillStyle = '#FFF';
+                ctx.fillText('Start Game', canvas.width / 2, startBtnY + 48);
+
+                if (game.startButtonHover) {
+                    ctx.restore();
+                }
+
+                // Instructions preview
+                ctx.font = '18px Kalam, cursive';
+                ctx.fillStyle = '#666';
+                ctx.fillText('Match artworks to visitor preferences', canvas.width / 2, 460);
+                ctx.fillText('Style preferences matter more than themes!', canvas.width / 2, 490);
+
+                // Store start button bounds for click detection
+                game.startButtonBounds = { x: startBtnX, y: startBtnY, w: startBtnW, h: startBtnH };
+
+                return; // Don't render game elements
+            }
+
+            // Apply screen shake
+            ctx.save();
+            if (game.screenShake > 0) {
+                const shakeX = (Math.random() - 0.5) * game.screenShake;
+                const shakeY = (Math.random() - 0.5) * game.screenShake;
+                ctx.translate(shakeX, shakeY);
+            }
+
+            // Draw Bach (top center)
+            const bachX = 450;
+            const bachY = 60;
+
+            if (game.imagesLoaded && game.images.bach && game.images.bach.complete) {
+                // Draw Bach PNG with shadow
+                const bachWidth = 60;
+                const bachHeight = 80;
+
+                // Shadow
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                ctx.shadowBlur = 10;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 4;
+
+                ctx.drawImage(game.images.bach, bachX - bachWidth/2, bachY - bachHeight/2, bachWidth, bachHeight);
+
+                // Reset shadow
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+
+                // Music notes floating around Bach
+                if (game.images.musicNotes && game.images.musicNotes.complete) {
+                    const noteFloat = Math.sin(game.time * 3) * 3;
+                    const noteSize = 30;
+                    ctx.globalAlpha = 0.8;
+                    ctx.drawImage(game.images.musicNotes, bachX - 50, bachY - 15 + noteFloat, noteSize, noteSize);
+                    ctx.drawImage(game.images.musicNotes, bachX + 30, bachY + noteFloat * 0.8, noteSize, noteSize);
+                    ctx.globalAlpha = 1;
+                }
+            } else {
+                // Fallback: simple stick figure
+                ctx.fillStyle = '#2C3E50';
+                ctx.beginPath();
+                ctx.arc(bachX, bachY, 15, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = '#2C3E50';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(bachX, bachY + 15);
+                ctx.lineTo(bachX, bachY + 40);
+                ctx.stroke();
+            }
+
+            // Bach's message - floating text only, no bubble
+            if (game.bachMessage && game.messageTimer > 0) {
+                const msgX = 450;
+                const msgY = 140;
+
+                // Text with strong outline for visibility
+                ctx.fillStyle = '#FFD700';
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 4;
+                ctx.font = 'bold 18px Kalam, cursive';
+                ctx.textAlign = 'center';
+                ctx.strokeText(game.bachMessage, msgX, msgY);
+                ctx.fillText(game.bachMessage, msgX, msgY);
+            }
+
+            // Draw display wall with modern depth
+            // Outer shadow
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 8;
+
+            // Wall background
+            ctx.fillStyle = '#D2B48C';
+            ctx.fillRect(game.wallX, game.wallY, game.wallWidth, game.wallHeight);
+
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+
+            // Inner shadow effect (darker inset)
+            const gradient = ctx.createLinearGradient(game.wallX, game.wallY, game.wallX, game.wallY + game.wallHeight);
+            gradient.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
+            gradient.addColorStop(0.5, 'rgba(0, 0, 0, 0)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0.05)');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(game.wallX, game.wallY, game.wallWidth, game.wallHeight);
+
+            // Wall label
+            ctx.fillStyle = '#666';
+            ctx.font = 'bold 16px Kalam, cursive';
+            ctx.textAlign = 'center';
+            ctx.fillText('DISPLAY WALL', game.wallX + game.wallWidth / 2, game.wallY - 10);
+            ctx.font = '12px Kalam, cursive';
+            ctx.fillText('(Drag artwork here)', game.wallX + game.wallWidth / 2, game.wallY - 30);
+
+            // Draw shelf artworks
+            game.shelfArtworks.forEach((artwork, i) => {
+                if (!game.dragging || game.dragging !== artwork) {
+                    // Add floating animation
+                    const float = Math.sin(game.time * 2 + i) * 3;
+                    drawArtwork(artwork, artwork.x, artwork.y + float, 1, true);
+                }
+            });
+
+            // Draw placed artwork
+            if (game.placedArtwork) {
+                drawArtwork(game.placedArtwork, game.placedArtwork.x, game.placedArtwork.y, 1, true);
+            }
+
+            // Draw dragging artwork
+            if (game.dragging) {
+                drawArtwork(game.dragging, game.dragging.x, game.dragging.y, 0.8, false);
+            }
+
+            // Draw particles
+            game.particles.forEach((p, i) => {
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.alpha;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+
+                // Update particle
+                if (p.vx !== undefined) {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.15; // gravity for fireworks
+                } else {
+                    p.y -= p.vy;
+                }
+                p.alpha -= 0.02;
+                if (p.alpha <= 0) game.particles.splice(i, 1);
+            });
+
+            // Draw confetti (victory only)
+            game.confetti.forEach((c) => {
+                ctx.save();
+                ctx.translate(c.x, c.y);
+                ctx.rotate(c.rotation);
+                ctx.fillStyle = c.color;
+                ctx.globalAlpha = c.alpha;
+                ctx.fillRect(-c.size/2, -c.size/2, c.size, c.size);
+                ctx.globalAlpha = 1;
+                ctx.restore();
+            });
+
+            // Draw visitor (stick figure with thought bubble)
+            if (game.currentVisitor) {
+                // Pacing animation - moves left/right based on patience
+                const paceRange = 30;
+                const paceSpeed = game.patience < 50 ? 4 : 2; // Pace faster when impatient
+                const paceOffset = Math.sin(game.time * paceSpeed) * paceRange;
+
+                // Bobbing animation
+                const bob = Math.sin(game.time * 3) * 2;
+                const visX = game.visitorX + 30 + paceOffset;
+                const visY = game.visitorY + 20 + bob;
+
+                // Shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                ctx.beginPath();
+                ctx.ellipse(visX, game.visitorY + 68, 20, 5, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Reaction glow with sparkles/particles
+                const glowColors = {
+                    happy: 'rgba(0, 255, 0, 0.6)',
+                    neutral: 'rgba(255, 255, 0, 0.5)',
+                    unhappy: 'rgba(255, 0, 0, 0.6)'
+                };
+                const solidColors = {
+                    happy: '#00FF00',
+                    neutral: '#FFFF00',
+                    unhappy: '#FF0000'
+                };
+
+                // Pulsating radial gradient glow
+                const pulseSize = 30 + Math.sin(game.time * 4) * 10;
+                const gradient = ctx.createRadialGradient(visX, visY + 20, 0, visX, visY + 20, pulseSize);
+                gradient.addColorStop(0, glowColors[game.currentVisitor.reaction]);
+                gradient.addColorStop(0.5, glowColors[game.currentVisitor.reaction].replace('0.6', '0.2'));
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(visX, visY + 20, pulseSize, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Sparkles around visitor
+                for (let i = 0; i < 3; i++) {
+                    const angle = (game.time * 2 + i * (Math.PI * 2 / 3)) % (Math.PI * 2);
+                    const sparkleX = visX + Math.cos(angle) * 35;
+                    const sparkleY = visY + 20 + Math.sin(angle) * 35;
+                    const sparkleSize = 3 + Math.sin(game.time * 6 + i) * 2;
+
+                    ctx.fillStyle = solidColors[game.currentVisitor.reaction];
+                    ctx.shadowColor = solidColors[game.currentVisitor.reaction];
+                    ctx.shadowBlur = 8;
+                    ctx.beginPath();
+                    ctx.arc(sparkleX, sparkleY, sparkleSize, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Reset shadow
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+
+                // Draw visitor PNG using current character
+                let visitorImg = null;
+                if (game.imagesLoaded && game.currentVisitorCharacter) {
+                    visitorImg = game.images[game.currentVisitorCharacter];
+
+                    if (!visitorImg || !visitorImg.complete) {
+                        console.warn(`Visitor character ${game.currentVisitorCharacter} not loaded properly`);
+                    }
+                }
+
+                if (visitorImg && visitorImg.complete) {
+                    const visWidth = 60;
+                    const visHeight = 80;
+                    ctx.drawImage(visitorImg, visX - visWidth/2, visY - visHeight/2 + 10, visWidth, visHeight);
+                } else {
+                    // Fallback: simple stick figure
+                    ctx.fillStyle = '#8B4513';
+                    ctx.beginPath();
+                    ctx.arc(visX, visY, 12, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.strokeStyle = '#333';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.moveTo(visX, visY + 12);
+                    ctx.lineTo(visX, visY + 35);
+                    ctx.stroke();
+                }
+
+                // Brain with text inside - moved right by 1/4 frame width (20px)
+                const brainCenterX = game.visitorX + 120 + 20;
+                const brainCenterY = game.visitorY + 20;
+
+                // Brain icon - preserve aspect ratio, slightly smaller
+                if (game.imagesLoaded && game.images.brain && game.images.brain.complete) {
+                    const img = game.images.brain;
+                    const aspectRatio = img.naturalWidth / img.naturalHeight;
+                    const maxHeight = 110; // Slightly smaller
+                    const brainHeight = maxHeight;
+                    const brainWidth = brainHeight * aspectRatio;
+                    const brainX = brainCenterX - brainWidth/2;
+                    const brainY = brainCenterY - brainHeight/2;
+
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                    ctx.shadowBlur = 15;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 5;
+
+                    ctx.drawImage(img, brainX, brainY, brainWidth, brainHeight);
+
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                } else {
+                    // Fallback brain
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                    ctx.shadowBlur = 15;
+                    ctx.fillStyle = '#FF69B4';
+                    ctx.beginPath();
+                    ctx.arc(brainCenterX, brainCenterY, 50, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
+                }
+
+                // Preference text with stroke outline - centered in brain
+                ctx.textAlign = 'center';
+
+                // "Wants:" label
+                ctx.font = 'bold 12px Kalam, cursive';
+                ctx.strokeStyle = '#FFF';
+                ctx.lineWidth = 4;
+                ctx.fillStyle = '#000';
+                ctx.strokeText('Wants:', brainCenterX, brainCenterY - 15);
+                ctx.fillText('Wants:', brainCenterX, brainCenterY - 15);
+
+                // Theme text with white stroke outline
+                ctx.font = 'bold 16px Kalam, cursive';
+                ctx.strokeStyle = '#FFF';
+                ctx.lineWidth = 5;
+                ctx.fillStyle = '#CC3300';
+                ctx.strokeText(game.currentVisitor.preferredTheme, brainCenterX, brainCenterY + 5);
+                ctx.fillText(game.currentVisitor.preferredTheme, brainCenterX, brainCenterY + 5);
+
+                // Style text with white stroke outline
+                ctx.font = 'bold 13px Kalam, cursive';
+                ctx.strokeStyle = '#FFF';
+                ctx.lineWidth = 4;
+                ctx.fillStyle = '#003399';
+                ctx.strokeText('(' + game.currentVisitor.preferredStyle + ')', brainCenterX, brainCenterY + 25);
+                ctx.fillText('(' + game.currentVisitor.preferredStyle + ')', brainCenterX, brainCenterY + 25);
+            }
+
+            // HUD (bottom right) with glassmorphism effect
+            const hudX = canvas.width - 225;
+            const hudY = 555;
+            const hudW = 210;
+            const hudH = 85;
+
+            // Shadow
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 4;
+
+            // Glassmorphism background
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            roundRect(ctx, hudX, hudY, hudW, hudH, 10);
+            ctx.fill();
+
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+
+            // Border with subtle glow
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.lineWidth = 2;
+            roundRect(ctx, hudX, hudY, hudW, hudH, 10);
+            ctx.stroke();
+
+            // Text with improved spacing
+            ctx.fillStyle = '#FFD700';
+            ctx.font = 'bold 16px Kalam, cursive';
+            ctx.textAlign = 'left';
+            ctx.fillText(`Round: ${game.round}/${game.maxRounds}`, hudX + 15, hudY + 28);
+            ctx.fillText(`Stars: ${game.stars}/${game.maxRounds}`, hudX + 15, hudY + 50);
+            ctx.fillStyle = '#FFF';
+            ctx.fillText(`Score: ${game.score}`, hudX + 15, hudY + 72);
+
+            // Patience meter (above visitor)
+            if (game.currentVisitor && !game.placedArtwork) {
+                const meterX = game.visitorX + 20;
+                const meterY = game.visitorY - 30;
+                const meterW = 150;
+                const meterH = 20;
+
+                // Background
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                roundRect(ctx, meterX, meterY, meterW, meterH, 5);
+                ctx.fill();
+
+                // Patience bar
+                const patienceWidth = (game.patience / 100) * meterW;
+                const patienceColor = game.patience > 50 ? '#4CAF50' : game.patience > 25 ? '#FFC107' : '#F44336';
+                ctx.fillStyle = patienceColor;
+                roundRect(ctx, meterX, meterY, patienceWidth, meterH, 5);
+                ctx.fill();
+
+                // Label
+                ctx.fillStyle = '#FFF';
+                ctx.font = 'bold 11px Kalam, cursive';
+                ctx.textAlign = 'center';
+                ctx.fillText('Patience', meterX + meterW / 2, meterY - 5);
+            }
+
+            // Combo display (top left)
+            if (game.comboCount > 0) {
+                ctx.fillStyle = '#FFD700';
+                ctx.font = 'bold 24px Kalam, cursive';
+                ctx.textAlign = 'left';
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 4;
+                ctx.strokeText(`${game.comboCount}x COMBO!`, 20, 40);
+                ctx.fillText(`${game.comboCount}x COMBO!`, 20, 40);
+            }
+
+            // VICTORY SCREEN!
+            if (game.victoryState) {
+                // Semi-transparent overlay
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Main victory text with pulsing animation
+                const pulse = Math.sin(game.victoryTimer * 4) * 0.2 + 1;
+                ctx.textAlign = 'center';
+
+                // "LEVEL COMPLETE!" title
+                ctx.font = `bold ${Math.floor(60 * pulse)}px Kalam, cursive`;
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 8;
+                ctx.fillStyle = '#FFD700';
+                ctx.strokeText('LEVEL COMPLETE!', canvas.width / 2, 150);
+                ctx.fillText('LEVEL COMPLETE!', canvas.width / 2, 150);
+
+                // Stats box
+                const boxY = 220;
+                const boxH = 250;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.fillRect(canvas.width / 2 - 200, boxY, 400, boxH);
+                ctx.strokeStyle = '#FFD700';
+                ctx.lineWidth = 4;
+                ctx.strokeRect(canvas.width / 2 - 200, boxY, 400, boxH);
+
+                // Final stats
+                const percentage = Math.round((game.stars / game.maxRounds) * 100);
+                ctx.font = 'bold 28px Kalam, cursive';
+                ctx.fillStyle = '#FFF';
+                ctx.textAlign = 'center';
+
+                ctx.fillText(`Stars Earned: ${game.stars}/${game.maxRounds}`, canvas.width / 2, boxY + 50);
+                ctx.fillText(`Satisfaction: ${percentage}%`, canvas.width / 2, boxY + 90);
+                ctx.fillText(`Final Score: ${game.score}`, canvas.width / 2, boxY + 130);
+
+                // Grade based on performance
+                let grade = 'C';
+                let gradeColor = '#FFA500';
+                if (percentage >= 95) { grade = 'S'; gradeColor = '#FFD700'; }
+                else if (percentage >= 85) { grade = 'A'; gradeColor = '#00FF00'; }
+                else if (percentage >= 75) { grade = 'B'; gradeColor = '#00CCFF'; }
+
+                ctx.font = 'bold 48px Kalam, cursive';
+                ctx.fillStyle = gradeColor;
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 6;
+                ctx.strokeText(`Grade: ${grade}`, canvas.width / 2, boxY + 190);
+                ctx.fillText(`Grade: ${grade}`, canvas.width / 2, boxY + 190);
+
+                // Restart button on victory screen
+                const restartBtnX = canvas.width / 2 - 100;
+                const restartBtnY = boxY + boxH + 20;
+                const restartBtnW = 200;
+                const restartBtnH = 50;
+
+                const blinkAlpha = Math.sin(game.victoryTimer * 3) * 0.3 + 0.7;
+                ctx.globalAlpha = blinkAlpha;
+
+                // Button background
+                ctx.fillStyle = '#3498DB';
+                ctx.strokeStyle = '#FFD700';
+                ctx.lineWidth = 3;
+                roundRect(ctx, restartBtnX, restartBtnY, restartBtnW, restartBtnH, 10);
+                ctx.fill();
+                ctx.stroke();
+
+                // Button text
+                ctx.font = 'bold 24px Kalam, cursive';
+                ctx.fillStyle = '#FFF';
+                ctx.textAlign = 'center';
+                ctx.fillText('Restart Level', canvas.width / 2, restartBtnY + 33);
+                ctx.globalAlpha = 1;
+
+                // Store restart button bounds for click detection
+                game.restartButtonBounds = { x: restartBtnX, y: restartBtnY, w: restartBtnW, h: restartBtnH };
+            } else {
+                game.restartButtonBounds = null; // Clear when not in victory state
+            }
+
+            // On-screen restart button (upper left corner) - always visible
+            const restartBtnCanvasX = 20;
+            const restartBtnCanvasY = 20;
+            const restartBtnCanvasW = 60;
+            const restartBtnCanvasH = 50;
+
+            // Button background with rounded corners
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 3;
+            roundRect(ctx, restartBtnCanvasX, restartBtnCanvasY, restartBtnCanvasW, restartBtnCanvasH, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            // Restart icon (circular arrow)
+            ctx.strokeStyle = '#FFF';
+            ctx.fillStyle = '#FFF';
+            ctx.lineWidth = 3;
+            const centerX = restartBtnCanvasX + restartBtnCanvasW / 2;
+            const centerY = restartBtnCanvasY + restartBtnCanvasH / 2;
+
+            // Draw circular arrow
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 12, 0.5, Math.PI * 2 - 0.5);
+            ctx.stroke();
+
+            // Arrow head
+            ctx.beginPath();
+            ctx.moveTo(centerX + 12, centerY - 3);
+            ctx.lineTo(centerX + 12, centerY + 5);
+            ctx.lineTo(centerX + 18, centerY);
+            ctx.closePath();
+            ctx.fill();
+
+            // Store restart button bounds for click detection
+            game.restartButtonCanvasBounds = { x: restartBtnCanvasX, y: restartBtnCanvasY, w: restartBtnCanvasW, h: restartBtnCanvasH };
+
+            // On-screen pause button (upper right corner)
+            const pauseBtnX = canvas.width - 80;
+            const pauseBtnY = 20;
+            const pauseBtnW = 60;
+            const pauseBtnH = 50;
+
+            // Button background with rounded corners
+            ctx.fillStyle = game.paused ? '#4CAF50' : 'rgba(0, 0, 0, 0.6)';
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 3;
+            roundRect(ctx, pauseBtnX, pauseBtnY, pauseBtnW, pauseBtnH, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            // Pause/Play icon
+            ctx.fillStyle = '#FFF';
+            if (game.paused) {
+                // Play triangle
+                ctx.beginPath();
+                ctx.moveTo(pauseBtnX + 20, pauseBtnY + 12);
+                ctx.lineTo(pauseBtnX + 20, pauseBtnY + 38);
+                ctx.lineTo(pauseBtnX + 45, pauseBtnY + 25);
+                ctx.closePath();
+                ctx.fill();
+            } else {
+                // Pause bars
+                ctx.fillRect(pauseBtnX + 18, pauseBtnY + 12, 8, 26);
+                ctx.fillRect(pauseBtnX + 34, pauseBtnY + 12, 8, 26);
+            }
+
+            // Store pause button bounds for click detection
+            game.pauseButtonBounds = { x: pauseBtnX, y: pauseBtnY, w: pauseBtnW, h: pauseBtnH };
+
+            // Pause overlay
+            if (game.paused && !game.victoryState) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.textAlign = 'center';
+                ctx.font = 'bold 60px Kalam, cursive';
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 8;
+                ctx.fillStyle = '#FFD700';
+                ctx.strokeText('PAUSED', canvas.width / 2, canvas.height / 2 - 30);
+                ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2 - 30);
+
+                ctx.font = 'bold 24px Kalam, cursive';
+                ctx.fillStyle = '#FFF';
+                ctx.fillText('Click pause icon to resume', canvas.width / 2, canvas.height / 2 + 40);
+            }
+
+            // Restore canvas state (end screen shake)
+            ctx.restore();
+        }
+
+        function drawArtwork(artwork, x, y, alpha = 1, drawShadow = true) {
+            ctx.save();
+            ctx.globalAlpha = alpha;
+
+            const artWidth = 80;
+            const artHeight = 120;
+
+            // Modern shadow with depth
+            if (drawShadow) {
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+                ctx.shadowBlur = 15;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 6;
+            }
+
+            // Always draw colored frame background
+            const artGradient = ctx.createLinearGradient(x, y, x, y + artHeight);
+            const baseColor = artwork.color;
+            artGradient.addColorStop(0, lightenColor(baseColor, 10));
+            artGradient.addColorStop(1, baseColor);
+            ctx.fillStyle = artGradient;
+            ctx.fillRect(x, y, artWidth, artHeight);
+
+            // Reset shadow for icon
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+
+            // Draw icon on top of frame
+            const hasPNG = game.imagesLoaded && artwork.iconImg && game.images[artwork.iconImg] && game.images[artwork.iconImg].complete;
+
+            if (hasPNG) {
+                // Draw PNG icon on top of colored frame
+                const iconSize = 50;
+                const iconX = x + artWidth/2 - iconSize/2;
+                const iconY = y + artHeight/2 - iconSize/2 - 5;
+                ctx.drawImage(game.images[artwork.iconImg], iconX, iconY, iconSize, iconSize);
+            } else if (artwork.icon) {
+                // Fallback to emoji
+                ctx.font = '32px Kalam, cursive';
+                ctx.textAlign = 'center';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                ctx.shadowBlur = 4;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 2;
+                ctx.fillText(artwork.icon, x + 40, y + 60);
+            }
+
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+
+            // Labels with better contrast
+            ctx.fillStyle = '#FFF';
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.lineWidth = 3;
+            ctx.font = 'bold 12px Kalam, cursive';
+            ctx.strokeText(artwork.theme, x + 40, y + 100);
+            ctx.fillText(artwork.theme, x + 40, y + 100);
+            ctx.font = 'bold 13px Kalam, cursive';
+            ctx.strokeText(artwork.style, x + 40, y + 115);
+            ctx.fillText(artwork.style, x + 40, y + 115);
+
+            ctx.restore();
+        }
+
+        // Helper function to lighten colors
+        function lightenColor(color, percent) {
+            const num = parseInt(color.replace('#', ''), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = Math.min(255, (num >> 16) + amt);
+            const G = Math.min(255, ((num >> 8) & 0x00FF) + amt);
+            const B = Math.min(255, (num & 0x0000FF) + amt);
+            return '#' + (0x1000000 + R * 0x10000 + G * 0x100 + B).toString(16).slice(1);
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            ctx.lineTo(x + r, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.closePath();
+        }
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            let yPos = y;
+
+            words.forEach((word, i) => {
+                const testLine = line + word + ' ';
+                const metrics = ctx.measureText(testLine);
+
+                if (metrics.width > maxWidth && i > 0) {
+                    ctx.fillText(line, x, yPos);
+                    line = word + ' ';
+                    yPos += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            });
+            ctx.fillText(line, x, yPos);
+        }
+
+        // Update loop
+        function update(dt) {
+            // Don't update game state when paused
+            if (game.paused) return;
+
+            if (game.messageTimer > 0) {
+                game.messageTimer -= dt;
+            }
+            game.time += dt;
+
+            // Screen shake decay (must happen before victory check!)
+            if (game.screenShake > 0) {
+                game.screenShake *= 0.85;
+                if (game.screenShake < 0.1) game.screenShake = 0;
+            }
+
+            // Victory state updates
+            if (game.victoryState) {
+                game.victoryTimer += dt;
+
+                // Update confetti
+                game.confetti.forEach((c, i) => {
+                    c.x += c.vx;
+                    c.y += c.vy;
+                    c.vy += 0.15; // gravity
+                    c.rotation += c.rotationSpeed;
+
+                    // Remove if off screen
+                    if (c.y > canvas.height + 50) {
+                        game.confetti.splice(i, 1);
+                    }
+                });
+
+                // Stop fireworks after 5 seconds
+                if (game.victoryTimer > 5 && game.fireworksInterval) {
+                    clearInterval(game.fireworksInterval);
+                    game.fireworksInterval = null;
+                }
+
+                return; // Skip normal game updates during victory
+            }
+
+            // Patience drains while visitor is waiting (faster in later rounds)
+            if (game.currentVisitor && !game.placedArtwork && game.roundInProgress) {
+                // Progressive difficulty: patience drains faster as rounds progress
+                const roundMultiplier = 1 + (game.round / game.maxRounds) * 2; // 1x to 3x speed
+                game.patience -= game.patienceDecay * roundMultiplier;
+                if (game.patience <= 0) {
+                    // Visitor leaves unhappy - lose combo and start new round
+                    game.roundInProgress = false; // Mark round as ending
+                    game.comboCount = 0;
+                    game.bachMessage = "They left unhappy! Patience ran out.";
+                    game.messageTimer = 2;
+                    game.patience = 0; // Lock at 0 to prevent re-triggering
+                    setTimeout(() => startNextRound(), 2000);
+                }
+            }
+        }
+
+        // Input handling
         canvas.addEventListener('mousedown', (e) => {
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
-            // Check if clicking on unplaced artwork
-            const unplacedArtworks = level.currentArtworks.filter(
-                art => !level.placedArtworks.find(p => p.id === art.id)
-            );
-
-            unplacedArtworks.forEach((artwork, index) => {
-                const artX = 50;
-                const artY = 150 + (index * 140);
-
-                if (x >= artX && x <= artX + 80 && y >= artY && y <= artY + 120) {
-                    draggedArtwork = artwork;
-                    dragOffsetX = x - artX;
-                    dragOffsetY = y - artY;
+            // Check if clicking on start button (before game starts)
+            if (!game.gameStarted && game.startButtonBounds) {
+                const sb = game.startButtonBounds;
+                if (x >= sb.x && x <= sb.x + sb.w && y >= sb.y && y <= sb.y + sb.h) {
+                    console.log('Start button clicked');
+                    startGame();
+                    return;
                 }
-            });
+            }
 
-            // Check if clicking on placed artwork
-            level.placedArtworks.forEach(artwork => {
-                if (x >= artwork.x && x <= artwork.x + 80 &&
-                    y >= artwork.y && y <= artwork.y + 120) {
-                    draggedArtwork = artwork;
-                    dragOffsetX = x - artwork.x;
-                    dragOffsetY = y - artwork.y;
+            // Check if clicking on restart button (upper left, always visible)
+            if (game.restartButtonCanvasBounds) {
+                const rb = game.restartButtonCanvasBounds;
+                if (x >= rb.x && x <= rb.x + rb.w && y >= rb.y && y <= rb.y + rb.h) {
+                    console.log('Restart button clicked on canvas');
+                    location.reload(); // Restart the game
+                    return;
                 }
-            });
+            }
 
-            // Check if clicking confirm button
-            if (level.placedArtworks.length === level.currentArtworks.length &&
-                level.currentArtworks.length > 0) {
-                if (x >= 700 && x <= 820 && y >= 500 && y <= 540) {
-                    level.confirmArrangement();
+            // Check if clicking on pause button
+            if (game.pauseButtonBounds && !game.victoryState) {
+                const pb = game.pauseButtonBounds;
+                if (x >= pb.x && x <= pb.x + pb.w && y >= pb.y && y <= pb.y + pb.h) {
+                    game.paused = !game.paused;
+                    console.log('Pause button clicked on canvas, paused:', game.paused);
+                    return; // Don't process other clicks
+                }
+            }
+
+            // Check if clicking on any shelf artwork
+            if (!game.placedArtwork && !game.paused) {
+                for (let artwork of game.shelfArtworks) {
+                    const ax = artwork.x;
+                    const ay = artwork.y;
+
+                    if (x >= ax && x <= ax + 80 && y >= ay && y <= ay + 120) {
+                        game.dragging = artwork;
+                        game.dragOffsetX = x - ax;
+                        game.dragOffsetY = y - ay;
+                        break;
+                    }
                 }
             }
         });
 
         canvas.addEventListener('mousemove', (e) => {
-            if (draggedArtwork) {
-                const rect = canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
 
-                // Visual feedback while dragging (could render preview)
-                canvas.style.cursor = 'grabbing';
-            } else {
-                canvas.style.cursor = 'pointer';
+            // Check if hovering over start button for cursor change
+            if (!game.gameStarted && game.startButtonBounds) {
+                const sb = game.startButtonBounds;
+                if (x >= sb.x && x <= sb.x + sb.w && y >= sb.y && y <= sb.y + sb.h) {
+                    canvas.style.cursor = 'pointer';
+                    game.startButtonHover = true;
+                    return;
+                } else {
+                    canvas.style.cursor = 'default';
+                    game.startButtonHover = false;
+                    return;
+                }
+            }
+
+            // Check if hovering over restart button for cursor change
+            if (game.restartButtonCanvasBounds) {
+                const rb = game.restartButtonCanvasBounds;
+                if (x >= rb.x && x <= rb.x + rb.w && y >= rb.y && y <= rb.y + rb.h) {
+                    canvas.style.cursor = 'pointer';
+                    return;
+                }
+            }
+
+            // Check if hovering over pause button for cursor change
+            if (game.pauseButtonBounds && !game.victoryState) {
+                const pb = game.pauseButtonBounds;
+                if (x >= pb.x && x <= pb.x + pb.w && y >= pb.y && y <= pb.y + pb.h) {
+                    canvas.style.cursor = 'pointer';
+                } else if (!game.dragging) {
+                    canvas.style.cursor = 'grab';
+                }
+            }
+
+            if (game.dragging) {
+                game.dragging.x = x - game.dragOffsetX;
+                game.dragging.y = y - game.dragOffsetY;
             }
         });
 
         canvas.addEventListener('mouseup', (e) => {
-            if (draggedArtwork) {
+            if (game.dragging) {
                 const rect = canvas.getBoundingClientRect();
                 const x = e.clientX - rect.left;
                 const y = e.clientY - rect.top;
 
-                // Check which wall was dropped on
-                level.walls.forEach(wall => {
-                    if (x >= wall.x && x <= wall.x + wall.width &&
-                        y >= wall.y && y <= wall.y + wall.height) {
-                        level.placeArtwork(draggedArtwork, wall);
-                    }
-                });
+                // Check if dropped on wall
+                if (x >= game.wallX && x <= game.wallX + game.wallWidth &&
+                    y >= game.wallY && y <= game.wallY + game.wallHeight) {
 
-                draggedArtwork = null;
-                canvas.style.cursor = 'pointer';
+                    // Place on wall
+                    game.placedArtwork = {
+                        ...game.dragging,
+                        x: game.wallX + game.wallWidth / 2 - 40,
+                        y: game.wallY + game.wallHeight / 2 - 60
+                    };
+
+                    // Spawn particles
+                    for (let i = 0; i < 15; i++) {
+                        game.particles.push({
+                            x: game.wallX + game.wallWidth / 2 + (Math.random() - 0.5) * 100,
+                            y: game.wallY + game.wallHeight / 2 + (Math.random() - 0.5) * 100,
+                            vy: Math.random() * 2 + 1,
+                            size: Math.random() * 4 + 2,
+                            alpha: 1,
+                            color: '#FFD700'
+                        });
+                    }
+
+                    // Remove from shelf
+                    const index = game.shelfArtworks.indexOf(game.dragging);
+                    if (index > -1) {
+                        game.shelfArtworks.splice(index, 1);
+                    }
+
+                    evaluatePlacement();
+
+                } else {
+                    // Return to original position with new spacing
+                    const originalIndex = game.dragging.index;
+                    game.dragging.x = game.shelfX;
+                    game.dragging.y = game.shelfY + (originalIndex * game.shelfSpacing);
+                }
+
+                game.dragging = null;
             }
         });
 
-        // Restart button
-        document.getElementById('restartBtn').addEventListener('click', () => {
-            location.reload();
-        });
+        // Note: Pause and Restart functionality are now handled by on-screen canvas buttons
 
         // Game loop
+        let lastTime = 0;
         function gameLoop(timestamp) {
-            const dt = 1 / 60; // Fixed timestep
+            const dt = (timestamp - lastTime) / 1000;
+            lastTime = timestamp;
 
-            // Update
-            level.update(dt);
-            ui.update(dt);
-            particles.update(dt);
-
-            // Render
-            const ctx = canvas.getContext('2d');
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            level.render(ctx);
-            particles.render(ctx);
-            ui.render(ctx);
+            update(dt);
+            render();
 
             requestAnimationFrame(gameLoop);
         }
 
+        // Start
+        init();
         requestAnimationFrame(gameLoop);
-
-        console.log('Level 2: Arrangement Room - Bach\'s Harmony Challenge');
     </script>
 </body>
 </html>

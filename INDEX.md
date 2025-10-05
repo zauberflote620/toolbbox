@@ -1,4 +1,4 @@
-# The Visual-First Shop Reset Toolbox
+# The Visual-First Toolbox
 
 Welcome to your reusable, methodology-led toolkit for conducting efficient and effective shop resets. This toolbox is designed to be adapted to any retail space by first understanding your unique constraints and goals.
 

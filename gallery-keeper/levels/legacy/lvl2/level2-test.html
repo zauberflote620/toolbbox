@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Level 2 Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #2C3E50;
+            color: white;
+            padding: 20px;
+        }
+        canvas {
+            display: block;
+            background: #F5E6D3;
+            margin: 20px auto;
+            border: 2px solid red;
+        }
+        #debug {
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            font-family: monospace;
+            margin: 20px auto;
+            max-width: 900px;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Level 2 Diagnostic Test</h1>
+    <canvas id="gameCanvas" width="900" height="650"></canvas>
+    <div id="debug">Loading...</div>
+
+    <script>
+        const debugDiv = document.getElementById('debug');
+        function log(msg) {
+            debugDiv.textContent += msg + '\n';
+            console.log(msg);
+        }
+
+        try {
+            log('1. Getting canvas...');
+            const canvas = document.getElementById('gameCanvas');
+            log('Canvas element: ' + (canvas ? 'FOUND' : 'NULL'));
+
+            log('2. Getting context...');
+            const ctx = canvas.getContext('2d');
+            log('Context: ' + (ctx ? 'OK' : 'FAILED'));
+
+            log('3. Drawing beige background...');
+            ctx.fillStyle = '#F5E6D3';
+            ctx.fillRect(0, 0, 900, 650);
+            log('Background drawn');
+
+            log('4. Drawing red test square at 100,100...');
+            ctx.fillStyle = '#FF0000';
+            ctx.fillRect(100, 100, 100, 100);
+            log('Red square drawn');
+
+            log('5. Drawing test text...');
+            ctx.fillStyle = '#000000';
+            ctx.font = '30px Arial';
+            ctx.fillText('TEST TEXT', 300, 300);
+            log('Text drawn');
+
+            log('6. Drawing Bach circle at 100,100...');
+            ctx.fillStyle = '#2C3E50';
+            ctx.beginPath();
+            ctx.arc(100, 100, 30, 0, Math.PI * 2);
+            ctx.fill();
+            log('Bach circle drawn');
+
+            log('\nSUCCESS: All drawing operations completed');
+            log('If you see red square, text, and dark circle, canvas works!');
+
+        } catch (error) {
+            log('ERROR: ' + error.message);
+            log('Stack: ' + error.stack);
+        }
+    </script>
+</body>
+</html>

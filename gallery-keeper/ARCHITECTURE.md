@@ -237,29 +237,61 @@ Score update → Next visitor
 
 ### Level 2: Arrangement Room
 
-**AI Concept:** Multi-Constraint Optimization
-**Gameplay:** Arrange artworks to satisfy visitor preferences
+**AI Concept:** Pattern Recognition + Weighted Preference Learning
+**Gameplay:** Match artworks to visitor style preferences (deeper knowledge > surface observations)
 **Mentor:** Johann Sebastian Bach (composer, music director)
+**Status:** MVP Complete (Oct 4, 2025)
 
 **Architecture:**
-- Artwork inventory system (8 types with properties)
-- Three gallery walls (placement zones)
-- Visitor preference evaluation
-- Harmony scoring (grouping bonus)
-- Progressive difficulty (1-4 artworks per round)
+- Single-file implementation (level2.html) - 1500+ lines
+- 12 artwork types (4 themes × 3 styles)
+  - Themes: NATURE, PEOPLE, SHAPES, OBJECTS (equal probability)
+  - Styles: classical (45%), modern (45%), jazz (10% - rare!)
+- Drag-and-drop artwork selection system
+- Weighted matching probability (25% perfect / 75% partial)
+- Time-based scoring with patience mechanic
+- Canvas-based UI (start screen, pause, restart buttons)
+- Progressive difficulty (patience drains faster each round)
 
 **Key Mechanics:**
 ```
-Round starts → Artworks available → Player arranges →
-Visitor reacts (colored glow) → Player confirms →
-Score + star → Next round
+Start Screen (user-initiated) → Tutorial (4 messages, auto-advancing) →
+Round starts → 3 artworks presented (weighted selection) →
+Player drags artwork to display wall →
+Evaluation (style > theme weighting) →
+Score + patience bonus + particles →
+Next round (20 total)
 ```
 
+**Scoring Philosophy - Style > Theme:**
+- **Perfect match** (theme + style): 100 base + patience bonus + combo multiplier
+- **Style match** (deeper knowledge): 60 base + patience bonus
+- **Theme match** (surface observation): 40 base + patience bonus
+- **No match**: 10 base + patience bonus
+- **Rationale**: Style preference is deeper knowledge (like music taste) vs theme (easy to observe)
+
 **Evaluation Algorithm:**
+```javascript
+// Weighted match probability
+perfectMatch = random() < 0.25 ? true : false  // 25% chance
+
+// Time bonus
+patienceBonus = floor(patience * 0.5)  // Up to +50 points
+
+// Combo system
+comboBonus = (consecutive_perfects * 50) // Multiplier for streaks
+
+// Final score
+totalScore = baseScore + patienceBonus + comboBonus
 ```
-Satisfaction = (theme_match + style_match) * count + harmony_bonus
-Reaction = happy(>70%) | neutral(40-70%) | unhappy(<40%)
-```
+
+**UI Components:**
+- Start screen with animated hover button
+- Restart button (upper left) - always visible, circular arrow icon
+- Pause button (upper right) - play/pause states
+- HUD (bottom right) - score, stars, round counter
+- Patience meter (above visitor) - color-coded urgency
+- Victory screen with letter grades (S/A/B/C)
 
 ## Data Flow
 

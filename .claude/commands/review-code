@@ -1,0 +1,101 @@
+---
+description: Comprehensive code review with quality analysis
+arguments: [files/paths] [--auto|--ask]
+---
+
+# Code Review
+
+**Output Format: Inline MD text only. NEVER create MD files.**
+
+**Default**: `/review-code` = Review with confirmation for fixes
+- `/review-code --auto` = Auto-apply safe improvements
+- `/review-code --ask` = Confirm each suggestion
+
+USE SUBAGENT /code-reviewer:
+Perform comprehensive code quality analysis focusing on maintainability, performance, and best practices.
+
+## Review Process
+
+### Code Quality Analysis
+```bash
+echo "=== CODE QUALITY ANALYSIS ==="
+# Complexity analysis
+radon cc app/ --min C --show-complexity | head -10
+radon mi app/ --min B | head -5
+
+# Dead code detection
+vulture app/ --min-confidence 80 | head -10
+
+# Code duplication
+python -c "
+import ast, os
+from collections import defaultdict
+duplicates = defaultdict(list)
+for root, dirs, files in os.walk('app/'):
+    for file in files:
+        if file.endswith('.py'):
+            with open(os.path.join(root, file)) as f:
+                try:
+                    tree = ast.parse(f.read())
+                    # Simple duplicate detection logic
+                except: pass
+"
+```
+
+### Architecture Review
+```bash
+echo "=== ARCHITECTURE REVIEW ==="
+# Import analysis
+python -c "
+import ast, os
+imports = {}
+for root, dirs, files in os.walk('app/'):
+    for file in files:
+        if file.endswith('.py'):
+            filepath = os.path.join(root, file)
+            with open(filepath) as f:
+                try:
+                    tree = ast.parse(f.read())
+                    for node in ast.walk(tree):
+                        if isinstance(node, ast.ImportFrom) and node.module:
+                            imports[filepath] = imports.get(filepath, []) + [node.module]
+                except: pass
+print('Top internal imports:', len([i for i in str(imports) if 'app.' in str(i)]))
+"
+```
+
+### Performance Analysis
+```bash
+echo "=== PERFORMANCE REVIEW ==="
+# Check for common performance issues
+grep -r "for.*in.*range(len" --include="*.py" app/ | head -3
+grep -r "\.append.*for.*in" --include="*.py" app/ | head -3
+grep -r "time\.sleep" --include="*.py" app/ | head -3
+```
+
+## Code Review Report
+
+**Files Reviewed**: XX
+**Issues Found**: XX (High: X, Medium: XX, Low: XXX)
+**Architecture Score**: X/10
+**Performance Score**: X/10
+
+### Critical Issues 🔴
+```
+file.py:123 - High: Performance bottleneck in loop
+file.py:456 - High: Security vulnerability in input handling
+```
+
+### Recommendations 💡
+1. [Specific improvement with code example]
+2. [Architecture enhancement]
+3. [Performance optimization]
+
+### Next Commands (Confidence: High/Medium/Low)
+**If CLEAN**: `/test` → `/quality-pipeline`
+**If ISSUES**: `/review-code --auto` → `/lint --fix`
+
+**Recommended Next**: `/[specific-command]` (Confidence: [High/Medium/Low])
+**Run next command automatically?** [Y/n]
+
+✅ Code review complete. Next: /test

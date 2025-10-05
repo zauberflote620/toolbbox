@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Reset Toolbox - Advanced Layout Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        .app-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            grid-template-rows: 60px 1fr 50px;
+            height: 100vh;
+            gap: 0;
+        }
+
+        /* HEADER */
+        .header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            font-size: 20px;
+            color: white;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #4ade80;
+            color: #1a1a2e;
+        }
+
+        .btn-primary:hover {
+            background: #22c55e;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            background: #16213e;
+            border-right: 1px solid #2a3f5f;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .panel-section {
+            margin-bottom: 30px;
+        }
+
+        .panel-section h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 5px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 8px 12px;
+            background: #0f1729;
+            border: 1px solid #2a3f5f;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* FIXTURE LIBRARY */
+        .fixture-library {
+            display: grid;
+            gap: 10px;
+        }
+
+        .fixture-category {
+            margin-bottom: 15px;
+        }
+
+        .fixture-category-title {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .fixture-item {
+            background: #0f1729;
+            border: 2px solid #2a3f5f;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: grab;
+            transition: all 0.2s;
+        }
+
+        .fixture-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .fixture-item:active {
+            cursor: grabbing;
+        }
+
+        .fixture-item-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .fixture-item-specs {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        /* PRODUCT LIST */
+        .product-list {
+            display: grid;
+            gap: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .product-item {
+            background: #0f1729;
+            border: 2px solid #2a3f5f;
+            border-radius: 6px;
+            padding: 10px;
+            cursor: grab;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-item:hover {
+            border-color: #4ade80;
+        }
+
+        .product-item.assigned {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.1);
+        }
+
+        .product-item.dragging {
+            opacity: 0.5;
+        }
+
+        .product-name {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .product-value {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .product-status {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ef4444;
+        }
+
+        .product-status.assigned {
+            background: #22c55e;
+        }
+
+        /* MAIN CANVAS */
+        .canvas-area {
+            background: #0f1729;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .canvas-toolbar {
+            background: #16213e;
+            padding: 10px 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-bottom: 1px solid #2a3f5f;
+        }
+
+        .canvas-container {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #mainCanvas {
+            background: #1a1a2e;
+            cursor: crosshair;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        /* RIGHT PANEL */
+        .right-panel {
+            background: #16213e;
+            border-left: 1px solid #2a3f5f;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* FIXTURE PROPERTIES EDITOR */
+        .properties-editor {
+            background: #0f1729;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .properties-editor h4 {
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .property-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .property-full {
+            grid-column: 1 / -1;
+        }
+
+        /* ZONE MANAGER */
+        .zone-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .zone-item {
+            background: #0f1729;
+            border-radius: 6px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .zone-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 2px solid #2a3f5f;
+        }
+
+        .zone-name {
+            flex: 1;
+            margin-left: 10px;
+            font-size: 13px;
+        }
+
+        /* BULK IMPORT */
+        .bulk-import textarea {
+            width: 100%;
+            height: 150px;
+            background: #0f1729;
+            border: 1px solid #2a3f5f;
+            border-radius: 6px;
+            padding: 10px;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            resize: vertical;
+        }
+
+        .bulk-import textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .bulk-import-hint {
+            font-size: 11px;
+            color: #64748b;
+            margin-top: 5px;
+        }
+
+        /* FOOTER */
+        .footer {
+            grid-column: 1 / -1;
+            background: #16213e;
+            border-top: 1px solid #2a3f5f;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .footer-info {
+            font-size: 12px;
+            color: #64748b;
+        }
+
+        /* SCROLLBAR STYLING */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f1729;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2a3f5f;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3a5f8f;
+        }
+
+        /* ALERTS */
+        .alert {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            z-index: 999;
+            display: none;
+            min-width: 300px;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert.success {
+            background: #22c55e;
+            color: white;
+        }
+
+        .alert.error {
+            background: #ef4444;
+            color: white;
+        }
+
+        .alert.info {
+            background: #3b82f6;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* CONTEXT MENU */
+        .context-menu {
+            position: fixed;
+            background: #16213e;
+            border: 1px solid #2a3f5f;
+            border-radius: 8px;
+            padding: 8px 0;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .context-menu-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .context-menu-item:hover {
+            background: #0f1729;
+        }
+
+        .context-menu-item.danger:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* RESIZE HANDLES */
+        .resize-handle {
+            position: absolute;
+            background: #667eea;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .fixture.selected .resize-handle {
+            opacity: 0.8;
+        }
+
+        .resize-handle:hover {
+            opacity: 1;
+        }
+
+        .resize-nw { top: -4px; left: -4px; width: 8px; height: 8px; cursor: nwse-resize; border-radius: 50%; }
+        .resize-ne { top: -4px; right: -4px; width: 8px; height: 8px; cursor: nesw-resize; border-radius: 50%; }
+        .resize-sw { bottom: -4px; left: -4px; width: 8px; height: 8px; cursor: nesw-resize; border-radius: 50%; }
+        .resize-se { bottom: -4px; right: -4px; width: 8px; height: 8px; cursor: nwse-resize; border-radius: 50%; }
+        .resize-n { top: -4px; left: 50%; transform: translateX(-50%); width: 40px; height: 8px; cursor: ns-resize; border-radius: 4px; }
+        .resize-s { bottom: -4px; left: 50%; transform: translateX(-50%); width: 40px; height: 8px; cursor: ns-resize; border-radius: 4px; }
+        .resize-w { left: -4px; top: 50%; transform: translateY(-50%); width: 8px; height: 40px; cursor: ew-resize; border-radius: 4px; }
+        .resize-e { right: -4px; top: 50%; transform: translateY(-50%); width: 8px; height: 40px; cursor: ew-resize; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div id="alertBox" class="alert"></div>
+    <div id="contextMenu" class="context-menu"></div>
+
+    <div class="app-layout">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>Shop Reset Toolbox - Advanced Layout Editor</h1>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="saveLayout()">Save Layout</button>
+                <button class="btn btn-secondary" onclick="exportCanvas()">Export PNG</button>
+                <button class="btn btn-secondary" onclick="exportCSV()">Export CSV</button>
+                <button class="btn btn-primary" onclick="runOptimization()">Run Optimization</button>
+            </div>
+        </div>
+
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="panel-section">
+                <h3>Store Dimensions</h3>
+                <div class="input-group">
+                    <label>Width (inches)</label>
+                    <input type="number" id="storeWidth" value="1000" onchange="updateCanvasSize()">
+                </div>
+                <div class="input-group">
+                    <label>Height (inches)</label>
+                    <input type="number" id="storeHeight" value="600" onchange="updateCanvasSize()">
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Fixture Library</h3>
+                <div class="fixture-library" id="fixtureLibrary"></div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Product List (<span id="productCount">0</span>)</h3>
+                <button class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;" onclick="showUploadCSV()">Upload CSV</button>
+                <div class="product-list" id="productList"></div>
+            </div>
+        </div>
+
+        <!-- MAIN CANVAS -->
+        <div class="canvas-area">
+            <div class="canvas-toolbar">
+                <button class="btn btn-secondary" onclick="toggleZones()">Toggle Zones</button>
+                <button class="btn btn-secondary" onclick="toggleHeatMap()">Toggle Heat Map</button>
+                <button class="btn btn-secondary" onclick="deleteSelected()">Delete Selected</button>
+                <span style="flex: 1;"></span>
+                <span style="font-size: 12px; color: #64748b;">Zoom: <span id="zoomLevel">100%</span></span>
+            </div>
+            <div class="canvas-container">
+                <canvas id="mainCanvas"></canvas>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="right-panel">
+            <div class="panel-section">
+                <h3>Fixture Properties</h3>
+                <div class="properties-editor" id="propertiesEditor">
+                    <p style="color: #64748b; font-size: 13px;">Select a fixture to edit properties</p>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Zone Manager</h3>
+                <button class="btn btn-secondary" style="width: 100%; margin-bottom: 10px;" onclick="addZone()">Add Zone</button>
+                <div class="zone-list" id="zoneList"></div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Bulk Import</h3>
+                <div class="bulk-import">
+                    <textarea id="bulkImportText" placeholder="Paste your products here...&#10;Format: Product Name, Zone, Fixture&#10;Example: Winter Coat, Entrance, Gondola-1"></textarea>
+                    <div class="bulk-import-hint">One product per line: Name, Zone, Fixture</div>
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="processBulkImport()">Import Products</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <div class="footer-info">
+                <span id="fixtureCount">0 fixtures</span> | <span id="assignedCount">0 assigned</span>
+            </div>
+            <div class="footer-info">
+                Mouse: <span id="mousePos">0, 0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== FIXTURE LIBRARY DATA ====================
+        const FIXTURE_LIBRARY = {
+            gondolas: [
+                {
+                    id: 'madix-3ft-60',
+                    name: 'Madix Gondola 3ft',
+                    type: 'gondola',
+                    width: 36,
+                    depth: 16,
+                    height: 60,
+                    shelves: {
+                        count: 4,
+                        adjustable: true,
+                        spacing: 15,
+                        weightCapacity: 150
+                    },
+                    wallType: 'solid',
+                    color: '#94a3b8'
+                },
+                {
+                    id: 'madix-4ft-72',
+                    name: 'Madix Gondola 4ft',
+                    type: 'gondola',
+                    width: 48,
+                    depth: 20,
+                    height: 72,
+                    shelves: {
+                        count: 5,
+                        adjustable: true,
+                        spacing: 14,
+                        weightCapacity: 150
+                    },
+                    wallType: 'solid',
+                    color: '#94a3b8'
+                },
+                {
+                    id: 'gondola-slatwall',
+                    name: 'Slatwall Gondola',
+                    type: 'gondola',
+                    width: 48,
+                    depth: 20,
+                    height: 72,
+                    shelves: {
+                        count: 4,
+                        adjustable: true,
+                        spacing: 18,
+                        weightCapacity: 150
+                    },
+                    wallType: 'slatwall',
+                    color: '#a78bfa'
+                }
+            ],
+            tables: [
+                {
+                    id: 'uline-table-medium',
+                    name: 'Uline Table Medium',
+                    type: 'table',
+                    width: 60,
+                    depth: 30,
+                    height: 24,
+                    hotZones: {
+                        front: { heat: 0.9, y: 0, height: 10 },
+                        center: { heat: 0.6, y: 10, height: 10 },
+                        back: { heat: 0.3, y: 20, height: 10 }
+                    },
+                    color: '#f59e0b'
+                },
+                {
+                    id: 'uline-table-large',
+                    name: 'Uline Table Large',
+                    type: 'table',
+                    width: 72,
+                    depth: 36,
+                    height: 30,
+                    hotZones: {
+                        front: { heat: 0.9, y: 0, height: 12 },
+                        center: { heat: 0.6, y: 12, height: 12 },
+                        back: { heat: 0.3, y: 24, height: 12 }
+                    },
+                    color: '#f59e0b'
+                }
+            ],
+            kiosks: [
+                {
+                    id: 'kiosk-double-slatwall',
+                    name: 'Double Slatwall Kiosk',
+                    type: 'kiosk',
+                    width: 24,
+                    depth: 24,
+                    height: 56,
+                    doors: {
+                        type: 'armoire',
+                        count: 2,
+                        openAngle: 90,
+                        isOpen: false
+                    },
+                    interior: {
+                        shelves: 3,
+                        spacing: 14,
+                        wallType: 'slatwall'
+                    },
+                    color: '#8b5cf6'
+                },
+                {
+                    id: 'kiosk-four-sided',
+                    name: 'Four-Sided Kiosk',
+                    type: 'kiosk',
+                    width: 24,
+                    depth: 24,
+                    height: 54,
+                    doors: {
+                        type: 'none',
+                        count: 0
+                    },
+                    interior: {
+                        shelves: 4,
+                        spacing: 12,
+                        wallType: 'gridwall'
+                    },
+                    color: '#8b5cf6'
+                }
+            ],
+            displays: [
+                {
+                    id: 'uline-etagere',
+                    name: 'Uline Étagère',
+                    type: 'display',
+                    width: 48,
+                    depth: 26,
+                    height: 84,
+                    shelves: {
+                        count: 3,
+                        adjustable: true,
+                        spacing: 21,
+                        weightCapacity: 100
+                    },
+                    color: '#06b6d4'
+                },
+                {
+                    id: 'uline-island',
+                    name: 'Uline Retail Island',
+                    type: 'display',
+                    width: 72,
+                    depth: 26,
+                    height: 36,
+                    shelves: {
+                        count: 3,
+                        adjustable: false,
+                        spacing: 14,
+                        weightCapacity: 100
+                    },
+                    color: '#06b6d4'
+                }
+            ]
+        };
+
+        // ==================== APPLICATION STATE ====================
+        const appState = {
+            storeWidth: 1000,
+            storeHeight: 600,
+            fixtures: [],
+            zones: [],
+            products: [],
+            selectedFixture: null,
+            draggedProduct: null,
+            draggedFixture: null,
+            resizing: null,
+            showZones: true,
+            showHeatMap: false,
+            nextFixtureId: 1,
+            nextZoneId: 1
+        };
+
+        // ==================== INITIALIZATION ====================
+        window.addEventListener('load', () => {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            renderFixtureLibrary();
+            loadSampleData();
+            updateCanvasSize();
+            setupCanvasEvents();
+            updateStats();
+            showAlert('Welcome! Click fixtures from the library to add them to your store.', 'info');
+        }
+
+        function renderFixtureLibrary() {
+            const libraryDiv = document.getElementById('fixtureLibrary');
+            libraryDiv.innerHTML = '';
+
+            for (const [category, fixtures] of Object.entries(FIXTURE_LIBRARY)) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'fixture-category';
+
+                const title = document.createElement('div');
+                title.className = 'fixture-category-title';
+                title.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                categoryDiv.appendChild(title);
+
+                fixtures.forEach(fixture => {
+                    const item = document.createElement('div');
+                    item.className = 'fixture-item';
+                    item.draggable = true;
+                    item.dataset.fixtureData = JSON.stringify(fixture);
+
+                    item.innerHTML = `
+                        <div class="fixture-item-name">${fixture.name}</div>
+                        <div class="fixture-item-specs">${fixture.width}" × ${fixture.depth}" × ${fixture.height}"</div>
+                        ${fixture.shelves ? `<div class="fixture-item-specs">${fixture.shelves.count} shelves</div>` : ''}
+                    `;
+
+                    item.addEventListener('dragstart', handleFixtureDragStart);
+                    item.addEventListener('click', () => addFixtureToCanvas(fixture));
+
+                    categoryDiv.appendChild(item);
+                });
+
+                libraryDiv.appendChild(categoryDiv);
+            }
+        }
+
+        function loadSampleData() {
+            appState.products = [
+                { id: 1, name: 'Winter Coat', category: 'Outerwear', price: 199.99, margin: 0.60, fixtureId: null, zone: null },
+                { id: 2, name: 'Wool Scarf', category: 'Accessories', price: 29.99, margin: 0.55, fixtureId: null, zone: null },
+                { id: 3, name: 'Leather Boots', category: 'Footwear', price: 149.99, margin: 0.65, fixtureId: null, zone: null },
+                { id: 4, name: 'Cashmere Sweater', category: 'Apparel', price: 89.99, margin: 0.70, fixtureId: null, zone: null },
+                { id: 5, name: 'Denim Jeans', category: 'Apparel', price: 79.99, margin: 0.50, fixtureId: null, zone: null }
+            ];
+
+            appState.zones = [
+                { id: 1, name: 'Entrance', color: '#3b82f6', x: 50, y: 50, width: 200, height: 150 },
+                { id: 2, name: 'High Traffic', color: '#eab308', x: 300, y: 100, width: 250, height: 200 },
+                { id: 3, name: 'Checkout', color: '#22c55e', x: 700, y: 400, width: 200, height: 150 }
+            ];
+
+            renderProductList();
+            renderZoneList();
+        }
+
+        // ==================== FIXTURE MANAGEMENT ====================
+        function addFixtureToCanvas(fixtureTemplate) {
+            const fixture = {
+                ...JSON.parse(JSON.stringify(fixtureTemplate)),
+                fixtureId: `fixture-${appState.nextFixtureId++}`,
+                x: 100 + (appState.fixtures.length * 30),
+                y: 100 + (appState.fixtures.length * 20),
+                rotation: 0,
+                products: []
+            };
+
+            appState.fixtures.push(fixture);
+            renderCanvas();
+            updateStats();
+            showAlert(`Added ${fixture.name} to canvas`, 'success');
+        }
+
+        function handleFixtureDragStart(e) {
+            e.dataTransfer.effectAllowed = 'copy';
+            e.dataTransfer.setData('fixtureData', e.target.dataset.fixtureData);
+        }
+
+        // ==================== CANVAS RENDERING ====================
+        function updateCanvasSize() {
+            const canvas = document.getElementById('mainCanvas');
+            const width = parseInt(document.getElementById('storeWidth').value);
+            const height = parseInt(document.getElementById('storeHeight').value);
+
+            appState.storeWidth = width;
+            appState.storeHeight = height;
+
+            canvas.width = width;
+            canvas.height = height;
+
+            renderCanvas();
+        }
+
+        function renderCanvas() {
+            const canvas = document.getElementById('mainCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Clear canvas
+            ctx.fillStyle = '#1a1a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw grid
+            drawGrid(ctx);
+
+            // Draw zones
+            if (appState.showZones) {
+                drawZones(ctx);
+            }
+
+            // Draw fixtures
+            appState.fixtures.forEach(fixture => {
+                drawFixture(ctx, fixture);
+            });
+
+            // Draw heat map overlays
+            if (appState.showHeatMap) {
+                drawHeatMap(ctx);
+            }
+        }
+
+        function drawGrid(ctx) {
+            ctx.strokeStyle = '#2a3f5f';
+            ctx.lineWidth = 1;
+
+            // Vertical lines every 12 inches
+            for (let x = 0; x < appState.storeWidth; x += 12) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, appState.storeHeight);
+                ctx.stroke();
+            }
+
+            // Horizontal lines every 12 inches
+            for (let y = 0; y < appState.storeHeight; y += 12) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(appState.storeWidth, y);
+                ctx.stroke();
+            }
+        }
+
+        function drawZones(ctx) {
+            appState.zones.forEach(zone => {
+                ctx.fillStyle = zone.color + '40';
+                ctx.fillRect(zone.x, zone.y, zone.width, zone.height);
+
+                ctx.strokeStyle = zone.color;
+                ctx.lineWidth = 2;
+                ctx.strokeRect(zone.x, zone.y, zone.width, zone.height);
+
+                ctx.fillStyle = zone.color;
+                ctx.font = '12px sans-serif';
+                ctx.fillText(zone.name, zone.x + 10, zone.y + 20);
+            });
+        }
+
+        function drawFixture(ctx, fixture) {
+            const isSelected = appState.selectedFixture === fixture.fixtureId;
+
+            // Main fixture body
+            ctx.fillStyle = fixture.color;
+            ctx.fillRect(fixture.x, fixture.y, fixture.width, fixture.depth);
+
+            // Border
+            ctx.strokeStyle = isSelected ? '#667eea' : '#2a3f5f';
+            ctx.lineWidth = isSelected ? 3 : 1;
+            ctx.strokeRect(fixture.x, fixture.y, fixture.width, fixture.depth);
+
+            // Fixture label
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '11px sans-serif';
+            ctx.fillText(fixture.name, fixture.x + 5, fixture.y + 15);
+
+            // Draw shelves for gondolas
+            if (fixture.shelves && fixture.shelves.count > 0) {
+                ctx.strokeStyle = '#1a1a2e';
+                ctx.lineWidth = 1;
+                const shelfSpacing = fixture.depth / (fixture.shelves.count + 1);
+                for (let i = 1; i <= fixture.shelves.count; i++) {
+                    const shelfY = fixture.y + (shelfSpacing * i);
+                    ctx.beginPath();
+                    ctx.moveTo(fixture.x, shelfY);
+                    ctx.lineTo(fixture.x + fixture.width, shelfY);
+                    ctx.stroke();
+                }
+            }
+
+            // Draw products on fixture
+            if (fixture.products && fixture.products.length > 0) {
+                ctx.fillStyle = '#22c55e';
+                ctx.fillRect(fixture.x + fixture.width - 10, fixture.y + 5, 8, 8);
+                ctx.fillStyle = '#ffffff';
+                ctx.font = '9px sans-serif';
+                ctx.fillText(fixture.products.length, fixture.x + fixture.width - 8, fixture.y + 12);
+            }
+
+            // Draw kiosk doors
+            if (fixture.type === 'kiosk' && fixture.doors && fixture.doors.count > 0) {
+                if (fixture.doors.isOpen) {
+                    const doorWidth = fixture.width / 2;
+                    ctx.strokeStyle = '#667eea';
+                    ctx.lineWidth = 2;
+                    // Left door
+                    ctx.strokeRect(fixture.x - 15, fixture.y, 15, fixture.depth);
+                    // Right door
+                    ctx.strokeRect(fixture.x + fixture.width, fixture.y, 15, fixture.depth);
+                }
+            }
+
+            // Draw heat zones for tables
+            if (fixture.type === 'table' && appState.showHeatMap && fixture.hotZones) {
+                for (const [zone, data] of Object.entries(fixture.hotZones)) {
+                    const alpha = Math.floor(data.heat * 100);
+                    ctx.fillStyle = `rgba(239, 68, 68, 0.${alpha})`;
+                    ctx.fillRect(fixture.x, fixture.y + data.y, fixture.width, data.height);
+                }
+            }
+        }
+
+        function drawHeatMap(ctx) {
+            // This would show aggregate heat map based on product placement
+            // For now, just show table hot zones (already handled in drawFixture)
+        }
+
+        // ==================== CANVAS INTERACTIONS ====================
+        function setupCanvasEvents() {
+            const canvas = document.getElementById('mainCanvas');
+
+            canvas.addEventListener('click', handleCanvasClick);
+            canvas.addEventListener('mousedown', handleCanvasMouseDown);
+            canvas.addEventListener('mousemove', handleCanvasMouseMove);
+            canvas.addEventListener('mouseup', handleCanvasMouseUp);
+            canvas.addEventListener('contextmenu', handleCanvasContextMenu);
+            canvas.addEventListener('dragover', handleCanvasDragOver);
+            canvas.addEventListener('drop', handleCanvasDrop);
+
+            // Track mouse position
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const x = Math.floor(e.clientX - rect.left);
+                const y = Math.floor(e.clientY - rect.top);
+                document.getElementById('mousePos').textContent = `${x}, ${y}`;
+            });
+
+            // Keyboard events
+            document.addEventListener('keydown', handleKeyDown);
+        }
+
+        function handleCanvasClick(e) {
+            const rect = e.target.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const clicked = findFixtureAtPoint(x, y);
+
+            if (clicked) {
+                appState.selectedFixture = clicked.fixtureId;
+                renderCanvas();
+                showFixtureProperties(clicked);
+            } else {
+                appState.selectedFixture = null;
+                renderCanvas();
+                clearFixtureProperties();
+            }
+        }
+
+        function handleCanvasMouseDown(e) {
+            const rect = e.target.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const fixture = findFixtureAtPoint(x, y);
+            if (fixture) {
+                appState.draggedFixture = {
+                    fixture: fixture,
+                    offsetX: x - fixture.x,
+                    offsetY: y - fixture.y
+                };
+            }
+        }
+
+        function handleCanvasMouseMove(e) {
+            if (appState.draggedFixture) {
+                const rect = e.target.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+
+                appState.draggedFixture.fixture.x = x - appState.draggedFixture.offsetX;
+                appState.draggedFixture.fixture.y = y - appState.draggedFixture.offsetY;
+
+                renderCanvas();
+            }
+        }
+
+        function handleCanvasMouseUp(e) {
+            appState.draggedFixture = null;
+        }
+
+        function handleCanvasContextMenu(e) {
+            e.preventDefault();
+            const rect = e.target.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const fixture = findFixtureAtPoint(x, y);
+            if (fixture) {
+                showContextMenu(e.clientX, e.clientY, fixture);
+            }
+        }
+
+        function handleCanvasDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleCanvasDrop(e) {
+            e.preventDefault();
+            const rect = e.target.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Check if dropping a product
+            if (appState.draggedProduct !== null) {
+                const fixture = findFixtureAtPoint(x, y);
+                if (fixture) {
+                    const product = appState.products[appState.draggedProduct];
+                    product.fixtureId = fixture.fixtureId;
+                    fixture.products = fixture.products || [];
+                    fixture.products.push(product.id);
+                    showAlert(`Assigned ${product.name} to ${fixture.name}`, 'success');
+                    renderCanvas();
+                    renderProductList();
+                    updateStats();
+                }
+                appState.draggedProduct = null;
+            }
+
+            // Check if dropping a fixture from library
+            const fixtureData = e.dataTransfer.getData('fixtureData');
+            if (fixtureData) {
+                const template = JSON.parse(fixtureData);
+                const fixture = {
+                    ...JSON.parse(JSON.stringify(template)),
+                    fixtureId: `fixture-${appState.nextFixtureId++}`,
+                    x: x - template.width / 2,
+                    y: y - template.depth / 2,
+                    rotation: 0,
+                    products: []
+                };
+                appState.fixtures.push(fixture);
+                renderCanvas();
+                updateStats();
+                showAlert(`Added ${fixture.name} to canvas`, 'success');
+            }
+        }
+
+        function handleKeyDown(e) {
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                deleteSelected();
+            }
+        }
+
+        function findFixtureAtPoint(x, y) {
+            for (let i = appState.fixtures.length - 1; i >= 0; i--) {
+                const f = appState.fixtures[i];
+                if (x >= f.x && x <= f.x + f.width && y >= f.y && y <= f.y + f.depth) {
+                    return f;
+                }
+            }
+            return null;
+        }
+
+        // ==================== FIXTURE PROPERTIES EDITOR ====================
+        function showFixtureProperties(fixture) {
+            const editor = document.getElementById('propertiesEditor');
+
+            let html = `<h4>${fixture.name}</h4>`;
+
+            // Dimensions
+            html += `
+                <div class="property-row">
+                    <div class="input-group">
+                        <label>Width</label>
+                        <input type="number" value="${fixture.width}" onchange="updateFixtureProperty('${fixture.fixtureId}', 'width', this.value)">
+                    </div>
+                    <div class="input-group">
+                        <label>Depth</label>
+                        <input type="number" value="${fixture.depth}" onchange="updateFixtureProperty('${fixture.fixtureId}', 'depth', this.value)">
+                    </div>
+                </div>
+            `;
+
+            // Shelves for gondolas/displays
+            if (fixture.shelves) {
+                html += `
+                    <div class="property-row">
+                        <div class="input-group">
+                            <label>Shelf Count</label>
+                            <input type="number" value="${fixture.shelves.count}" onchange="updateFixtureShelfCount('${fixture.fixtureId}', this.value)">
+                        </div>
+                        <div class="input-group">
+                            <label>Shelf Spacing</label>
+                            <input type="number" value="${fixture.shelves.spacing}" onchange="updateFixtureShelfSpacing('${fixture.fixtureId}', this.value)">
+                        </div>
+                    </div>
+                `;
+
+                html += `
+                    <div class="property-full">
+                        <div class="input-group">
+                            <label>Wall Type</label>
+                            <select onchange="updateFixtureWallType('${fixture.fixtureId}', this.value)">
+                                <option value="solid" ${fixture.wallType === 'solid' ? 'selected' : ''}>Solid</option>
+                                <option value="slatwall" ${fixture.wallType === 'slatwall' ? 'selected' : ''}>Slatwall</option>
+                                <option value="gridwall" ${fixture.wallType === 'gridwall' ? 'selected' : ''}>Gridwall</option>
+                                <option value="pegboard" ${fixture.wallType === 'pegboard' ? 'selected' : ''}>Pegboard</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Kiosk doors
+            if (fixture.doors && fixture.doors.count > 0) {
+                html += `
+                    <div class="property-full">
+                        <button class="btn btn-secondary" style="width: 100%;" onclick="toggleKioskDoors('${fixture.fixtureId}')">
+                            ${fixture.doors.isOpen ? 'Close Doors' : 'Open Doors'}
+                        </button>
+                    </div>
+                `;
+            }
+
+            // Assigned products
+            if (fixture.products && fixture.products.length > 0) {
+                html += `
+                    <div class="property-full">
+                        <label style="font-size: 12px; color: #667eea; margin-top: 10px; display: block;">Assigned Products (${fixture.products.length})</label>
+                        <div style="font-size: 11px; color: #94a3b8; max-height: 100px; overflow-y: auto;">
+                `;
+                fixture.products.forEach(pid => {
+                    const product = appState.products.find(p => p.id === pid);
+                    if (product) {
+                        html += `<div>• ${product.name}</div>`;
+                    }
+                });
+                html += `</div></div>`;
+            }
+
+            editor.innerHTML = html;
+        }
+
+        function clearFixtureProperties() {
+            const editor = document.getElementById('propertiesEditor');
+            editor.innerHTML = '<p style="color: #64748b; font-size: 13px;">Select a fixture to edit properties</p>';
+        }
+
+        function updateFixtureProperty(fixtureId, prop, value) {
+            const fixture = appState.fixtures.find(f => f.fixtureId === fixtureId);
+            if (fixture) {
+                fixture[prop] = parseFloat(value);
+                renderCanvas();
+            }
+        }
+
+        function updateFixtureShelfCount(fixtureId, count) {
+            const fixture = appState.fixtures.find(f => f.fixtureId === fixtureId);
+            if (fixture && fixture.shelves) {
+                fixture.shelves.count = parseInt(count);
+                renderCanvas();
+            }
+        }
+
+        function updateFixtureShelfSpacing(fixtureId, spacing) {
+            const fixture = appState.fixtures.find(f => f.fixtureId === fixtureId);
+            if (fixture && fixture.shelves) {
+                fixture.shelves.spacing = parseFloat(spacing);
+                renderCanvas();
+            }
+        }
+
+        function updateFixtureWallType(fixtureId, wallType) {
+            const fixture = appState.fixtures.find(f => f.fixtureId === fixtureId);
+            if (fixture) {
+                fixture.wallType = wallType;
+                renderCanvas();
+                showAlert(`Wall type changed to ${wallType}`, 'info');
+            }
+        }
+
+        function toggleKioskDoors(fixtureId) {
+            const fixture = appState.fixtures.find(f => f.fixtureId === fixtureId);
+            if (fixture && fixture.doors) {
+                fixture.doors.isOpen = !fixture.doors.isOpen;
+                renderCanvas();
+                showFixtureProperties(fixture);
+            }
+        }
+
+        // ==================== PRODUCT MANAGEMENT ====================
+        function renderProductList() {
+            const listDiv = document.getElementById('productList');
+            listDiv.innerHTML = '';
+
+            appState.products.forEach((product, index) => {
+                const item = document.createElement('div');
+                item.className = 'product-item';
+                if (product.fixtureId) item.classList.add('assigned');
+                item.draggable = true;
+                item.dataset.index = index;
+
+                item.innerHTML = `
+                    <div>
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-value">$${product.price} | ${(product.margin * 100).toFixed(0)}% margin</div>
+                    </div>
+                    <div class="product-status ${product.fixtureId ? 'assigned' : ''}"></div>
+                `;
+
+                item.addEventListener('dragstart', handleProductDragStart);
+                item.addEventListener('dragend', handleProductDragEnd);
+
+                listDiv.appendChild(item);
+            });
+
+            document.getElementById('productCount').textContent = appState.products.length;
+        }
+
+        function handleProductDragStart(e) {
+            e.target.classList.add('dragging');
+            appState.draggedProduct = parseInt(e.target.dataset.index);
+        }
+
+        function handleProductDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        // ==================== ZONE MANAGEMENT ====================
+        function renderZoneList() {
+            const listDiv = document.getElementById('zoneList');
+            listDiv.innerHTML = '';
+
+            appState.zones.forEach(zone => {
+                const item = document.createElement('div');
+                item.className = 'zone-item';
+
+                item.innerHTML = `
+                    <div class="zone-color" style="background: ${zone.color};"></div>
+                    <div class="zone-name">${zone.name}</div>
+                    <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 11px;" onclick="deleteZone(${zone.id})">Delete</button>
+                `;
+
+                listDiv.appendChild(item);
+            });
+        }
+
+        function addZone() {
+            const name = prompt('Zone name:');
+            if (!name) return;
+
+            const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            const zone = {
+                id: appState.nextZoneId++,
+                name: name,
+                color: color,
+                x: 100,
+                y: 100,
+                width: 200,
+                height: 150
+            };
+
+            appState.zones.push(zone);
+            renderZoneList();
+            renderCanvas();
+            showAlert(`Added zone: ${name}`, 'success');
+        }
+
+        function deleteZone(id) {
+            appState.zones = appState.zones.filter(z => z.id !== id);
+            renderZoneList();
+            renderCanvas();
+        }
+
+        function toggleZones() {
+            appState.showZones = !appState.showZones;
+            renderCanvas();
+        }
+
+        function toggleHeatMap() {
+            appState.showHeatMap = !appState.showHeatMap;
+            renderCanvas();
+        }
+
+        // ==================== BULK IMPORT ====================
+        function processBulkImport() {
+            const text = document.getElementById('bulkImportText').value.trim();
+            if (!text) {
+                showAlert('Please paste product data first', 'error');
+                return;
+            }
+
+            const lines = text.split('\n');
+            let imported = 0;
+
+            lines.forEach(line => {
+                const parts = line.split(',').map(p => p.trim());
+                if (parts.length < 3) return;
+
+                const [name, zoneName, fixtureName] = parts;
+
+                // Find zone
+                const zone = appState.zones.find(z => z.name.toLowerCase() === zoneName.toLowerCase());
+
+                // Find fixture
+                const fixture = appState.fixtures.find(f => f.fixtureId.includes(fixtureName) || f.name.includes(fixtureName));
+
+                // Create or find product
+                let product = appState.products.find(p => p.name === name);
+                if (!product) {
+                    product = {
+                        id: appState.products.length + 1,
+                        name: name,
+                        category: 'General',
+                        price: 50,
+                        margin: 0.5,
+                        fixtureId: fixture ? fixture.fixtureId : null,
+                        zone: zone ? zone.id : null
+                    };
+                    appState.products.push(product);
+                } else {
+                    if (fixture) product.fixtureId = fixture.fixtureId;
+                    if (zone) product.zone = zone.id;
+                }
+
+                if (fixture && product.fixtureId) {
+                    fixture.products = fixture.products || [];
+                    if (!fixture.products.includes(product.id)) {
+                        fixture.products.push(product.id);
+                    }
+                }
+
+                imported++;
+            });
+
+            renderProductList();
+            renderCanvas();
+            updateStats();
+            showAlert(`Imported ${imported} products`, 'success');
+            document.getElementById('bulkImportText').value = '';
+        }
+
+        // ==================== CONTEXT MENU ====================
+        function showContextMenu(x, y, fixture) {
+            const menu = document.getElementById('contextMenu');
+            menu.innerHTML = `
+                <div class="context-menu-item" onclick="duplicateFixture('${fixture.fixtureId}')">Duplicate</div>
+                <div class="context-menu-item" onclick="rotateFixture('${fixture.fixtureId}')">Rotate 90°</div>
+                <div class="context-menu-item danger" onclick="deleteFixture('${fixture.fixtureId}')">Delete</div>
+            `;
+            menu.style.left = x + 'px';
+            menu.style.top = y + 'px';
+            menu.style.display = 'block';
+
+            setTimeout(() => {
+                document.addEventListener('click', () => {
+                    menu.style.display = 'none';
+                }, { once: true });
+            }, 10);
+        }
+
+        function duplicateFixture(fixtureId) {
+            const original = appState.fixtures.find(f => f.fixtureId === fixtureId);
+            if (original) {
+                const copy = {
+                    ...JSON.parse(JSON.stringify(original)),
+                    fixtureId: `fixture-${appState.nextFixtureId++}`,
+                    x: original.x + 30,
+                    y: original.y + 30,
+                    products: []
+                };
+                appState.fixtures.push(copy);
+                renderCanvas();
+                updateStats();
+            }
+        }
+
+        function rotateFixture(fixtureId) {
+            const fixture = appState.fixtures.find(f => f.fixtureId === fixtureId);
+            if (fixture) {
+                [fixture.width, fixture.depth] = [fixture.depth, fixture.width];
+                renderCanvas();
+            }
+        }
+
+        function deleteFixture(fixtureId) {
+            appState.fixtures = appState.fixtures.filter(f => f.fixtureId !== fixtureId);
+            appState.products.forEach(p => {
+                if (p.fixtureId === fixtureId) p.fixtureId = null;
+            });
+            renderCanvas();
+            renderProductList();
+            updateStats();
+            clearFixtureProperties();
+            showAlert('Fixture deleted', 'info');
+        }
+
+        function deleteSelected() {
+            if (appState.selectedFixture) {
+                deleteFixture(appState.selectedFixture);
+                appState.selectedFixture = null;
+            }
+        }
+
+        // ==================== OPTIMIZATION ====================
+        function runOptimization() {
+            showAlert('Running optimization...', 'info');
+
+            setTimeout(() => {
+                // Simple greedy optimization
+                const unassigned = appState.products.filter(p => !p.fixtureId);
+
+                unassigned.forEach(product => {
+                    // Find best fixture based on simple heuristics
+                    let bestFixture = null;
+                    let bestScore = -1;
+
+                    appState.fixtures.forEach(fixture => {
+                        const productCount = fixture.products ? fixture.products.length : 0;
+                        const score = (fixture.width * fixture.depth) - (productCount * 10);
+
+                        if (score > bestScore) {
+                            bestScore = score;
+                            bestFixture = fixture;
+                        }
+                    });
+
+                    if (bestFixture) {
+                        product.fixtureId = bestFixture.fixtureId;
+                        bestFixture.products = bestFixture.products || [];
+                        bestFixture.products.push(product.id);
+                    }
+                });
+
+                renderCanvas();
+                renderProductList();
+                updateStats();
+                showAlert('Optimization complete!', 'success');
+            }, 1000);
+        }
+
+        // ==================== EXPORT FUNCTIONS ====================
+        function saveLayout() {
+            const layout = {
+                storeWidth: appState.storeWidth,
+                storeHeight: appState.storeHeight,
+                fixtures: appState.fixtures,
+                zones: appState.zones,
+                products: appState.products
+            };
+
+            const json = JSON.stringify(layout, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `shop-layout-${Date.now()}.json`;
+            a.click();
+            showAlert('Layout saved!', 'success');
+        }
+
+        function exportCanvas() {
+            const canvas = document.getElementById('mainCanvas');
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `shop-layout-${Date.now()}.png`;
+                a.click();
+                showAlert('Canvas exported as PNG!', 'success');
+            });
+        }
+
+        function exportCSV() {
+            let csv = 'Product,Category,Price,Margin,Fixture,Zone\n';
+
+            appState.products.forEach(product => {
+                const fixture = appState.fixtures.find(f => f.fixtureId === product.fixtureId);
+                const zone = appState.zones.find(z => z.id === product.zone);
+
+                csv += `"${product.name}","${product.category}",${product.price},${product.margin},"${fixture ? fixture.name : 'Unassigned'}","${zone ? zone.name : 'None'}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `product-list-${Date.now()}.csv`;
+            a.click();
+            showAlert('Product list exported as CSV!', 'success');
+        }
+
+        // ==================== UTILITIES ====================
+        function updateStats() {
+            document.getElementById('fixtureCount').textContent = `${appState.fixtures.length} fixtures`;
+            const assigned = appState.products.filter(p => p.fixtureId).length;
+            document.getElementById('assignedCount').textContent = `${assigned}/${appState.products.length} assigned`;
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('alertBox');
+            alert.textContent = message;
+            alert.className = `alert ${type} show`;
+
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 3000);
+        }
+
+        function showUploadCSV() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.csv';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    parseCSV(event.target.result);
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+
+                const values = lines[i].split(',').map(v => v.trim());
+                const product = {
+                    id: appState.products.length + 1,
+                    name: values[headers.indexOf('name')],
+                    category: values[headers.indexOf('category')] || 'General',
+                    price: parseFloat(values[headers.indexOf('price')]) || 50,
+                    margin: parseFloat(values[headers.indexOf('margin')]) || 0.5,
+                    fixtureId: null,
+                    zone: null
+                };
+
+                appState.products.push(product);
+            }
+
+            renderProductList();
+            showAlert(`Imported ${lines.length - 1} products from CSV`, 'success');
+        }
+    </script>
+</body>
+</html>

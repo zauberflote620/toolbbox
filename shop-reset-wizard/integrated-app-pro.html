@@ -1,0 +1,2955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop Reset Toolbox - Professional Edition</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: #0a0e1a;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        .app-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr 380px;
+            grid-template-rows: 60px 1fr 50px;
+            height: 100vh;
+            gap: 0;
+        }
+
+        /* HEADER */
+        .header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .header h1 {
+            font-size: 18px;
+            color: white;
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #4ade80;
+            color: #0a0e1a;
+        }
+
+        .btn-primary:hover {
+            background: #22c55e;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.15);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.25);
+        }
+
+        .btn-small {
+            padding: 4px 10px;
+            font-size: 11px;
+        }
+
+        /* LEFT PANEL */
+        .left-panel {
+            background: #12161f;
+            border-right: 1px solid #1e293b;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .panel-section {
+            margin-bottom: 24px;
+        }
+
+        .panel-section h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #667eea;
+            margin-bottom: 12px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 11px;
+            color: #94a3b8;
+            margin-bottom: 4px;
+            font-weight: 500;
+        }
+
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 7px 10px;
+            background: #0a0e1a;
+            border: 1px solid #1e293b;
+            border-radius: 5px;
+            color: #e0e0e0;
+            font-size: 13px;
+        }
+
+        .input-group input:focus, .input-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: #0f1419;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        /* FIXTURE LIBRARY */
+        .fixture-library {
+            display: grid;
+            gap: 8px;
+        }
+
+        .fixture-category {
+            margin-bottom: 12px;
+        }
+
+        .fixture-category-title {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .fixture-item {
+            background: #0a0e1a;
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .fixture-item:hover {
+            border-color: #667eea;
+            transform: translateX(4px);
+            background: #0f1419;
+        }
+
+        .fixture-item-name {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .fixture-item-specs {
+            font-size: 10px;
+            color: #64748b;
+        }
+
+        .fixture-item-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #667eea;
+            color: white;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        /* PRODUCT LIST */
+        .product-list {
+            display: grid;
+            gap: 6px;
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .product-item {
+            background: #0a0e1a;
+            border: 1px solid #1e293b;
+            border-radius: 5px;
+            padding: 8px;
+            cursor: grab;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-item:hover {
+            border-color: #4ade80;
+            background: #0f1419;
+        }
+
+        .product-item.assigned {
+            border-color: #22c55e;
+            background: rgba(34, 197, 94, 0.05);
+        }
+
+        .product-item.dragging {
+            opacity: 0.4;
+        }
+
+        .product-name {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .product-value {
+            font-size: 10px;
+            color: #64748b;
+        }
+
+        .product-status {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ef4444;
+        }
+
+        .product-status.assigned {
+            background: #22c55e;
+        }
+
+        /* MAIN CANVAS */
+        .canvas-area {
+            background: #0a0e1a;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .canvas-toolbar {
+            background: #12161f;
+            padding: 8px 16px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .canvas-container {
+            flex: 1;
+            overflow: auto;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at center, #0f1419 0%, #0a0e1a 100%);
+        }
+
+        #mainCanvas {
+            background: #12161f;
+            cursor: default;
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* RESIZE HANDLES */
+        .resize-handle {
+            position: absolute;
+            z-index: 100;
+        }
+
+        .resize-nw, .resize-ne, .resize-sw, .resize-se {
+            width: 10px;
+            height: 10px;
+            background: #667eea;
+            border: 2px solid white;
+            border-radius: 50%;
+        }
+
+        .resize-nw { top: -5px; left: -5px; cursor: nwse-resize; }
+        .resize-ne { top: -5px; right: -5px; cursor: nesw-resize; }
+        .resize-sw { bottom: -5px; left: -5px; cursor: nesw-resize; }
+        .resize-se { bottom: -5px; right: -5px; cursor: nwse-resize; }
+
+        .resize-n, .resize-s {
+            height: 6px;
+            width: 40px;
+            background: #667eea;
+            border-radius: 3px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .resize-n { top: -3px; cursor: ns-resize; }
+        .resize-s { bottom: -3px; cursor: ns-resize; }
+
+        .resize-e, .resize-w {
+            width: 6px;
+            height: 40px;
+            background: #667eea;
+            border-radius: 3px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .resize-e { right: -3px; cursor: ew-resize; }
+        .resize-w { left: -3px; cursor: ew-resize; }
+
+        /* RIGHT PANEL */
+        .right-panel {
+            background: #12161f;
+            border-left: 1px solid #1e293b;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* PROPERTIES EDITOR */
+        .properties-editor {
+            background: #0a0e1a;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 16px;
+            border: 1px solid #1e293b;
+        }
+
+        .properties-editor h4 {
+            font-size: 13px;
+            margin-bottom: 12px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .property-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .property-full {
+            grid-column: 1 / -1;
+        }
+
+        /* HEAT ZONE DISPLAY */
+        .heat-zones {
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #1e293b;
+        }
+
+        .heat-zone-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px;
+            background: #0f1419;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+
+        .heat-zone-name {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .heat-zone-value {
+            font-size: 11px;
+            font-weight: 600;
+            color: #ef4444;
+        }
+
+        /* ZONE MANAGER */
+        .zone-list {
+            display: grid;
+            gap: 6px;
+        }
+
+        .zone-item {
+            background: #0a0e1a;
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .zone-item:hover {
+            border-color: #667eea;
+            background: #0f1419;
+        }
+
+        .zone-item.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .zone-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 2px solid #1e293b;
+        }
+
+        .zone-name {
+            flex: 1;
+            margin-left: 8px;
+            font-size: 12px;
+        }
+
+        .zone-auto-badge {
+            background: #3b82f6;
+            color: white;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-left: 8px;
+        }
+
+        /* STORE MARKERS */
+        .store-markers {
+            display: grid;
+            gap: 8px;
+        }
+
+        .marker-item {
+            background: #0a0e1a;
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .marker-label {
+            font-size: 11px;
+            color: #94a3b8;
+        }
+
+        .marker-pos {
+            font-size: 10px;
+            color: #64748b;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* BULK IMPORT */
+        .bulk-import textarea {
+            width: 100%;
+            height: 120px;
+            background: #0a0e1a;
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            padding: 10px;
+            color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            resize: vertical;
+        }
+
+        .bulk-import textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .bulk-import-hint {
+            font-size: 10px;
+            color: #64748b;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+
+        /* CUSTOM FIXTURES */
+        .custom-fixture-list {
+            display: grid;
+            gap: 6px;
+            margin-top: 8px;
+        }
+
+        .custom-fixture-item {
+            background: #0a0e1a;
+            border: 1px solid #8b5cf6;
+            border-radius: 5px;
+            padding: 8px;
+            font-size: 11px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* FOOTER */
+        .footer {
+            grid-column: 1 / -1;
+            background: #12161f;
+            border-top: 1px solid #1e293b;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+
+        .footer-info {
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0e1a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #334155;
+        }
+
+        /* ALERTS */
+        .alert {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 12px 16px;
+            border-radius: 6px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+            min-width: 280px;
+            font-size: 13px;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert.success {
+            background: #22c55e;
+            color: white;
+        }
+
+        .alert.error {
+            background: #ef4444;
+            color: white;
+        }
+
+        .alert.info {
+            background: #3b82f6;
+            color: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* CONTEXT MENU */
+        .context-menu {
+            position: fixed;
+            background: #12161f;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 6px 0;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            min-width: 180px;
+        }
+
+        .context-menu-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.15s;
+        }
+
+        .context-menu-item:hover {
+            background: #0a0e1a;
+        }
+
+        .context-menu-item.danger:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .context-menu-divider {
+            height: 1px;
+            background: #1e293b;
+            margin: 4px 0;
+        }
+
+        /* MODAL */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: #12161f;
+            border: 1px solid #667eea;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid #1e293b;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 20px;
+            color: #667eea;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 28px;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        .modal-close:hover {
+            background: #1e293b;
+            color: #e0e0e0;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #1e293b;
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .opt-section {
+            margin-bottom: 24px;
+        }
+
+        .opt-section h3 {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .opt-select {
+            width: 100%;
+            padding: 10px 12px;
+            background: #0a0e1a;
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            color: #e0e0e0;
+            font-size: 14px;
+        }
+
+        .opt-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .opt-checkbox {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            font-size: 13px;
+            color: #e0e0e0;
+            cursor: pointer;
+        }
+
+        .opt-checkbox input {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .opt-info {
+            background: #0a0e1a;
+            border: 1px solid #1e293b;
+            border-radius: 6px;
+            padding: 16px;
+            font-size: 12px;
+            color: #94a3b8;
+            line-height: 1.6;
+        }
+
+        .opt-info strong {
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div id="alertBox" class="alert"></div>
+    <div id="contextMenu" class="context-menu"></div>
+
+    <!-- OPTIMIZATION MODAL -->
+    <div id="optimizationModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Smart Product Placement</h2>
+                <button class="modal-close" onclick="closeOptimizationModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="opt-section">
+                    <h3>Optimization Goal</h3>
+                    <select id="optGoal" class="opt-select">
+                        <option value="margin">Maximize Profit Margin</option>
+                        <option value="traffic">Maximize Customer Engagement</option>
+                        <option value="balanced">Balanced (Margin + Traffic)</option>
+                    </select>
+                </div>
+
+                <div class="opt-section">
+                    <h3>Product Priority</h3>
+                    <label class="opt-checkbox">
+                        <input type="checkbox" id="optHighValue" checked> Place high-value items in eye-level zones
+                    </label>
+                    <label class="opt-checkbox">
+                        <input type="checkbox" id="optGroupCategory" checked> Group products by category
+                    </label>
+                    <label class="opt-checkbox">
+                        <input type="checkbox" id="optEntranceAnchors"> Put anchor products near entrance
+                    </label>
+                </div>
+
+                <div class="opt-section">
+                    <h3>Heat Zone Strategy</h3>
+                    <select id="optHeatStrategy" class="opt-select">
+                        <option value="best">Best items in hottest zones (90% heat)</option>
+                        <option value="spread">Spread good items across all zones</option>
+                        <option value="impulse">Impulse buys in checkout zones</option>
+                    </select>
+                </div>
+
+                <div class="opt-info">
+                    <strong>How it works:</strong><br>
+                    The algorithm calculates a score for each product based on:<br>
+                    • Product value (price × margin)<br>
+                    • Fixture heat zones (eye-level = 90%, bottom = 30%)<br>
+                    • Store zones (entrance, high-traffic, checkout)<br>
+                    • Category grouping preferences<br>
+                    <br>
+                    Higher-scoring products get placed in better locations.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeOptimizationModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="runSmartPlacement()">Run Optimization</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-layout">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>Shop Reset Toolbox - Professional Edition</h1>
+            <div class="header-actions">
+                <button class="btn btn-secondary btn-small" onclick="saveLayout()">Save</button>
+                <button class="btn btn-secondary btn-small" onclick="loadLayout()">Load</button>
+                <button class="btn btn-secondary btn-small" onclick="exportCanvas()">Export PNG</button>
+                <button class="btn btn-secondary btn-small" onclick="exportCSV()">Export CSV</button>
+                <button class="btn btn-primary" onclick="showOptimizationModal()">Smart Placement</button>
+            </div>
+        </div>
+
+        <!-- LEFT PANEL -->
+        <div class="left-panel">
+            <div class="panel-section">
+                <h3>Store Dimensions</h3>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Width (in)</label>
+                        <input type="number" id="storeWidth" value="800" onchange="updateCanvasSize()">
+                    </div>
+                    <div class="input-group">
+                        <label>Length (in)</label>
+                        <input type="number" id="storeLength" value="600" onchange="updateCanvasSize()">
+                    </div>
+                    <div class="input-group">
+                        <label>Height (in)</label>
+                        <input type="number" id="storeHeight" value="96" onchange="updateStoreHeight()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Store Markers</h3>
+                <div class="store-markers" id="storeMarkers"></div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Fixture Library</h3>
+                <div class="fixture-library" id="fixtureLibrary"></div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Custom Fixtures</h3>
+                <button class="btn btn-secondary btn-small" style="width: 100%; margin-bottom: 8px;" onclick="saveCurrentAsCustom()">Save Selected as Custom</button>
+                <div class="custom-fixture-list" id="customFixtures"></div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Product List (<span id="productCount">0</span>)</h3>
+                <button class="btn btn-secondary btn-small" style="width: 100%; margin-bottom: 8px;" onclick="showUploadCSV()">Upload CSV</button>
+                <div class="product-list" id="productList"></div>
+            </div>
+        </div>
+
+        <!-- MAIN CANVAS -->
+        <div class="canvas-area">
+            <div class="canvas-toolbar">
+                <button class="btn btn-secondary btn-small" onclick="toggleZones()">
+                    <span id="zoneToggleText">Hide Zones</span>
+                </button>
+                <button class="btn btn-secondary btn-small" onclick="toggleHeatMap()">
+                    <span id="heatToggleText">Show Heat Map</span>
+                </button>
+                <button class="btn btn-secondary btn-small" onclick="autoAssignZones()">Auto-Assign Zones</button>
+                <button class="btn btn-secondary btn-small" onclick="deleteSelected()">Delete (Del)</button>
+                <button class="btn btn-secondary btn-small" onclick="resetView()">Reset View</button>
+                <span style="flex: 1;"></span>
+                <span style="font-size: 11px; color: #64748b;">Zoom: <span id="zoomLevel">100%</span></span>
+            </div>
+            <div class="canvas-container">
+                <canvas id="mainCanvas"></canvas>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="right-panel">
+            <div class="panel-section">
+                <h3>Selection Properties</h3>
+                <div class="properties-editor" id="propertiesEditor">
+                    <p style="color: #64748b; font-size: 12px;">Select a fixture or zone to edit</p>
+                </div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Zone Manager</h3>
+                <button class="btn btn-secondary btn-small" style="width: 100%; margin-bottom: 8px;" onclick="addZone()">Add Custom Zone</button>
+                <div class="zone-list" id="zoneList"></div>
+            </div>
+
+            <div class="panel-section">
+                <h3>Bulk Product Import</h3>
+                <div class="bulk-import">
+                    <textarea id="bulkImportText" placeholder="Paste products here...&#10;Format: Name, Zone, Fixture&#10;&#10;Example:&#10;Winter Coat, Entrance, gondola&#10;Wool Scarf, High Traffic, table&#10;Leather Boots, Checkout, gondola"></textarea>
+                    <div class="bulk-import-hint">
+                        <strong>How it works:</strong><br>
+                        1. Add fixtures to canvas first<br>
+                        2. Zone names match auto-zones or custom zones<br>
+                        3. Fixture names are partial matches (e.g., "gondola" finds "gondola-1")<br>
+                        4. Products appear as green dots on assigned fixtures<br>
+                        <br>
+                        <strong>Format:</strong> ProductName, ZoneName, FixtureName<br>
+                        One per line, comma-separated
+                    </div>
+                    <div style="display: flex; gap: 4px; margin-top: 8px;">
+                        <button class="btn btn-secondary btn-small" style="flex: 1;" onclick="loadExampleData()">Load Example</button>
+                        <button class="btn btn-primary btn-small" style="flex: 1;" onclick="processBulkImport()">Import</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <div class="footer-info">
+                <span id="fixtureCount">0 fixtures</span> |
+                <span id="zoneCount">0 zones</span> |
+                <span id="assignedCount">0/0 assigned</span>
+            </div>
+            <div class="footer-info">
+                Mouse: <span id="mousePos">0, 0</span> |
+                Store: <span id="storeDims">800×600×96"</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== FIXTURE LIBRARY DATA ====================
+        const FIXTURE_LIBRARY = {
+            gondolas: [
+                {
+                    id: 'madix-3ft-60',
+                    name: 'Madix Gondola 3ft',
+                    type: 'gondola',
+                    width: 36,
+                    depth: 16,
+                    height: 60,
+                    shelves: {
+                        count: 4,
+                        adjustable: true,
+                        spacing: 15,
+                        weightCapacity: 150
+                    },
+                    wallType: 'solid',
+                    color: '#94a3b8',
+                    heatZones: [
+                        { name: 'Eye Level (48-60")', heat: 0.9, shelfIndex: 3 },
+                        { name: 'Middle (30-48")', heat: 0.7, shelfIndex: 2 },
+                        { name: 'Lower (15-30")', heat: 0.5, shelfIndex: 1 },
+                        { name: 'Bottom (0-15")', heat: 0.3, shelfIndex: 0 }
+                    ]
+                },
+                {
+                    id: 'madix-4ft-72',
+                    name: 'Madix Gondola 4ft',
+                    type: 'gondola',
+                    width: 48,
+                    depth: 20,
+                    height: 72,
+                    shelves: {
+                        count: 5,
+                        adjustable: true,
+                        spacing: 14,
+                        weightCapacity: 150
+                    },
+                    wallType: 'solid',
+                    color: '#94a3b8',
+                    heatZones: [
+                        { name: 'Top (60-72")', heat: 0.4, shelfIndex: 4 },
+                        { name: 'Eye Level (48-60")', heat: 0.9, shelfIndex: 3 },
+                        { name: 'Middle (36-48")', heat: 0.7, shelfIndex: 2 },
+                        { name: 'Lower (24-36")', heat: 0.5, shelfIndex: 1 },
+                        { name: 'Bottom (0-24")', heat: 0.3, shelfIndex: 0 }
+                    ]
+                }
+            ],
+            tables: [
+                {
+                    id: 'uline-table-medium',
+                    name: 'Uline Table Medium',
+                    type: 'table',
+                    width: 60,
+                    depth: 30,
+                    height: 24,
+                    color: '#f59e0b',
+                    heatZones: [
+                        { name: 'Front Edge', heat: 0.9, y: 0, height: 10 },
+                        { name: 'Center', heat: 0.6, y: 10, height: 10 },
+                        { name: 'Back', heat: 0.3, y: 20, height: 10 }
+                    ]
+                },
+                {
+                    id: 'uline-table-large',
+                    name: 'Uline Table Large',
+                    type: 'table',
+                    width: 72,
+                    depth: 36,
+                    height: 30,
+                    color: '#f59e0b',
+                    heatZones: [
+                        { name: 'Front Edge', heat: 0.9, y: 0, height: 12 },
+                        { name: 'Center', heat: 0.6, y: 12, height: 12 },
+                        { name: 'Back', heat: 0.3, y: 24, height: 12 }
+                    ]
+                }
+            ],
+            kiosks: [
+                {
+                    id: 'kiosk-double-slatwall',
+                    name: 'Slatwall Kiosk',
+                    type: 'kiosk',
+                    width: 24,
+                    depth: 24,
+                    height: 56,
+                    doors: {
+                        type: 'armoire',
+                        count: 2,
+                        openAngle: 90,
+                        isOpen: false
+                    },
+                    interior: {
+                        shelves: 3,
+                        spacing: 14,
+                        wallType: 'slatwall'
+                    },
+                    color: '#8b5cf6',
+                    heatZones: [
+                        { name: 'Upper', heat: 0.5, y: 0, height: 19 },
+                        { name: 'Eye Level', heat: 0.9, y: 19, height: 19 },
+                        { name: 'Lower', heat: 0.6, y: 38, height: 18 }
+                    ]
+                }
+            ],
+            displays: [
+                {
+                    id: 'uline-etagere',
+                    name: 'Uline Étagère',
+                    type: 'display',
+                    width: 48,
+                    depth: 26,
+                    height: 84,
+                    shelves: {
+                        count: 3,
+                        adjustable: true,
+                        spacing: 21,
+                        weightCapacity: 100
+                    },
+                    color: '#06b6d4',
+                    heatZones: [
+                        { name: 'Top (60-84")', heat: 0.4, shelfIndex: 2 },
+                        { name: 'Eye Level (42-60")', heat: 0.9, shelfIndex: 1 },
+                        { name: 'Lower (0-42")', heat: 0.6, shelfIndex: 0 }
+                    ]
+                }
+            ]
+        };
+
+        // ==================== APPLICATION STATE ====================
+        const appState = {
+            storeWidth: 800,
+            storeLength: 600,
+            storeHeight: 96,
+            fixtures: [],
+            zones: [],
+            products: [],
+            customFixtures: [],
+            storeMarkers: {
+                entrance: { x: 400, y: 0, type: 'entrance' },
+                exit: { x: 700, y: 0, type: 'exit' },
+                pos: { x: 750, y: 550, type: 'pos' }
+            },
+            selectedFixture: null,
+            selectedZone: null,
+            draggedProduct: null,
+            draggedFixture: null,
+            draggedZone: null,
+            draggedMarker: null,
+            resizing: null,
+            panning: null,
+            showZones: true,
+            showHeatMap: false,
+            nextFixtureId: 1,
+            nextZoneId: 1,
+            // Pan and zoom
+            panX: 0,
+            panY: 0,
+            zoom: 1.0
+        };
+
+        // ==================== INITIALIZATION ====================
+        window.addEventListener('load', () => {
+            initializeApp();
+        });
+
+        window.addEventListener('resize', () => {
+            updateCanvasSize();
+        });
+
+        function initializeApp() {
+            renderFixtureLibrary();
+            loadSampleData();
+            updateCanvasSize();
+            setupCanvasEvents();
+            renderStoreMarkers();
+            updateStats();
+            showAlert('Infinite canvas ready! Double-click fixtures to zoom in. Space+drag to pan.', 'info');
+        }
+
+        function renderFixtureLibrary() {
+            const libraryDiv = document.getElementById('fixtureLibrary');
+            libraryDiv.innerHTML = '';
+
+            for (const [category, fixtures] of Object.entries(FIXTURE_LIBRARY)) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'fixture-category';
+
+                const title = document.createElement('div');
+                title.className = 'fixture-category-title';
+                title.textContent = category.charAt(0).toUpperCase() + category.slice(1);
+                categoryDiv.appendChild(title);
+
+                fixtures.forEach(fixture => {
+                    const item = document.createElement('div');
+                    item.className = 'fixture-item';
+                    item.onclick = () => addFixtureToCanvas(fixture);
+
+                    let specs = `${fixture.width}"W × ${fixture.depth}"D × ${fixture.height}"H`;
+                    if (fixture.shelves) {
+                        specs += ` • ${fixture.shelves.count} shelves`;
+                    }
+
+                    item.innerHTML = `
+                        <div class="fixture-item-name">${fixture.name}</div>
+                        <div class="fixture-item-specs">${specs}</div>
+                    `;
+
+                    if (fixture.heatZones) {
+                        const badge = document.createElement('div');
+                        badge.className = 'fixture-item-badge';
+                        badge.textContent = 'Heat';
+                        item.appendChild(badge);
+                    }
+
+                    categoryDiv.appendChild(item);
+                });
+
+                libraryDiv.appendChild(categoryDiv);
+            }
+        }
+
+        function loadSampleData() {
+            appState.products = [
+                { id: 1, name: 'Winter Coat', category: 'Outerwear', price: 199.99, margin: 0.60, fixtureId: null, zone: null, x: 0, y: 0 },
+                { id: 2, name: 'Wool Scarf', category: 'Accessories', price: 29.99, margin: 0.55, fixtureId: null, zone: null, x: 0, y: 0 },
+                { id: 3, name: 'Leather Boots', category: 'Footwear', price: 149.99, margin: 0.65, fixtureId: null, zone: null, x: 0, y: 0 },
+                { id: 4, name: 'Cashmere Sweater', category: 'Apparel', price: 89.99, margin: 0.70, fixtureId: null, zone: null, x: 0, y: 0 },
+                { id: 5, name: 'Denim Jeans', category: 'Apparel', price: 79.99, margin: 0.50, fixtureId: null, zone: null, x: 0, y: 0 }
+            ];
+
+            appState.zones = [
+                { id: 1, name: 'Entrance', color: '#3b82f6', x: 50, y: 50, width: 200, height: 150, auto: false },
+                { id: 2, name: 'High Traffic', color: '#eab308', x: 300, y: 100, width: 250, height: 200, auto: false },
+                { id: 3, name: 'Checkout', color: '#22c55e', x: 600, y: 450, width: 150, height: 100, auto: false }
+            ];
+
+            renderProductList();
+            renderZoneList();
+        }
+
+        function renderStoreMarkers() {
+            const container = document.getElementById('storeMarkers');
+            container.innerHTML = '';
+
+            for (const [key, marker] of Object.entries(appState.storeMarkers)) {
+                const item = document.createElement('div');
+                item.className = 'marker-item';
+                item.onclick = () => selectMarker(key);
+
+                const icons = { entrance: '🚪', exit: '🚶', pos: '💳' };
+                const labels = { entrance: 'Entrance', exit: 'Exit', pos: 'POS' };
+
+                item.innerHTML = `
+                    <div class="marker-label">${icons[key]} ${labels[key]}</div>
+                    <div class="marker-pos">${Math.round(marker.x)}, ${Math.round(marker.y)}</div>
+                `;
+
+                container.appendChild(item);
+            }
+        }
+
+        function selectMarker(key) {
+            showAlert(`Click on canvas to place ${key}`, 'info');
+            appState.selectedMarker = key;
+        }
+
+        // ==================== FIXTURE MANAGEMENT ====================
+        function addFixtureToCanvas(fixtureTemplate) {
+            const fixture = {
+                ...JSON.parse(JSON.stringify(fixtureTemplate)),
+                fixtureId: `${fixtureTemplate.type}-${appState.nextFixtureId++}`,
+                x: 100 + (appState.fixtures.length * 25),
+                y: 100 + (appState.fixtures.length * 20),
+                rotation: 0,
+                products: [],
+                zoneId: null
+            };
+
+            appState.fixtures.push(fixture);
+            renderCanvas();
+            updateStats();
+            showAlert(`Added ${fixture.name}`, 'success');
+        }
+
+        // ==================== CANVAS SIZE & RENDERING ====================
+        function updateCanvasSize() {
+            const canvas = document.getElementById('mainCanvas');
+            const container = canvas.parentElement;
+
+            // Make canvas fill the container
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+
+            const width = parseInt(document.getElementById('storeWidth').value);
+            const length = parseInt(document.getElementById('storeLength').value);
+
+            appState.storeWidth = width;
+            appState.storeLength = length;
+
+            document.getElementById('storeDims').textContent = `${width}×${length}×${appState.storeHeight}"`;
+
+            renderCanvas();
+        }
+
+        function updateStoreHeight() {
+            appState.storeHeight = parseInt(document.getElementById('storeHeight').value);
+            document.getElementById('storeDims').textContent = `${appState.storeWidth}×${appState.storeLength}×${appState.storeHeight}"`;
+        }
+
+        function renderCanvas() {
+            const canvas = document.getElementById('mainCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Clear
+            ctx.fillStyle = '#12161f';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Save context and apply pan/zoom transform
+            ctx.save();
+            ctx.translate(appState.panX, appState.panY);
+            ctx.scale(appState.zoom, appState.zoom);
+
+            // Draw grid
+            drawGrid(ctx);
+
+            // Draw zones
+            if (appState.showZones) {
+                drawZones(ctx);
+            }
+
+            // Draw store markers
+            drawStoreMarkers(ctx);
+
+            // Draw fixtures
+            appState.fixtures.forEach(fixture => {
+                drawFixture(ctx, fixture);
+            });
+
+            // Draw products on fixtures
+            if (appState.showHeatMap) {
+                drawHeatMapOverlay(ctx);
+            }
+
+            // Draw selection handles
+            if (appState.selectedFixture) {
+                const fixture = appState.fixtures.find(f => f.fixtureId === appState.selectedFixture);
+                if (fixture) drawResizeHandles(ctx, fixture);
+            }
+
+            if (appState.selectedZone) {
+                const zone = appState.zones.find(z => z.id === appState.selectedZone);
+                if (zone) drawResizeHandles(ctx, zone, true);
+            }
+
+            // Restore context
+            ctx.restore();
+
+            // Update zoom display
+            document.getElementById('zoomLevel').textContent = Math.round(appState.zoom * 100) + '%';
+        }
+
+        function drawGrid(ctx) {
+            const canvas = document.getElementById('mainCanvas');
+
+            // Calculate visible area in world coordinates
+            const visibleLeft = -appState.panX / appState.zoom;
+            const visibleTop = -appState.panY / appState.zoom;
+            const visibleRight = (canvas.width - appState.panX) / appState.zoom;
+            const visibleBottom = (canvas.height - appState.panY) / appState.zoom;
+
+            // Grid spacing (12 inches)
+            const gridSpacing = 12;
+
+            // Calculate grid line positions to draw
+            const startX = Math.floor(visibleLeft / gridSpacing) * gridSpacing;
+            const endX = Math.ceil(visibleRight / gridSpacing) * gridSpacing;
+            const startY = Math.floor(visibleTop / gridSpacing) * gridSpacing;
+            const endY = Math.ceil(visibleBottom / gridSpacing) * gridSpacing;
+
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 0.5 / appState.zoom;
+
+            // Draw vertical lines
+            for (let x = startX; x <= endX; x += gridSpacing) {
+                ctx.beginPath();
+                ctx.moveTo(x, startY);
+                ctx.lineTo(x, endY);
+                ctx.stroke();
+            }
+
+            // Draw horizontal lines
+            for (let y = startY; y <= endY; y += gridSpacing) {
+                ctx.beginPath();
+                ctx.moveTo(startX, y);
+                ctx.lineTo(endX, y);
+                ctx.stroke();
+            }
+        }
+
+        function drawZones(ctx) {
+            const zoom = appState.zoom;
+            appState.zones.forEach(zone => {
+                ctx.fillStyle = zone.color + '30';
+                ctx.fillRect(zone.x, zone.y, zone.width, zone.height);
+
+                ctx.strokeStyle = zone.color;
+                ctx.lineWidth = 2 / zoom;
+                ctx.strokeRect(zone.x, zone.y, zone.width, zone.height);
+
+                ctx.fillStyle = zone.color;
+                ctx.font = `bold ${11 / zoom}px sans-serif`;
+                ctx.fillText(zone.name, zone.x + 8 / zoom, zone.y + 18 / zoom);
+
+                if (zone.auto) {
+                    ctx.font = `${9 / zoom}px sans-serif`;
+                    ctx.fillText('AUTO', zone.x + 8 / zoom, zone.y + 32 / zoom);
+                }
+            });
+        }
+
+        function drawStoreMarkers(ctx) {
+            const markers = appState.storeMarkers;
+            const zoom = appState.zoom;
+            const icons = {
+                entrance: { color: '#3b82f6', label: 'ENTRANCE' },
+                exit: { color: '#ef4444', label: 'EXIT' },
+                pos: { color: '#22c55e', label: 'POS' }
+            };
+
+            for (const [key, marker] of Object.entries(markers)) {
+                const style = icons[key];
+                const size = 30 / zoom;
+                const half = size / 2;
+
+                ctx.fillStyle = style.color;
+                ctx.fillRect(marker.x - half, marker.y - half, size, size);
+
+                ctx.fillStyle = 'white';
+                ctx.font = `bold ${8 / zoom}px sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.fillText(style.label, marker.x, marker.y + 3 / zoom);
+                ctx.textAlign = 'left';
+            }
+        }
+
+        function drawFixture(ctx, fixture) {
+            const isSelected = appState.selectedFixture === fixture.fixtureId;
+            const zoom = appState.zoom;
+
+            // Main body
+            ctx.fillStyle = fixture.color;
+            ctx.fillRect(fixture.x, fixture.y, fixture.width, fixture.depth);
+
+            // Border
+            ctx.strokeStyle = isSelected ? '#667eea' : '#334155';
+            ctx.lineWidth = (isSelected ? 3 : 1) / zoom;
+            ctx.strokeRect(fixture.x, fixture.y, fixture.width, fixture.depth);
+
+            // Label (always visible)
+            ctx.fillStyle = '#ffffff';
+            ctx.font = `bold ${10 / zoom}px sans-serif`;
+            ctx.fillText(fixture.fixtureId, fixture.x + 4 / zoom, fixture.y + 12 / zoom);
+
+            // Draw shelves (basic level)
+            if (fixture.shelves) {
+                ctx.strokeStyle = '#1e293b';
+                ctx.lineWidth = 1 / zoom;
+                const shelfSpacing = fixture.depth / (fixture.shelves.count + 1);
+                for (let i = 1; i <= fixture.shelves.count; i++) {
+                    const shelfY = fixture.y + (shelfSpacing * i);
+                    ctx.beginPath();
+                    ctx.moveTo(fixture.x, shelfY);
+                    ctx.lineTo(fixture.x + fixture.width, shelfY);
+                    ctx.stroke();
+                }
+
+                // DETAIL LEVEL 1: Show shelf labels when zoomed > 1.5x
+                if (zoom > 1.5) {
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.font = `${8 / zoom}px sans-serif`;
+                    for (let i = 1; i <= fixture.shelves.count; i++) {
+                        const shelfY = fixture.y + (shelfSpacing * i);
+                        ctx.fillText(`Shelf ${i}`, fixture.x + 2 / zoom, shelfY - 2 / zoom);
+                    }
+                }
+
+                // DETAIL LEVEL 2: Show slat lines when zoomed > 2.0x
+                if (zoom > 2.0 && (fixture.wallType === 'slatwall' || fixture.wallType === 'gridwall')) {
+                    ctx.strokeStyle = '#334155';
+                    ctx.lineWidth = 0.5 / zoom;
+
+                    if (fixture.wallType === 'slatwall') {
+                        // Horizontal slat lines every 3 inches
+                        for (let y = fixture.y; y < fixture.y + fixture.depth; y += 3) {
+                            ctx.beginPath();
+                            ctx.moveTo(fixture.x, y);
+                            ctx.lineTo(fixture.x + fixture.width, y);
+                            ctx.stroke();
+                        }
+                    } else if (fixture.wallType === 'gridwall') {
+                        // Grid pattern every 3 inches
+                        for (let x = fixture.x; x < fixture.x + fixture.width; x += 3) {
+                            ctx.beginPath();
+                            ctx.moveTo(x, fixture.y);
+                            ctx.lineTo(x, fixture.y + fixture.depth);
+                            ctx.stroke();
+                        }
+                        for (let y = fixture.y; y < fixture.y + fixture.depth; y += 3) {
+                            ctx.beginPath();
+                            ctx.moveTo(fixture.x, y);
+                            ctx.lineTo(fixture.x + fixture.width, y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                // DETAIL LEVEL 3: Show shelf specs when zoomed > 2.5x
+                if (zoom > 2.5 && fixture.shelves.weightCapacity) {
+                    ctx.fillStyle = '#64748b';
+                    ctx.font = `${7 / zoom}px sans-serif`;
+                    ctx.fillText(
+                        `${fixture.shelves.weightCapacity}lb capacity`,
+                        fixture.x + 2 / zoom,
+                        fixture.y + fixture.depth - 2 / zoom
+                    );
+                }
+            }
+
+            // Draw products on fixture
+            if (fixture.products && fixture.products.length > 0) {
+                fixture.products.forEach((productId, idx) => {
+                    const product = appState.products.find(p => p.id === productId);
+                    if (product) {
+                        const px = fixture.x + (idx % 3) * 8 + 4;
+                        const py = fixture.y + Math.floor(idx / 3) * 8 + 20;
+
+                        // Product dots
+                        ctx.fillStyle = '#22c55e';
+                        ctx.beginPath();
+                        ctx.arc(px, py, 3 / zoom, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // DETAIL LEVEL 2: Show product names when zoomed > 2.0x
+                        if (zoom > 2.0) {
+                            ctx.fillStyle = '#e0e0e0';
+                            ctx.font = `${7 / zoom}px sans-serif`;
+                            ctx.fillText(product.name, px + 5 / zoom, py + 2 / zoom);
+                        }
+                    }
+                });
+
+                // Product count badge
+                if (zoom < 2.0) {
+                    ctx.fillStyle = '#22c55e';
+                    ctx.fillRect(fixture.x + fixture.width - 20 / zoom, fixture.y + 4 / zoom, 16 / zoom, 12 / zoom);
+                    ctx.fillStyle = '#ffffff';
+                    ctx.font = `bold ${9 / zoom}px sans-serif`;
+                    ctx.fillText(fixture.products.length, fixture.x + fixture.width - 14 / zoom, fixture.y + 13 / zoom);
+                }
+            }
+
+            // Kiosk doors
+            if (fixture.doors) {
+                if (fixture.doors.isOpen) {
+                    ctx.strokeStyle = '#667eea';
+                    ctx.lineWidth = 2 / zoom;
+                    ctx.strokeRect(fixture.x - 12, fixture.y, 10, fixture.depth);
+                    ctx.strokeRect(fixture.x + fixture.width + 2, fixture.y, 10, fixture.depth);
+                }
+
+                // DETAIL LEVEL 2: Show door hardware when zoomed > 2.0x
+                if (zoom > 2.0) {
+                    ctx.fillStyle = '#94a3b8';
+                    ctx.fillRect(fixture.x + 2, fixture.y + fixture.depth / 2 - 2, 2, 4);
+                    ctx.fillRect(fixture.x + fixture.width - 4, fixture.y + fixture.depth / 2 - 2, 2, 4);
+                }
+            }
+
+            // DETAIL LEVEL 3: Show dimensions when zoomed > 2.5x
+            if (zoom > 2.5) {
+                ctx.fillStyle = '#667eea';
+                ctx.font = `${8 / zoom}px sans-serif`;
+                ctx.fillText(
+                    `${fixture.width}" × ${fixture.depth}" × ${fixture.height}"`,
+                    fixture.x + fixture.width / 2 - 20 / zoom,
+                    fixture.y - 4 / zoom
+                );
+            }
+        }
+
+        function drawHeatMapOverlay(ctx) {
+            appState.fixtures.forEach(fixture => {
+                if (fixture.heatZones) {
+                    fixture.heatZones.forEach(hz => {
+                        if (fixture.type === 'table') {
+                            const alpha = hz.heat * 0.6;
+                            ctx.fillStyle = `rgba(239, 68, 68, ${alpha})`;
+                            ctx.fillRect(fixture.x, fixture.y + hz.y, fixture.width, hz.height);
+
+                            // Draw heat label
+                            ctx.fillStyle = 'white';
+                            ctx.font = 'bold 9px sans-serif';
+                            ctx.fillText(`${(hz.heat * 100).toFixed(0)}%`, fixture.x + 4, fixture.y + hz.y + 10);
+                        } else if (fixture.shelves) {
+                            const shelfY = fixture.y + (hz.shelfIndex * (fixture.depth / fixture.shelves.count));
+                            const alpha = hz.heat * 0.6;
+                            ctx.fillStyle = `rgba(239, 68, 68, ${alpha})`;
+                            ctx.fillRect(fixture.x, shelfY, fixture.width, fixture.depth / fixture.shelves.count);
+
+                            // Draw heat label
+                            ctx.fillStyle = 'white';
+                            ctx.font = 'bold 9px sans-serif';
+                            ctx.fillText(`${(hz.heat * 100).toFixed(0)}%`, fixture.x + 4, shelfY + 10);
+                        }
+                    });
+                }
+            });
+        }
+
+        function drawResizeHandles(ctx, obj, isZone = false) {
+            const zoom = appState.zoom;
+            const handleSize = 10 / zoom;
+            const half = handleSize / 2;
+
+            const handles = [
+                { x: obj.x - half, y: obj.y - half, w: handleSize, h: handleSize },
+                { x: obj.x + obj.width - half, y: obj.y - half, w: handleSize, h: handleSize },
+                { x: obj.x - half, y: obj.y + (isZone ? obj.height : obj.depth) - half, w: handleSize, h: handleSize },
+                { x: obj.x + obj.width - half, y: obj.y + (isZone ? obj.height : obj.depth) - half, w: handleSize, h: handleSize }
+            ];
+
+            ctx.fillStyle = '#667eea';
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2 / zoom;
+
+            handles.forEach(h => {
+                ctx.fillRect(h.x, h.y, h.w, h.h);
+                ctx.strokeRect(h.x, h.y, h.w, h.h);
+            });
+        }
+
+        // ==================== CANVAS INTERACTIONS ====================
+        function setupCanvasEvents() {
+            const canvas = document.getElementById('mainCanvas');
+
+            canvas.addEventListener('click', handleCanvasClick);
+            canvas.addEventListener('dblclick', handleCanvasDoubleClick);
+            canvas.addEventListener('mousedown', handleCanvasMouseDown);
+            canvas.addEventListener('mousemove', handleCanvasMouseMove);
+            canvas.addEventListener('mouseup', handleCanvasMouseUp);
+            canvas.addEventListener('contextmenu', handleCanvasContextMenu);
+            canvas.addEventListener('dragover', handleCanvasDragOver);
+            canvas.addEventListener('drop', handleCanvasDrop);
+
+            // Zoom with mouse wheel
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                const newZoom = Math.max(0.1, Math.min(5.0, appState.zoom * delta));
+
+                // Zoom towards mouse position
+                const worldX = (mouseX - appState.panX) / appState.zoom;
+                const worldY = (mouseY - appState.panY) / appState.zoom;
+
+                appState.zoom = newZoom;
+                appState.panX = mouseX - worldX * newZoom;
+                appState.panY = mouseY - worldY * newZoom;
+
+                renderCanvas();
+            }, { passive: false });
+
+            // Mouse position tracking
+            canvas.addEventListener('mousemove', (e) => {
+                const coords = getCanvasCoords(e);
+                document.getElementById('mousePos').textContent = `${Math.floor(coords.x)}, ${Math.floor(coords.y)}`;
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Delete' || e.key === 'Backspace') {
+                    deleteSelected();
+                }
+                if (e.key === ' ') {
+                    e.preventDefault();
+                    appState.spacePressed = true;
+                    canvas.style.cursor = 'grab';
+                }
+            });
+
+            document.addEventListener('keyup', (e) => {
+                if (e.key === ' ') {
+                    appState.spacePressed = false;
+                    canvas.style.cursor = 'default';
+                }
+            });
+        }
+
+        // Helper to transform mouse coords to canvas coords
+        function getCanvasCoords(e) {
+            const canvas = document.getElementById('mainCanvas');
+            const rect = canvas.getBoundingClientRect();
+            const x = (e.clientX - rect.left - appState.panX) / appState.zoom;
+            const y = (e.clientY - rect.top - appState.panY) / appState.zoom;
+            return { x, y };
+        }
+
+        function handleCanvasClick(e) {
+            const coords = getCanvasCoords(e);
+            const x = coords.x;
+            const y = coords.y;
+
+            // Place marker if selected
+            if (appState.selectedMarker) {
+                appState.storeMarkers[appState.selectedMarker].x = x;
+                appState.storeMarkers[appState.selectedMarker].y = y;
+                renderStoreMarkers();
+                renderCanvas();
+                appState.selectedMarker = null;
+                return;
+            }
+
+            // Check for zone click
+            const clickedZone = findZoneAtPoint(x, y);
+            if (clickedZone) {
+                appState.selectedZone = clickedZone.id;
+                appState.selectedFixture = null;
+                renderCanvas();
+                showZoneProperties(clickedZone);
+                return;
+            }
+
+            // Check for fixture click
+            const clickedFixture = findFixtureAtPoint(x, y);
+            if (clickedFixture) {
+                appState.selectedFixture = clickedFixture.fixtureId;
+                appState.selectedZone = null;
+                renderCanvas();
+                showFixtureProperties(clickedFixture);
+                return;
+            }
+
+            // Deselect
+            appState.selectedFixture = null;
+            appState.selectedZone = null;
+            renderCanvas();
+            clearProperties();
+        }
+
+        function handleCanvasDoubleClick(e) {
+            const coords = getCanvasCoords(e);
+            const x = coords.x;
+            const y = coords.y;
+
+            // Check for fixture click
+            const clickedFixture = findFixtureAtPoint(x, y);
+            if (clickedFixture) {
+                zoomToFixture(clickedFixture);
+                return;
+            }
+
+            // Check for zone click
+            const clickedZone = findZoneAtPoint(x, y);
+            if (clickedZone) {
+                zoomToZone(clickedZone);
+                return;
+            }
+        }
+
+        function zoomToFixture(fixture) {
+            const canvas = document.getElementById('mainCanvas');
+
+            // Calculate zoom to fit fixture with padding
+            const padding = 100;
+            const zoomX = canvas.width / (fixture.width + padding * 2);
+            const zoomY = canvas.height / (fixture.depth + padding * 2);
+            const targetZoom = Math.min(zoomX, zoomY, 3.0);
+
+            // Center fixture in viewport
+            const fixtureCenterX = fixture.x + fixture.width / 2;
+            const fixtureCenterY = fixture.y + fixture.depth / 2;
+
+            appState.zoom = targetZoom;
+            appState.panX = canvas.width / 2 - fixtureCenterX * targetZoom;
+            appState.panY = canvas.height / 2 - fixtureCenterY * targetZoom;
+
+            renderCanvas();
+            showAlert(`Zoomed to ${fixture.fixtureId}`, 'info');
+        }
+
+        function zoomToZone(zone) {
+            const canvas = document.getElementById('mainCanvas');
+
+            // Calculate zoom to fit zone with padding
+            const padding = 150;
+            const zoomX = canvas.width / (zone.width + padding * 2);
+            const zoomY = canvas.height / (zone.height + padding * 2);
+            const targetZoom = Math.min(zoomX, zoomY, 2.0);
+
+            // Center zone in viewport
+            const zoneCenterX = zone.x + zone.width / 2;
+            const zoneCenterY = zone.y + zone.height / 2;
+
+            appState.zoom = targetZoom;
+            appState.panX = canvas.width / 2 - zoneCenterX * targetZoom;
+            appState.panY = canvas.height / 2 - zoneCenterY * targetZoom;
+
+            renderCanvas();
+            showAlert(`Zoomed to ${zone.name}`, 'info');
+        }
+
+        function resetView() {
+            const canvas = document.getElementById('mainCanvas');
+
+            if (appState.fixtures.length === 0) {
+                // No fixtures, just reset to origin
+                appState.zoom = 1.0;
+                appState.panX = 0;
+                appState.panY = 0;
+                renderCanvas();
+                return;
+            }
+
+            // Calculate bounding box of all fixtures
+            let minX = Infinity, minY = Infinity;
+            let maxX = -Infinity, maxY = -Infinity;
+
+            appState.fixtures.forEach(f => {
+                minX = Math.min(minX, f.x);
+                minY = Math.min(minY, f.y);
+                maxX = Math.max(maxX, f.x + f.width);
+                maxY = Math.max(maxY, f.y + f.depth);
+            });
+
+            appState.zones.forEach(z => {
+                minX = Math.min(minX, z.x);
+                minY = Math.min(minY, z.y);
+                maxX = Math.max(maxX, z.x + z.width);
+                maxY = Math.max(maxY, z.y + z.height);
+            });
+
+            const padding = 100;
+            const contentWidth = maxX - minX;
+            const contentHeight = maxY - minY;
+
+            const zoomX = canvas.width / (contentWidth + padding * 2);
+            const zoomY = canvas.height / (contentHeight + padding * 2);
+            const targetZoom = Math.min(zoomX, zoomY, 1.5);
+
+            const centerX = (minX + maxX) / 2;
+            const centerY = (minY + maxY) / 2;
+
+            appState.zoom = targetZoom;
+            appState.panX = canvas.width / 2 - centerX * targetZoom;
+            appState.panY = canvas.height / 2 - centerY * targetZoom;
+
+            renderCanvas();
+            showAlert('View reset to fit all content', 'info');
+        }
+
+        function handleCanvasMouseDown(e) {
+            const canvas = document.getElementById('mainCanvas');
+            const coords = getCanvasCoords(e);
+            const x = coords.x;
+            const y = coords.y;
+
+            // Pan mode (space key or middle mouse)
+            if (appState.spacePressed || e.button === 1) {
+                e.preventDefault();
+                appState.panning = {
+                    startX: e.clientX - appState.panX,
+                    startY: e.clientY - appState.panY
+                };
+                canvas.style.cursor = 'grabbing';
+                return;
+            }
+
+            // Check for resize handle
+            if (appState.selectedFixture) {
+                const fixture = appState.fixtures.find(f => f.fixtureId === appState.selectedFixture);
+                if (fixture) {
+                    const handle = getResizeHandle(fixture, x, y, false);
+                    if (handle) {
+                        appState.resizing = { obj: fixture, handle: handle, isZone: false };
+                        return;
+                    }
+                }
+            }
+
+            if (appState.selectedZone) {
+                const zone = appState.zones.find(z => z.id === appState.selectedZone);
+                if (zone) {
+                    const handle = getResizeHandle(zone, x, y, true);
+                    if (handle) {
+                        appState.resizing = { obj: zone, handle: handle, isZone: true };
+                        return;
+                    }
+                }
+            }
+
+            // Check for marker drag
+            const marker = findMarkerAtPoint(x, y);
+            if (marker) {
+                appState.draggedMarker = {
+                    key: marker.key,
+                    offsetX: x - marker.marker.x,
+                    offsetY: y - marker.marker.y
+                };
+                return;
+            }
+
+            // Check for zone drag
+            const zone = findZoneAtPoint(x, y);
+            if (zone) {
+                appState.draggedZone = {
+                    zone: zone,
+                    offsetX: x - zone.x,
+                    offsetY: y - zone.y
+                };
+                return;
+            }
+
+            // Check for fixture drag
+            const fixture = findFixtureAtPoint(x, y);
+            if (fixture) {
+                appState.draggedFixture = {
+                    fixture: fixture,
+                    offsetX: x - fixture.x,
+                    offsetY: y - fixture.y
+                };
+                return;
+            }
+        }
+
+        function handleCanvasMouseMove(e) {
+            const canvas = document.getElementById('mainCanvas');
+            const coords = getCanvasCoords(e);
+            const x = coords.x;
+            const y = coords.y;
+
+            // Pan mode
+            if (appState.panning) {
+                appState.panX = e.clientX - appState.panning.startX;
+                appState.panY = e.clientY - appState.panning.startY;
+                renderCanvas();
+                return;
+            }
+
+            // Resize mode
+            if (appState.resizing) {
+                const obj = appState.resizing.obj;
+                const handle = appState.resizing.handle;
+                const isZone = appState.resizing.isZone;
+
+                if (handle === 'se') {
+                    if (isZone) {
+                        obj.width = Math.max(50, x - obj.x);
+                        obj.height = Math.max(50, y - obj.y);
+                    } else {
+                        obj.width = Math.max(12, x - obj.x);
+                        obj.depth = Math.max(12, y - obj.y);
+                    }
+                } else if (handle === 'sw') {
+                    const newWidth = Math.max(50, obj.x + obj.width - x);
+                    obj.x = x;
+                    obj.width = newWidth;
+                    if (isZone) {
+                        obj.height = Math.max(50, y - obj.y);
+                    } else {
+                        obj.depth = Math.max(12, y - obj.y);
+                    }
+                } else if (handle === 'ne') {
+                    obj.width = Math.max(50, x - obj.x);
+                    const newHeight = Math.max(50, obj.y + (isZone ? obj.height : obj.depth) - y);
+                    obj.y = y;
+                    if (isZone) {
+                        obj.height = newHeight;
+                    } else {
+                        obj.depth = newHeight;
+                    }
+                } else if (handle === 'nw') {
+                    const newWidth = Math.max(50, obj.x + obj.width - x);
+                    const newHeight = Math.max(50, obj.y + (isZone ? obj.height : obj.depth) - y);
+                    obj.x = x;
+                    obj.y = y;
+                    obj.width = newWidth;
+                    if (isZone) {
+                        obj.height = newHeight;
+                    } else {
+                        obj.depth = newHeight;
+                    }
+                }
+
+                renderCanvas();
+                if (appState.selectedFixture) {
+                    showFixtureProperties(obj);
+                } else if (appState.selectedZone) {
+                    showZoneProperties(obj);
+                }
+                return;
+            }
+
+            // Drag marker
+            if (appState.draggedMarker) {
+                appState.storeMarkers[appState.draggedMarker.key].x = x - appState.draggedMarker.offsetX;
+                appState.storeMarkers[appState.draggedMarker.key].y = y - appState.draggedMarker.offsetY;
+                renderStoreMarkers();
+                renderCanvas();
+                return;
+            }
+
+            // Drag zone
+            if (appState.draggedZone) {
+                appState.draggedZone.zone.x = x - appState.draggedZone.offsetX;
+                appState.draggedZone.zone.y = y - appState.draggedZone.offsetY;
+                renderCanvas();
+                return;
+            }
+
+            // Drag fixture
+            if (appState.draggedFixture) {
+                appState.draggedFixture.fixture.x = x - appState.draggedFixture.offsetX;
+                appState.draggedFixture.fixture.y = y - appState.draggedFixture.offsetY;
+                renderCanvas();
+                return;
+            }
+        }
+
+        function handleCanvasMouseUp(e) {
+            const canvas = document.getElementById('mainCanvas');
+            appState.panning = null;
+            appState.resizing = null;
+            appState.draggedMarker = null;
+            appState.draggedZone = null;
+            appState.draggedFixture = null;
+            if (!appState.spacePressed) {
+                canvas.style.cursor = 'default';
+            }
+        }
+
+        // Get resize handle at point
+        function getResizeHandle(obj, x, y, isZone) {
+            const tolerance = 10 / appState.zoom;
+            const handles = {
+                nw: { x: obj.x, y: obj.y },
+                ne: { x: obj.x + obj.width, y: obj.y },
+                sw: { x: obj.x, y: obj.y + (isZone ? obj.height : obj.depth) },
+                se: { x: obj.x + obj.width, y: obj.y + (isZone ? obj.height : obj.depth) }
+            };
+
+            for (const [name, pos] of Object.entries(handles)) {
+                if (Math.abs(x - pos.x) < tolerance && Math.abs(y - pos.y) < tolerance) {
+                    return name;
+                }
+            }
+            return null;
+        }
+
+        function handleCanvasContextMenu(e) {
+            e.preventDefault();
+            const coords = getCanvasCoords(e);
+            const x = coords.x;
+            const y = coords.y;
+
+            const fixture = findFixtureAtPoint(x, y);
+            if (fixture) {
+                showContextMenu(e.clientX, e.clientY, fixture, 'fixture');
+                return;
+            }
+
+            const zone = findZoneAtPoint(x, y);
+            if (zone) {
+                showContextMenu(e.clientX, e.clientY, zone, 'zone');
+            }
+        }
+
+        function handleCanvasDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleCanvasDrop(e) {
+            e.preventDefault();
+            const coords = getCanvasCoords(e);
+            const x = coords.x;
+            const y = coords.y;
+
+            if (appState.draggedProduct !== null) {
+                const fixture = findFixtureAtPoint(x, y);
+                if (fixture) {
+                    const product = appState.products[appState.draggedProduct];
+                    product.fixtureId = fixture.fixtureId;
+                    product.x = x;
+                    product.y = y;
+                    fixture.products = fixture.products || [];
+                    if (!fixture.products.includes(product.id)) {
+                        fixture.products.push(product.id);
+                    }
+                    showAlert(`${product.name} → ${fixture.fixtureId}`, 'success');
+                    renderCanvas();
+                    renderProductList();
+                    updateStats();
+                }
+                appState.draggedProduct = null;
+            }
+        }
+
+        function findFixtureAtPoint(x, y) {
+            for (let i = appState.fixtures.length - 1; i >= 0; i--) {
+                const f = appState.fixtures[i];
+                if (x >= f.x && x <= f.x + f.width && y >= f.y && y <= f.y + f.depth) {
+                    return f;
+                }
+            }
+            return null;
+        }
+
+        function findZoneAtPoint(x, y) {
+            for (let i = appState.zones.length - 1; i >= 0; i--) {
+                const z = appState.zones[i];
+                if (x >= z.x && x <= z.x + z.width && y >= z.y && y <= z.y + z.height) {
+                    return z;
+                }
+            }
+            return null;
+        }
+
+        function findMarkerAtPoint(x, y) {
+            const tolerance = 15 / appState.zoom;
+            for (const [key, marker] of Object.entries(appState.storeMarkers)) {
+                const dx = x - marker.x;
+                const dy = y - marker.y;
+                if (Math.abs(dx) < tolerance && Math.abs(dy) < tolerance) {
+                    return { key, marker };
+                }
+            }
+            return null;
+        }
+
+        // ==================== PROPERTIES PANEL ====================
+        function showFixtureProperties(fixture) {
+            const editor = document.getElementById('propertiesEditor');
+
+            let html = `<h4>${fixture.name}</h4>`;
+
+            html += `
+                <div class="property-row">
+                    <div class="input-group">
+                        <label>Width (in)</label>
+                        <input type="number" value="${fixture.width}" onchange="updateFixtureProperty('${fixture.fixtureId}', 'width', this.value)">
+                    </div>
+                    <div class="input-group">
+                        <label>Depth (in)</label>
+                        <input type="number" value="${fixture.depth}" onchange="updateFixtureProperty('${fixture.fixtureId}', 'depth', this.value)">
+                    </div>
+                </div>
+            `;
+
+            if (fixture.shelves) {
+                html += `
+                    <div class="property-row">
+                        <div class="input-group">
+                            <label>Shelves</label>
+                            <input type="number" value="${fixture.shelves.count}" onchange="updateFixtureShelves('${fixture.fixtureId}', this.value)">
+                        </div>
+                        <div class="input-group">
+                            <label>Wall Type</label>
+                            <select onchange="updateFixtureWall('${fixture.fixtureId}', this.value)">
+                                <option value="solid" ${fixture.wallType === 'solid' ? 'selected' : ''}>Solid</option>
+                                <option value="slatwall" ${fixture.wallType === 'slatwall' ? 'selected' : ''}>Slatwall</option>
+                                <option value="gridwall" ${fixture.wallType === 'gridwall' ? 'selected' : ''}>Gridwall</option>
+                                <option value="pegboard" ${fixture.wallType === 'pegboard' ? 'selected' : ''}>Pegboard</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (fixture.doors) {
+                html += `
+                    <div class="property-full">
+                        <button class="btn btn-secondary btn-small" style="width: 100%;" onclick="toggleDoors('${fixture.fixtureId}')">
+                            ${fixture.doors.isOpen ? 'Close Doors' : 'Open Doors'}
+                        </button>
+                    </div>
+                `;
+            }
+
+            // Heat zones
+            if (fixture.heatZones) {
+                html += `<div class="heat-zones"><label style="font-size: 11px; color: #667eea; font-weight: 600;">Heat Zones</label>`;
+                fixture.heatZones.forEach(hz => {
+                    const heatPercent = (hz.heat * 100).toFixed(0);
+                    html += `
+                        <div class="heat-zone-item">
+                            <span class="heat-zone-name">${hz.name}</span>
+                            <span class="heat-zone-value">${heatPercent}%</span>
+                        </div>
+                    `;
+                });
+                html += `</div>`;
+            }
+
+            // Assigned products
+            if (fixture.products && fixture.products.length > 0) {
+                html += `<div class="property-full" style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #1e293b;">`;
+                html += `<label style="font-size: 11px; color: #667eea; font-weight: 600; display: block; margin-bottom: 6px;">Products (${fixture.products.length})</label>`;
+                html += `<div style="font-size: 11px; color: #94a3b8; max-height: 100px; overflow-y: auto;">`;
+                fixture.products.forEach(pid => {
+                    const product = appState.products.find(p => p.id === pid);
+                    if (product) {
+                        html += `<div style="padding: 2px 0;">• ${product.name}</div>`;
+                    }
+                });
+                html += `</div></div>`;
+            }
+
+            editor.innerHTML = html;
+        }
+
+        function showZoneProperties(zone) {
+            const editor = document.getElementById('propertiesEditor');
+
+            let html = `<h4>${zone.name} Zone</h4>`;
+
+            html += `
+                <div class="property-row">
+                    <div class="input-group">
+                        <label>Width (in)</label>
+                        <input type="number" value="${zone.width}" onchange="updateZoneProperty(${zone.id}, 'width', this.value)">
+                    </div>
+                    <div class="input-group">
+                        <label>Height (in)</label>
+                        <input type="number" value="${zone.height}" onchange="updateZoneProperty(${zone.id}, 'height', this.value)">
+                    </div>
+                </div>
+                <div class="property-full">
+                    <div class="input-group">
+                        <label>Color</label>
+                        <input type="color" value="${zone.color}" onchange="updateZoneProperty(${zone.id}, 'color', this.value)">
+                    </div>
+                </div>
+            `;
+
+            editor.innerHTML = html;
+        }
+
+        function clearProperties() {
+            const editor = document.getElementById('propertiesEditor');
+            editor.innerHTML = '<p style="color: #64748b; font-size: 12px;">Select a fixture or zone to edit</p>';
+        }
+
+        function updateFixtureProperty(fixtureId, prop, value) {
+            const fixture = appState.fixtures.find(f => f.fixtureId === fixtureId);
+            if (fixture) {
+                fixture[prop] = parseFloat(value);
+                renderCanvas();
+            }
+        }
+
+        function updateFixtureShelves(fixtureId, count) {
+            const fixture = appState.fixtures.find(f => f.fixtureId === fixtureId);
+            if (fixture && fixture.shelves) {
+                fixture.shelves.count = parseInt(count);
+                renderCanvas();
+                showFixtureProperties(fixture);
+            }
+        }
+
+        function updateFixtureWall(fixtureId, wallType) {
+            const fixture = appState.fixtures.find(f => f.fixtureId === fixtureId);
+            if (fixture) {
+                fixture.wallType = wallType;
+                renderCanvas();
+                showAlert(`Wall type: ${wallType}`, 'info');
+            }
+        }
+
+        function toggleDoors(fixtureId) {
+            const fixture = appState.fixtures.find(f => f.fixtureId === fixtureId);
+            if (fixture && fixture.doors) {
+                fixture.doors.isOpen = !fixture.doors.isOpen;
+                renderCanvas();
+                showFixtureProperties(fixture);
+            }
+        }
+
+        function updateZoneProperty(zoneId, prop, value) {
+            const zone = appState.zones.find(z => z.id === zoneId);
+            if (zone) {
+                if (prop === 'color') {
+                    zone[prop] = value;
+                } else {
+                    zone[prop] = parseFloat(value);
+                }
+                renderCanvas();
+                renderZoneList();
+            }
+        }
+
+        // ==================== PRODUCT LIST ====================
+        function renderProductList() {
+            const listDiv = document.getElementById('productList');
+            listDiv.innerHTML = '';
+
+            appState.products.forEach((product, index) => {
+                const item = document.createElement('div');
+                item.className = 'product-item';
+                if (product.fixtureId) item.classList.add('assigned');
+                item.draggable = true;
+                item.dataset.index = index;
+
+                item.innerHTML = `
+                    <div>
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-value">$${product.price.toFixed(2)}</div>
+                    </div>
+                    <div class="product-status ${product.fixtureId ? 'assigned' : ''}"></div>
+                `;
+
+                item.addEventListener('dragstart', (e) => {
+                    e.target.classList.add('dragging');
+                    appState.draggedProduct = parseInt(e.target.dataset.index);
+                });
+
+                item.addEventListener('dragend', (e) => {
+                    e.target.classList.remove('dragging');
+                });
+
+                listDiv.appendChild(item);
+            });
+
+            document.getElementById('productCount').textContent = appState.products.length;
+        }
+
+        // ==================== ZONE MANAGEMENT ====================
+        function renderZoneList() {
+            const listDiv = document.getElementById('zoneList');
+            listDiv.innerHTML = '';
+
+            appState.zones.forEach(zone => {
+                const item = document.createElement('div');
+                item.className = 'zone-item';
+                if (appState.selectedZone === zone.id) item.classList.add('selected');
+                item.onclick = () => {
+                    appState.selectedZone = zone.id;
+                    appState.selectedFixture = null;
+                    renderCanvas();
+                    renderZoneList();
+                    showZoneProperties(zone);
+                };
+
+                item.innerHTML = `
+                    <div class="zone-color" style="background: ${zone.color};"></div>
+                    <div class="zone-name">${zone.name}</div>
+                    ${zone.auto ? '<div class="zone-auto-badge">AUTO</div>' : ''}
+                    <button class="btn btn-secondary btn-small" onclick="deleteZone(${zone.id}); event.stopPropagation();">×</button>
+                `;
+
+                listDiv.appendChild(item);
+            });
+        }
+
+        function addZone() {
+            const name = prompt('Zone name:');
+            if (!name) return;
+
+            const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+
+            const zone = {
+                id: appState.nextZoneId++,
+                name: name,
+                color: color,
+                x: 100,
+                y: 100,
+                width: 200,
+                height: 150,
+                auto: false
+            };
+
+            appState.zones.push(zone);
+            renderZoneList();
+            renderCanvas();
+            updateStats();
+            showAlert(`Zone added: ${name}`, 'success');
+        }
+
+        function deleteZone(id) {
+            appState.zones = appState.zones.filter(z => z.id !== id);
+            renderZoneList();
+            renderCanvas();
+            updateStats();
+        }
+
+        function toggleZones() {
+            appState.showZones = !appState.showZones;
+            document.getElementById('zoneToggleText').textContent = appState.showZones ? 'Hide Zones' : 'Show Zones';
+            renderCanvas();
+        }
+
+        function toggleHeatMap() {
+            appState.showHeatMap = !appState.showHeatMap;
+            document.getElementById('heatToggleText').textContent = appState.showHeatMap ? 'Hide Heat Map' : 'Show Heat Map';
+            renderCanvas();
+        }
+
+        // ==================== AUTO ZONE ASSIGNMENT ====================
+        function autoAssignZones() {
+            const entrance = appState.storeMarkers.entrance;
+            const exit = appState.storeMarkers.exit;
+            const pos = appState.storeMarkers.pos;
+
+            // Create zones automatically
+            appState.zones = [
+                {
+                    id: 1,
+                    name: 'Entrance Zone',
+                    color: '#3b82f6',
+                    x: entrance.x - 100,
+                    y: entrance.y,
+                    width: 200,
+                    height: 150,
+                    auto: true
+                },
+                {
+                    id: 2,
+                    name: 'High Traffic',
+                    color: '#eab308',
+                    x: appState.storeWidth / 2 - 125,
+                    y: appState.storeLength / 2 - 100,
+                    width: 250,
+                    height: 200,
+                    auto: true
+                },
+                {
+                    id: 3,
+                    name: 'Checkout Zone',
+                    color: '#22c55e',
+                    x: pos.x - 100,
+                    y: pos.y - 100,
+                    width: 150,
+                    height: 100,
+                    auto: true
+                },
+                {
+                    id: 4,
+                    name: 'Exit Zone',
+                    color: '#ef4444',
+                    x: exit.x - 100,
+                    y: exit.y,
+                    width: 150,
+                    height: 100,
+                    auto: true
+                }
+            ];
+
+            appState.nextZoneId = 5;
+
+            // Assign fixtures to zones
+            appState.fixtures.forEach(fixture => {
+                let closestZone = null;
+                let minDist = Infinity;
+
+                appState.zones.forEach(zone => {
+                    const dist = Math.sqrt(
+                        Math.pow(fixture.x - zone.x, 2) +
+                        Math.pow(fixture.y - zone.y, 2)
+                    );
+                    if (dist < minDist) {
+                        minDist = dist;
+                        closestZone = zone;
+                    }
+                });
+
+                if (closestZone) {
+                    fixture.zoneId = closestZone.id;
+                }
+            });
+
+            renderZoneList();
+            renderCanvas();
+            updateStats();
+            showAlert('Zones auto-assigned based on store markers!', 'success');
+        }
+
+        // ==================== BULK IMPORT ====================
+        function loadExampleData() {
+            const exampleData = `Winter Puffer Jacket, Entrance, gondola
+Cashmere Scarf, Entrance, table
+Leather Gloves, High Traffic, gondola
+Wool Beanie, High Traffic, table
+Snow Boots, Checkout, gondola
+Rain Boots, Checkout, gondola
+Designer Handbag, High Traffic, display
+Wallet, Checkout, table
+Sunglasses, Entrance, display
+Belt, High Traffic, gondola`;
+
+            document.getElementById('bulkImportText').value = exampleData;
+            showAlert('Example data loaded! Click Import to visualize.', 'info');
+        }
+
+        function processBulkImport() {
+            const text = document.getElementById('bulkImportText').value.trim();
+            if (!text) {
+                showAlert('Paste product data first', 'error');
+                return;
+            }
+
+            const lines = text.split('\n');
+            let imported = 0;
+
+            lines.forEach(line => {
+                const parts = line.split(',').map(p => p.trim());
+                if (parts.length < 3) return;
+
+                const [name, zoneName, fixtureName] = parts;
+
+                const zone = appState.zones.find(z => z.name.toLowerCase().includes(zoneName.toLowerCase()));
+                const fixture = appState.fixtures.find(f => f.fixtureId.toLowerCase().includes(fixtureName.toLowerCase()));
+
+                let product = appState.products.find(p => p.name === name);
+                if (!product) {
+                    product = {
+                        id: appState.products.length + 1,
+                        name: name,
+                        category: 'Imported',
+                        price: 50,
+                        margin: 0.5,
+                        fixtureId: fixture ? fixture.fixtureId : null,
+                        zone: zone ? zone.id : null,
+                        x: fixture ? fixture.x + 10 : 0,
+                        y: fixture ? fixture.y + 10 : 0
+                    };
+                    appState.products.push(product);
+                } else {
+                    if (fixture) product.fixtureId = fixture.fixtureId;
+                    if (zone) product.zone = zone.id;
+                }
+
+                if (fixture && product.fixtureId) {
+                    fixture.products = fixture.products || [];
+                    if (!fixture.products.includes(product.id)) {
+                        fixture.products.push(product.id);
+                    }
+                }
+
+                imported++;
+            });
+
+            renderProductList();
+            renderCanvas();
+            updateStats();
+            showAlert(`Imported ${imported} products - now visible on fixtures!`, 'success');
+            document.getElementById('bulkImportText').value = '';
+        }
+
+        // ==================== CUSTOM FIXTURES ====================
+        function saveCurrentAsCustom() {
+            if (!appState.selectedFixture) {
+                showAlert('Select a fixture first', 'error');
+                return;
+            }
+
+            const fixture = appState.fixtures.find(f => f.fixtureId === appState.selectedFixture);
+            if (!fixture) return;
+
+            const name = prompt('Custom fixture name:', `Custom ${fixture.name}`);
+            if (!name) return;
+
+            const custom = {
+                ...JSON.parse(JSON.stringify(fixture)),
+                id: `custom-${Date.now()}`,
+                name: name
+            };
+            delete custom.fixtureId;
+            delete custom.products;
+            delete custom.zoneId;
+
+            appState.customFixtures.push(custom);
+            renderCustomFixtures();
+            showAlert(`Saved as custom: ${name}`, 'success');
+        }
+
+        function renderCustomFixtures() {
+            const container = document.getElementById('customFixtures');
+            container.innerHTML = '';
+
+            if (appState.customFixtures.length === 0) {
+                container.innerHTML = '<p style="font-size: 11px; color: #64748b;">No custom fixtures yet</p>';
+                return;
+            }
+
+            appState.customFixtures.forEach(fixture => {
+                const item = document.createElement('div');
+                item.className = 'custom-fixture-item';
+                item.onclick = () => addFixtureToCanvas(fixture);
+
+                item.innerHTML = `
+                    <div>${fixture.name}</div>
+                    <button class="btn btn-secondary btn-small" onclick="deleteCustomFixture('${fixture.id}'); event.stopPropagation();">×</button>
+                `;
+
+                container.appendChild(item);
+            });
+        }
+
+        function deleteCustomFixture(id) {
+            appState.customFixtures = appState.customFixtures.filter(f => f.id !== id);
+            renderCustomFixtures();
+        }
+
+        // ==================== CONTEXT MENU ====================
+        function showContextMenu(x, y, obj, type) {
+            const menu = document.getElementById('contextMenu');
+
+            if (type === 'fixture') {
+                menu.innerHTML = `
+                    <div class="context-menu-item" onclick="duplicateFixture('${obj.fixtureId}')">Duplicate</div>
+                    <div class="context-menu-item" onclick="rotateFixture('${obj.fixtureId}')">Rotate 90°</div>
+                    <div class="context-menu-divider"></div>
+                    <div class="context-menu-item danger" onclick="deleteFixture('${obj.fixtureId}')">Delete</div>
+                `;
+            } else if (type === 'zone') {
+                menu.innerHTML = `
+                    <div class="context-menu-item" onclick="duplicateZone(${obj.id})">Duplicate</div>
+                    <div class="context-menu-divider"></div>
+                    <div class="context-menu-item danger" onclick="deleteZone(${obj.id})">Delete</div>
+                `;
+            }
+
+            menu.style.left = x + 'px';
+            menu.style.top = y + 'px';
+            menu.style.display = 'block';
+
+            setTimeout(() => {
+                document.addEventListener('click', () => {
+                    menu.style.display = 'none';
+                }, { once: true });
+            }, 10);
+        }
+
+        function duplicateFixture(fixtureId) {
+            const original = appState.fixtures.find(f => f.fixtureId === fixtureId);
+            if (original) {
+                const copy = {
+                    ...JSON.parse(JSON.stringify(original)),
+                    fixtureId: `${original.type}-${appState.nextFixtureId++}`,
+                    x: original.x + 30,
+                    y: original.y + 30,
+                    products: []
+                };
+                appState.fixtures.push(copy);
+                renderCanvas();
+                updateStats();
+            }
+        }
+
+        function rotateFixture(fixtureId) {
+            const fixture = appState.fixtures.find(f => f.fixtureId === fixtureId);
+            if (fixture) {
+                [fixture.width, fixture.depth] = [fixture.depth, fixture.width];
+                renderCanvas();
+            }
+        }
+
+        function deleteFixture(fixtureId) {
+            appState.fixtures = appState.fixtures.filter(f => f.fixtureId !== fixtureId);
+            appState.products.forEach(p => {
+                if (p.fixtureId === fixtureId) p.fixtureId = null;
+            });
+            renderCanvas();
+            renderProductList();
+            updateStats();
+            clearProperties();
+        }
+
+        function deleteSelected() {
+            if (appState.selectedFixture) {
+                deleteFixture(appState.selectedFixture);
+                appState.selectedFixture = null;
+            } else if (appState.selectedZone) {
+                deleteZone(appState.selectedZone);
+                appState.selectedZone = null;
+            }
+        }
+
+        function duplicateZone(zoneId) {
+            const original = appState.zones.find(z => z.id === zoneId);
+            if (original) {
+                const copy = {
+                    ...JSON.parse(JSON.stringify(original)),
+                    id: appState.nextZoneId++,
+                    name: original.name + ' Copy',
+                    x: original.x + 30,
+                    y: original.y + 30,
+                    auto: false
+                };
+                appState.zones.push(copy);
+                renderZoneList();
+                renderCanvas();
+                updateStats();
+            }
+        }
+
+        // ==================== SMART PLACEMENT ====================
+        function showOptimizationModal() {
+            if (appState.products.length === 0) {
+                showAlert('Add products first before running optimization', 'error');
+                return;
+            }
+            if (appState.fixtures.length === 0) {
+                showAlert('Add fixtures to canvas first', 'error');
+                return;
+            }
+            document.getElementById('optimizationModal').style.display = 'flex';
+        }
+
+        function closeOptimizationModal() {
+            document.getElementById('optimizationModal').style.display = 'none';
+        }
+
+        function runSmartPlacement() {
+            closeOptimizationModal();
+            showAlert('Running smart placement algorithm...', 'info');
+
+            setTimeout(() => {
+                const goal = document.getElementById('optGoal').value;
+                const highValue = document.getElementById('optHighValue').checked;
+                const groupCategory = document.getElementById('optGroupCategory').checked;
+                const entranceAnchors = document.getElementById('optEntranceAnchors').checked;
+                const heatStrategy = document.getElementById('optHeatStrategy').value;
+
+                // Calculate product scores
+                const productsWithScores = appState.products.map(product => {
+                    const value = product.price * product.margin;
+                    return {
+                        ...product,
+                        score: value,
+                        value: value
+                    };
+                });
+
+                // Sort by score (highest first)
+                productsWithScores.sort((a, b) => b.score - a.score);
+
+                // Calculate fixture slots with heat scores
+                const fixtureSlots = [];
+                appState.fixtures.forEach(fixture => {
+                    // Get zone multiplier
+                    let zoneMultiplier = 1.0;
+                    if (fixture.zoneId) {
+                        const zone = appState.zones.find(z => z.id === fixture.zoneId);
+                        if (zone) {
+                            if (zone.name.toLowerCase().includes('entrance')) zoneMultiplier = 1.3;
+                            else if (zone.name.toLowerCase().includes('high traffic')) zoneMultiplier = 1.2;
+                            else if (zone.name.toLowerCase().includes('checkout')) zoneMultiplier = 1.1;
+                        }
+                    }
+
+                    // Calculate heat zones for this fixture
+                    if (fixture.heatZones) {
+                        fixture.heatZones.forEach((hz, idx) => {
+                            const slotScore = hz.heat * zoneMultiplier;
+                            fixtureSlots.push({
+                                fixture: fixture,
+                                heatZone: hz,
+                                heatZoneIndex: idx,
+                                score: slotScore,
+                                assigned: null
+                            });
+                        });
+                    } else {
+                        // No heat zones, use base score
+                        fixtureSlots.push({
+                            fixture: fixture,
+                            heatZone: null,
+                            heatZoneIndex: 0,
+                            score: zoneMultiplier,
+                            assigned: null
+                        });
+                    }
+                });
+
+                // Sort slots by score (best first)
+                fixtureSlots.sort((a, b) => b.score - a.score);
+
+                // Clear existing assignments
+                appState.fixtures.forEach(f => {
+                    f.products = [];
+                });
+
+                // Assign products to slots
+                let productIdx = 0;
+                let slotIdx = 0;
+
+                if (heatStrategy === 'best') {
+                    // Place best products in best slots
+                    while (productIdx < productsWithScores.length && slotIdx < fixtureSlots.length) {
+                        const product = productsWithScores[productIdx];
+                        const slot = fixtureSlots[slotIdx];
+
+                        product.fixtureId = slot.fixture.fixtureId;
+                        slot.fixture.products.push(product.id);
+                        slot.assigned = product.id;
+
+                        productIdx++;
+                        slotIdx++;
+                    }
+                } else if (heatStrategy === 'spread') {
+                    // Distribute products across different heat levels
+                    productsWithScores.forEach((product, idx) => {
+                        const slotGroup = idx % 3; // Rotate through 3 groups
+                        const targetSlot = fixtureSlots[Math.floor(idx / 3) + slotGroup];
+                        if (targetSlot) {
+                            product.fixtureId = targetSlot.fixture.fixtureId;
+                            targetSlot.fixture.products.push(product.id);
+                            targetSlot.assigned = product.id;
+                        }
+                    });
+                } else if (heatStrategy === 'impulse') {
+                    // Place high-margin items near checkout
+                    const checkoutFixtures = appState.fixtures.filter(f => {
+                        if (!f.zoneId) return false;
+                        const zone = appState.zones.find(z => z.id === f.zoneId);
+                        return zone && zone.name.toLowerCase().includes('checkout');
+                    });
+
+                    let checkoutIdx = 0;
+                    productsWithScores.forEach(product => {
+                        if (product.margin > 0.6 && checkoutIdx < checkoutFixtures.length) {
+                            const fixture = checkoutFixtures[checkoutIdx % checkoutFixtures.length];
+                            product.fixtureId = fixture.fixtureId;
+                            fixture.products.push(product.id);
+                            checkoutIdx++;
+                        } else {
+                            // Place in regular slots
+                            const slot = fixtureSlots[slotIdx++];
+                            if (slot) {
+                                product.fixtureId = slot.fixture.fixtureId;
+                                slot.fixture.products.push(product.id);
+                            }
+                        }
+                    });
+                }
+
+                renderCanvas();
+                renderProductList();
+                updateStats();
+
+                const placedCount = appState.products.filter(p => p.fixtureId).length;
+                showAlert(`Smart placement complete! ${placedCount} products optimally placed.`, 'success');
+            }, 500);
+        }
+
+        // ==================== EXPORT/SAVE ====================
+        function saveLayout() {
+            const layout = {
+                storeWidth: appState.storeWidth,
+                storeLength: appState.storeLength,
+                storeHeight: appState.storeHeight,
+                fixtures: appState.fixtures,
+                zones: appState.zones,
+                products: appState.products,
+                storeMarkers: appState.storeMarkers,
+                customFixtures: appState.customFixtures
+            };
+
+            const json = JSON.stringify(layout, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `shop-layout-${Date.now()}.json`;
+            a.click();
+            showAlert('Layout saved!', 'success');
+        }
+
+        function loadLayout() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    const layout = JSON.parse(event.target.result);
+                    appState.storeWidth = layout.storeWidth;
+                    appState.storeLength = layout.storeLength;
+                    appState.storeHeight = layout.storeHeight;
+                    appState.fixtures = layout.fixtures;
+                    appState.zones = layout.zones;
+                    appState.products = layout.products;
+                    appState.storeMarkers = layout.storeMarkers || appState.storeMarkers;
+                    appState.customFixtures = layout.customFixtures || [];
+
+                    document.getElementById('storeWidth').value = appState.storeWidth;
+                    document.getElementById('storeLength').value = appState.storeLength;
+                    document.getElementById('storeHeight').value = appState.storeHeight;
+
+                    updateCanvasSize();
+                    renderProductList();
+                    renderZoneList();
+                    renderStoreMarkers();
+                    renderCustomFixtures();
+                    updateStats();
+                    showAlert('Layout loaded!', 'success');
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function exportCanvas() {
+            const canvas = document.getElementById('mainCanvas');
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `shop-layout-${Date.now()}.png`;
+                a.click();
+                showAlert('Canvas exported!', 'success');
+            });
+        }
+
+        function exportCSV() {
+            let csv = 'Product,Category,Price,Margin,Fixture,Zone\n';
+
+            appState.products.forEach(product => {
+                const fixture = appState.fixtures.find(f => f.fixtureId === product.fixtureId);
+                const zone = appState.zones.find(z => z.id === product.zone);
+
+                csv += `"${product.name}","${product.category}",${product.price},${product.margin},"${fixture ? fixture.fixtureId : 'Unassigned'}","${zone ? zone.name : 'None'}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `product-list-${Date.now()}.csv`;
+            a.click();
+            showAlert('CSV exported!', 'success');
+        }
+
+        // ==================== UTILITIES ====================
+        function updateStats() {
+            document.getElementById('fixtureCount').textContent = `${appState.fixtures.length} fixtures`;
+            document.getElementById('zoneCount').textContent = `${appState.zones.length} zones`;
+            const assigned = appState.products.filter(p => p.fixtureId).length;
+            document.getElementById('assignedCount').textContent = `${assigned}/${appState.products.length} assigned`;
+        }
+
+        function showAlert(message, type) {
+            const alert = document.getElementById('alertBox');
+            alert.textContent = message;
+            alert.className = `alert ${type} show`;
+
+            setTimeout(() => {
+                alert.classList.remove('show');
+            }, 3000);
+        }
+
+        function showUploadCSV() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.csv';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    parseCSV(event.target.result);
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function parseCSV(csv) {
+            const lines = csv.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+
+                const values = lines[i].split(',').map(v => v.trim());
+                const product = {
+                    id: appState.products.length + 1,
+                    name: values[headers.indexOf('name')],
+                    category: values[headers.indexOf('category')] || 'General',
+                    price: parseFloat(values[headers.indexOf('price')]) || 50,
+                    margin: parseFloat(values[headers.indexOf('margin')]) || 0.5,
+                    fixtureId: null,
+                    zone: null,
+                    x: 0,
+                    y: 0
+                };
+
+                appState.products.push(product);
+            }
+
+            renderProductList();
+            updateStats();
+            showAlert(`Imported ${lines.length - 1} products`, 'success');
+        }
+    </script>
+</body>
+</html>
