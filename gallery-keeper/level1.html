@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery Keeper - Level 1: Greeting Hall</title>
     <style>
+        @font-face {
+            font-family: 'mOS';
+            src: url('assets/fonts/mOS-Black.otf') format('opentype');
+            font-weight: bold;
+            font-style: normal;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,7 +19,7 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: 'mOS', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             display: flex;
             align-items: center;
@@ -62,8 +69,7 @@
         }
 
         .start-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 32px rgba(102, 126, 234, 0.6);
+            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.7);
         }
 
         @keyframes pulse {
@@ -193,20 +199,20 @@
     <div class="game-container">
         <!-- START SCREEN -->
         <div class="start-screen" id="startScreen">
-            <h1>🏛️ Greeting Hall</h1>
+            <h1>Greeting Hall</h1>
             <p class="subtitle">Level 1 - Carnegie's Routing Challenge</p>
 
             <button class="start-btn" id="startBtn">Start Level</button>
 
             <div class="tutorial-text" id="tutorialText">
                 <div class="tutorial-content">
-                    <h3>📜 Carnegie's Story</h3>
+                    <h3>Carnegie's Story</h3>
                     <p>
                         In 1850, young Andrew Carnegie worked as a telegraph messenger boy, learning to route messages
                         quickly and accurately across Pittsburgh. This skill helped him build 2,509 libraries that served millions.
                     </p>
 
-                    <h3>🎯 Your Mission:</h3>
+                    <h3>Your Mission:</h3>
                     <ul>
                         <li>Visitors enter from the top - match their colors to door circles</li>
                         <li>Drag them to matching colored doors before hall fills up!</li>
@@ -228,8 +234,8 @@
             </div>
 
             <div class="controls-bar">
-                <button class="btn btn-primary" id="restartBtn">🔄 Restart</button>
-                <a href="index.html" class="btn">← Back to Gallery</a>
+                <button class="btn btn-primary" id="restartBtn">Restart</button>
+                <a href="index.html" class="btn">Back to Gallery</a>
             </div>
         </div>
     </div>
