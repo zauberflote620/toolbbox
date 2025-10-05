@@ -277,10 +277,10 @@
 
             // Helper character (stick_hands_hip)
             helper: {
-                x: canvas.width - 100, // Lower right corner
-                y: canvas.height - 100,
-                targetX: canvas.width - 100,
-                targetY: canvas.height - 100,
+                x: canvas.width - 250, // Closer to center
+                y: canvas.height - 150,
+                targetX: canvas.width - 250,
+                targetY: canvas.height - 150,
                 moving: false
             }
         };
@@ -2180,11 +2180,11 @@
                 ctx.stroke();
             }
 
-            // Draw helper (stick_hands_hip) in lower right during tutorial
+            // Draw helper (stick_hands_hip) closer to center during tutorial
             if (!game.gameStarted && game.imagesLoaded && game.images.stick_hands_hip && game.images.stick_hands_hip.complete) {
                 const helperBob = Math.sin(game.time * 2) * 5;
-                const helperWidth = 50;
-                const helperHeight = 60;
+                const helperWidth = 63;  // 1.25x larger than 50
+                const helperHeight = 75; // 1.25x larger than 60
 
                 ctx.drawImage(
                     game.images.stick_hands_hip,
