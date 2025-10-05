@@ -344,7 +344,7 @@
                 // Special assets
                 'branch': '../Excalidraw/assets/nature/branches.png',
                 'groot': '../Excalidraw/assets/nature/i-am-groot.svg',
-                'skull': '../Excalidraw/assets/symbols/skull_red.png',
+                'skull': '../Excalidraw/assets/creatures/crying-head.svg',
                 'alarm': '../Excalidraw/assets/objects/alarm-red.svg',
 
                 // Surprise elements (chickens and weather)
@@ -496,11 +496,11 @@
                 if (game.grootCooldown < 0) game.grootCooldown = 0;
             }
 
-            // Check for Groot popup (any plant fully watered)
-            const allPlantsFullyWatered = game.plants.some(p => p.waterLevel >= 95);
+            // Check for Groot popup (happiness reaches 90%)
+            const happinessHigh = game.overallHappiness >= 90;
 
-            // Only trigger if not in cooldown, not already showing, and plants are fully watered
-            if (allPlantsFullyWatered && !game.grootPopup && game.grootCooldown === 0) {
+            // Only trigger if not in cooldown, not already showing, and happiness is 90%+
+            if (happinessHigh && !game.grootPopup && game.grootCooldown === 0) {
                 game.grootPopup = true;
                 game.grootPopupTimer = 0;
                 game.grootPopupScale = 0;
