@@ -129,17 +129,21 @@ time-banked: 6.17
 - [x] Validation checkpoint: Level 2 MVP COMPLETE AND PLAYABLE
 
 
-## Level 3 - Living Gallery (Phase 4 - 5h)
+## Level 3 - Living Gallery (Phase 4 - 5h) - ✅ COMPLETE (Oct 5, 2025)
 
-- [ ] Build Feynman tutorial (environmental interaction)
-- [ ] Create plant system (watering, growth, bloom)
-- [ ] Implement lighting system (3 adjustable zones)
-- [ ] Add cleanliness system (dirt spawns, cleaning tool)
-- [ ] Build visitor pathfinding AI
-- [ ] Create emergent behavior (visitors gather at pretty areas)
-- [ ] Design Feynman spirit NPC (celebrates discoveries)
-- [ ] Set victory condition (80% happiness for 5 minutes)
-- [ ] Validation checkpoint: Level 3 playable
+- [x] Build Feynman tutorial (environmental interaction)
+- [x] Create plant system (watering, growth, bloom with glow effects)
+- [x] Implement lighting system (3 adjustable zones with flash effects)
+- [x] Add cleanliness system (dirt spawns, cleaning tool)
+- [x] Build visitor pathfinding AI (intelligent 8-candidate evaluation)
+- [x] Create emergent behavior (visitors gravitate to well-maintained areas)
+- [x] Design Feynman spirit NPC (celebrates discoveries with 4 discovery types)
+- [x] Set victory condition (75% happiness for 3 minutes - balanced from original 80%/5min)
+- [x] Add visual polish (plant glow, lighting flash, movement trails)
+- [x] Implement Feynman discovery reactions (synergy, blooming, clean, lighting)
+- [x] Balance game difficulty (adjusted timers, happiness targets)
+- [x] Update index.html with Level 3 link
+- [x] Validation checkpoint: Level 3 COMPLETE AND PLAYABLE
 
 
 ## Level 4 - Question Corner (Phase 5 - 4h)

@@ -1,0 +1,1643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 3: Living Gallery - Gallery Keeper</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 100%);
+            color: #ECF0F1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #81C784;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #C5E1A5;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .game-container {
+            background: #2E7D32;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 940px;
+            width: 100%;
+        }
+
+        canvas {
+            display: block;
+            background: linear-gradient(135deg, #E8F5E9 0%, #F1F8E9 50%, #FFF9C4 100%);
+            border-radius: 12px;
+            margin: 0 auto 20px;
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            cursor: default;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #66BB6A 0%, #4CAF50 100%);
+            color: white;
+            box-shadow:
+                0 4px 12px rgba(76, 175, 80, 0.4),
+                0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+            transform: translateY(-2px);
+            box-shadow:
+                0 6px 16px rgba(76, 175, 80, 0.5),
+                0 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95A5A6 0%, #7F8C8D 100%);
+            color: white;
+            box-shadow:
+                0 4px 12px rgba(149, 165, 166, 0.3),
+                0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #7F8C8D 0%, #5D6D7E 100%);
+            transform: translateY(-2px);
+            box-shadow:
+                0 6px 16px rgba(149, 165, 166, 0.4),
+                0 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .instructions {
+            background: #1B5E20;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .instructions h3 {
+            color: #81C784;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Gallery Keeper: Living Gallery</h1>
+        <p class="subtitle">Level 3 - Feynman's Environmental Challenge</p>
+
+        <canvas id="gameCanvas" width="900" height="650"></canvas>
+
+        <div class="controls">
+            <a href="index.html" class="btn btn-secondary" style="text-decoration: none;">Back to Gallery</a>
+        </div>
+
+        <div class="instructions">
+            <h3>How to Play</h3>
+            <ul>
+                <li><strong>Goal:</strong> Create a happy environment for gallery visitors</li>
+                <li><strong>Water plants:</strong> Click plants to water them (they'll grow and bloom!)</li>
+                <li><strong>Adjust lighting:</strong> Control 3 lighting zones (dim, normal, bright)</li>
+                <li><strong>Clean dirt:</strong> Click dirt spots to clean them</li>
+                <li><strong>Watch visitors:</strong> They'll naturally gravitate to pleasant areas</li>
+                <li><strong>Victory:</strong> Maintain 75%+ visitor happiness for 3 continuous minutes</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game state
+        const game = {
+            // Time tracking
+            time: 0,
+            victoryState: false,
+            victoryTimer: 0,
+            gameStarted: false,
+            startButtonHover: false,
+            paused: false,
+
+            // Tutorial
+            tutorialStep: 0,
+            feynmanMessage: '',
+            messageTimer: 0,
+            tutorialComplete: false,
+
+            // Plant system (6 plant zones across the gallery)
+            plants: [],
+            plantZones: [
+                { x: 100, y: 150, waterLevel: 50, growthStage: 1 },
+                { x: 300, y: 150, waterLevel: 50, growthStage: 1 },
+                { x: 500, y: 150, waterLevel: 50, growthStage: 1 },
+                { x: 100, y: 400, waterLevel: 50, growthStage: 1 },
+                { x: 300, y: 400, waterLevel: 50, growthStage: 1 },
+                { x: 500, y: 400, waterLevel: 50, growthStage: 1 }
+            ],
+
+            // Lighting system (3 zones: left, center, right)
+            lightZones: [
+                { x: 0, y: 100, w: 300, h: 500, brightness: 1, name: 'Left', flashTimer: 0 },      // 0=dim, 1=normal, 2=bright
+                { x: 300, y: 100, w: 300, h: 500, brightness: 1, name: 'Center', flashTimer: 0 },
+                { x: 600, y: 100, w: 300, h: 500, brightness: 1, name: 'Right', flashTimer: 0 }
+            ],
+
+            // Cleanliness system
+            dirtSpots: [],
+            dirtSpawnTimer: 0,
+            dirtSpawnInterval: 12, // Spawn dirt every 12 seconds (more forgiving)
+
+            // Visitor AI
+            visitors: [],
+            visitorSpawnTimer: 0,
+            visitorSpawnInterval: 2.5, // Spawn visitor every 2.5 seconds
+            maxVisitors: 10,
+
+            // Environmental scoring
+            overallHappiness: 0, // 0-100
+            happinessHistory: [], // Track happiness over time
+            timeAtTargetHappiness: 0, // Seconds at 80%+ happiness
+            targetHappiness: 75, // Lowered from 80 to 75
+            targetDuration: 180, // 3 minutes = 180 seconds (down from 5 minutes)
+
+            // Tool selection
+            currentTool: 'water', // 'water', 'clean', 'light'
+
+            // UI elements
+            toolButtons: [],
+            restartButtonCanvasBounds: null,
+            pauseButtonBounds: null,
+
+            // Visual effects
+            particles: [],
+            screenShake: 0,
+            confetti: [],
+
+            // Feynman NPC
+            feynmanX: 700,
+            feynmanY: 50,
+            feynmanExcited: false,
+            feynmanReactionTimer: 0,
+            lastHappiness: 50,
+            discoveryMade: {
+                bloomingPlants: false,
+                cleanEnvironment: false,
+                perfectLighting: false,
+                synergy: false
+            }
+        };
+
+        // Initialize game
+        function init() {
+            console.log('Level 3: Living Gallery - Initializing...');
+
+            // Initialize plant zones
+            game.plants = game.plantZones.map((zone, i) => ({
+                id: i,
+                x: zone.x,
+                y: zone.y,
+                waterLevel: 50,
+                growthStage: 1, // 0=wilted, 1=healthy, 2=blooming
+                wateringAnimation: 0
+            }));
+
+            // Initialize dirt spots (start with a few)
+            for (let i = 0; i < 3; i++) {
+                spawnDirt();
+            }
+
+            // Setup tool buttons
+            game.toolButtons = [
+                { tool: 'water', x: 20, y: 100, w: 80, h: 60, label: 'Water', icon: '💧' },
+                { tool: 'clean', x: 20, y: 180, w: 80, h: 60, label: 'Clean', icon: '🧹' },
+                { tool: 'light', x: 20, y: 260, w: 80, h: 60, label: 'Light', icon: '💡' }
+            ];
+
+            // Start tutorial
+            showTutorial();
+        }
+
+        function showTutorial() {
+            const messages = [
+                "Welcome to the Living Gallery! I'm Richard Feynman.",
+                "Your goal: create an environment where visitors feel happy.",
+                "Water plants, adjust lighting, and keep things clean.",
+                "Visitors will naturally move toward pleasant areas.",
+                "Experiment! Try different combinations and observe what happens.",
+                "Maintain 80% happiness for 5 minutes to win. Good luck!"
+            ];
+
+            if (game.tutorialStep < messages.length) {
+                game.feynmanMessage = messages[game.tutorialStep];
+                game.messageTimer = 3;
+                game.tutorialStep++;
+
+                if (game.tutorialStep >= messages.length) {
+                    game.tutorialComplete = true;
+                    setTimeout(() => {
+                        game.gameStarted = true;
+                    }, 3000);
+                } else {
+                    setTimeout(() => showTutorial(), 3000);
+                }
+            }
+        }
+
+        function spawnDirt() {
+            // Random position within gallery bounds
+            const x = 150 + Math.random() * 600;
+            const y = 150 + Math.random() * 400;
+
+            game.dirtSpots.push({
+                x: x,
+                y: y,
+                size: 15 + Math.random() * 10,
+                cleanLevel: 100 // 0=clean, 100=very dirty
+            });
+        }
+
+        function spawnVisitor() {
+            if (game.visitors.length >= game.maxVisitors) return;
+
+            // Random entry point (top or sides)
+            const spawnSide = Math.floor(Math.random() * 3);
+            let x, y;
+
+            if (spawnSide === 0) { // Top
+                x = 200 + Math.random() * 500;
+                y = 100;
+            } else if (spawnSide === 1) { // Left
+                x = 120;
+                y = 150 + Math.random() * 400;
+            } else { // Right
+                x = 780;
+                y = 150 + Math.random() * 400;
+            }
+
+            game.visitors.push({
+                id: Date.now() + Math.random(),
+                x: x,
+                y: y,
+                vx: 0,
+                vy: 0,
+                happiness: 50, // 0-100
+                targetX: null,
+                targetY: null,
+                speed: 30 + Math.random() * 20,
+                idleTimer: 0
+            });
+        }
+
+        function updatePlants(dt) {
+            game.plants.forEach(plant => {
+                // Water evaporates over time (slower than before)
+                plant.waterLevel -= 1.5 * dt;
+                if (plant.waterLevel < 0) plant.waterLevel = 0;
+                if (plant.waterLevel > 100) plant.waterLevel = 100;
+
+                // Update growth stage based on water level
+                if (plant.waterLevel < 20) {
+                    plant.growthStage = 0; // Wilted
+                } else if (plant.waterLevel < 70) {
+                    plant.growthStage = 1; // Healthy
+                } else {
+                    plant.growthStage = 2; // Blooming
+                }
+
+                // Decay watering animation
+                if (plant.wateringAnimation > 0) {
+                    plant.wateringAnimation -= dt * 2;
+                }
+            });
+        }
+
+        function updateLighting(dt) {
+            // Update flash timers
+            game.lightZones.forEach(zone => {
+                if (zone.flashTimer > 0) {
+                    zone.flashTimer -= dt;
+                }
+            });
+        }
+
+        function updateDirt(dt) {
+            // Spawn new dirt periodically
+            game.dirtSpawnTimer += dt;
+            if (game.dirtSpawnTimer >= game.dirtSpawnInterval) {
+                game.dirtSpawnTimer = 0;
+                spawnDirt();
+            }
+        }
+
+        function updateVisitors(dt) {
+            // Spawn new visitors
+            game.visitorSpawnTimer += dt;
+            if (game.visitorSpawnTimer >= game.visitorSpawnInterval) {
+                game.visitorSpawnTimer = 0;
+                spawnVisitor();
+            }
+
+            // Update each visitor
+            game.visitors.forEach((visitor, index) => {
+                // Pick new target if idle
+                if (!visitor.targetX || visitor.idleTimer > 2) {
+                    pickNewTarget(visitor);
+                    visitor.idleTimer = 0;
+                }
+
+                // Move toward target
+                const dx = visitor.targetX - visitor.x;
+                const dy = visitor.targetY - visitor.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist > 5) {
+                    visitor.vx = (dx / dist) * visitor.speed;
+                    visitor.vy = (dy / dist) * visitor.speed;
+                    visitor.x += visitor.vx * dt;
+                    visitor.y += visitor.vy * dt;
+
+                    // Add subtle movement trail particles
+                    if (Math.random() < 0.15) {
+                        let trailColor;
+                        if (visitor.happiness >= 70) {
+                            trailColor = 'rgba(76, 175, 80, 0.4)';
+                        } else if (visitor.happiness >= 40) {
+                            trailColor = 'rgba(255, 235, 59, 0.4)';
+                        } else {
+                            trailColor = 'rgba(244, 67, 54, 0.4)';
+                        }
+
+                        game.particles.push({
+                            x: visitor.x,
+                            y: visitor.y + 10,
+                            vy: 0.5,
+                            size: 2,
+                            alpha: 0.5,
+                            color: trailColor
+                        });
+                    }
+                } else {
+                    visitor.vx = 0;
+                    visitor.vy = 0;
+                    visitor.idleTimer += dt;
+                }
+
+                // Calculate happiness based on environment
+                visitor.happiness = calculateVisitorHappiness(visitor);
+
+                // Remove visitors that are unhappy for too long
+                if (visitor.happiness < 20 && visitor.idleTimer > 5) {
+                    game.visitors.splice(index, 1);
+                }
+            });
+        }
+
+        function pickNewTarget(visitor) {
+            // Intelligent AI: evaluate multiple potential targets and pick the best one
+            const numCandidates = 8;
+            let bestTarget = null;
+            let bestScore = -999;
+
+            for (let i = 0; i < numCandidates; i++) {
+                const candidateX = 200 + Math.random() * 500;
+                const candidateY = 200 + Math.random() * 350;
+
+                // Evaluate this position's environmental quality
+                let score = 0;
+
+                // Evaluate nearby plants
+                game.plants.forEach(plant => {
+                    const dx = plant.x - candidateX;
+                    const dy = plant.y - candidateY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 120) {
+                        if (plant.growthStage === 2) {
+                            score += 25; // Strongly attracted to blooming plants
+                        } else if (plant.growthStage === 1) {
+                            score += 10; // Moderately attracted to healthy plants
+                        } else {
+                            score -= 15; // Avoid wilted plants
+                        }
+                    }
+                });
+
+                // Evaluate lighting
+                const zone = game.lightZones.find(z =>
+                    candidateX >= z.x && candidateX <= z.x + z.w &&
+                    candidateY >= z.y && candidateY <= z.y + z.h
+                );
+
+                if (zone) {
+                    if (zone.brightness === 1) {
+                        score += 15; // Prefer normal lighting
+                    } else if (zone.brightness === 2) {
+                        score += 8; // Bright is okay
+                    } else {
+                        score -= 12; // Avoid dim areas
+                    }
+                }
+
+                // Evaluate nearby dirt
+                game.dirtSpots.forEach(dirt => {
+                    const dx = dirt.x - candidateX;
+                    const dy = dirt.y - candidateY;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 100) {
+                        score -= 20; // Strongly avoid dirty areas
+                    }
+                });
+
+                // Add some randomness to avoid predictability
+                score += (Math.random() - 0.5) * 10;
+
+                // Track best candidate
+                if (score > bestScore) {
+                    bestScore = score;
+                    bestTarget = { x: candidateX, y: candidateY };
+                }
+            }
+
+            // Set target to best candidate
+            if (bestTarget) {
+                visitor.targetX = bestTarget.x;
+                visitor.targetY = bestTarget.y;
+            } else {
+                // Fallback to random
+                visitor.targetX = 200 + Math.random() * 500;
+                visitor.targetY = 200 + Math.random() * 350;
+            }
+        }
+
+        function calculateVisitorHappiness(visitor) {
+            let happiness = 50; // Base happiness
+
+            // Check nearby plants
+            game.plants.forEach(plant => {
+                const dx = plant.x - visitor.x;
+                const dy = plant.y - visitor.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 100) {
+                    if (plant.growthStage === 2) {
+                        happiness += 15; // Blooming plants nearby
+                    } else if (plant.growthStage === 1) {
+                        happiness += 5; // Healthy plants
+                    } else {
+                        happiness -= 5; // Wilted plants
+                    }
+                }
+            });
+
+            // Check lighting in current zone
+            const zone = game.lightZones.find(z =>
+                visitor.x >= z.x && visitor.x <= z.x + z.w &&
+                visitor.y >= z.y && visitor.y <= z.y + z.h
+            );
+
+            if (zone) {
+                if (zone.brightness === 1) {
+                    happiness += 10; // Normal lighting is good
+                } else if (zone.brightness === 0) {
+                    happiness -= 10; // Too dim
+                } else if (zone.brightness === 2) {
+                    happiness += 5; // Bright is okay
+                }
+            }
+
+            // Check nearby dirt
+            game.dirtSpots.forEach(dirt => {
+                const dx = dirt.x - visitor.x;
+                const dy = dirt.y - visitor.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < 80) {
+                    happiness -= 15; // Dirt nearby is bad
+                }
+            });
+
+            // Clamp happiness
+            if (happiness < 0) happiness = 0;
+            if (happiness > 100) happiness = 100;
+
+            return happiness;
+        }
+
+        function evaluateEnvironment() {
+            // Calculate overall environment quality
+            if (game.visitors.length === 0) {
+                game.overallHappiness = 50; // Neutral when no visitors
+                return;
+            }
+
+            // Average visitor happiness
+            const totalHappiness = game.visitors.reduce((sum, v) => sum + v.happiness, 0);
+            game.overallHappiness = totalHappiness / game.visitors.length;
+
+            // Track happiness over time
+            game.happinessHistory.push(game.overallHappiness);
+            if (game.happinessHistory.length > 60) {
+                game.happinessHistory.shift(); // Keep last 60 samples
+            }
+        }
+
+        function checkForDiscoveries() {
+            // Detect when player creates good environmental combinations
+            // Feynman celebrates discoveries!
+
+            // Check for happiness spike (discovery moment)
+            const happinessIncrease = game.overallHappiness - game.lastHappiness;
+
+            // Discovery: Multiple blooming plants
+            const bloomingCount = game.plants.filter(p => p.growthStage === 2).length;
+            if (bloomingCount >= 4 && !game.discoveryMade.bloomingPlants) {
+                game.discoveryMade.bloomingPlants = true;
+                game.feynmanExcited = true;
+                game.feynmanReactionTimer = 3;
+                game.feynmanMessage = "Whoa! Look at all those flowers blooming! Beautiful!";
+                game.messageTimer = 3;
+            }
+
+            // Discovery: Clean environment
+            if (game.dirtSpots.length === 0 && !game.discoveryMade.cleanEnvironment) {
+                game.discoveryMade.cleanEnvironment = true;
+                game.feynmanExcited = true;
+                game.feynmanReactionTimer = 3;
+                game.feynmanMessage = "Spotless! A clean environment makes such a difference!";
+                game.messageTimer = 3;
+            }
+
+            // Discovery: Good lighting setup
+            const normalLightZones = game.lightZones.filter(z => z.brightness === 1).length;
+            if (normalLightZones === 3 && bloomingCount >= 3 && !game.discoveryMade.perfectLighting) {
+                game.discoveryMade.perfectLighting = true;
+                game.feynmanExcited = true;
+                game.feynmanReactionTimer = 3;
+                game.feynmanMessage = "Perfect! Balanced lighting with healthy plants - they love it!";
+                game.messageTimer = 3;
+            }
+
+            // Discovery: Synergy (everything working together)
+            if (bloomingCount >= 5 && game.dirtSpots.length <= 1 && game.overallHappiness >= 85 && !game.discoveryMade.synergy) {
+                game.discoveryMade.synergy = true;
+                game.feynmanExcited = true;
+                game.feynmanReactionTimer = 4;
+                game.feynmanMessage = "AMAZING! Everything's working together! This is what I call synergy!";
+                game.messageTimer = 4;
+                game.screenShake = 15;
+
+                // Extra celebration particles
+                for (let i = 0; i < 50; i++) {
+                    game.particles.push({
+                        x: game.feynmanX + (Math.random() - 0.5) * 60,
+                        y: game.feynmanY + (Math.random() - 0.5) * 60,
+                        vy: Math.random() * 3 + 2,
+                        size: Math.random() * 5 + 2,
+                        alpha: 1,
+                        color: ['#4CAF50', '#FFD700', '#FF69B4'][Math.floor(Math.random() * 3)]
+                    });
+                }
+            }
+
+            // General excitement from big happiness increase
+            if (happinessIncrease > 20 && game.feynmanReactionTimer <= 0) {
+                game.feynmanExcited = true;
+                game.feynmanReactionTimer = 2;
+                game.feynmanMessage = "Nice! Something you did really helped!";
+                game.messageTimer = 2;
+            }
+
+            game.lastHappiness = game.overallHappiness;
+        }
+
+        function checkVictoryProgress(dt) {
+            if (game.overallHappiness >= game.targetHappiness) {
+                game.timeAtTargetHappiness += dt;
+
+                if (game.timeAtTargetHappiness >= game.targetDuration) {
+                    handleVictory();
+                }
+            } else {
+                game.timeAtTargetHappiness = 0; // Reset if happiness drops
+            }
+        }
+
+        function handleVictory() {
+            console.log('VICTORY!');
+            game.victoryState = true;
+            game.victoryTimer = 0;
+
+            game.feynmanMessage = 'AMAZING! You created a thriving environment!';
+            game.messageTimer = 999;
+            game.feynmanExcited = true;
+
+            // Generate confetti
+            for (let i = 0; i < 200; i++) {
+                game.confetti.push({
+                    x: Math.random() * canvas.width,
+                    y: -20 - Math.random() * 100,
+                    vx: (Math.random() - 0.5) * 4,
+                    vy: Math.random() * 3 + 2,
+                    rotation: Math.random() * Math.PI * 2,
+                    rotationSpeed: (Math.random() - 0.5) * 0.2,
+                    size: Math.random() * 10 + 5,
+                    color: ['#4CAF50', '#8BC34A', '#CDDC39', '#66BB6A', '#81C784'][Math.floor(Math.random() * 5)],
+                    alpha: 1
+                });
+            }
+        }
+
+        // Update loop
+        function update(dt) {
+            if (game.paused) return;
+            if (!game.gameStarted) return;
+
+            game.time += dt;
+
+            if (game.messageTimer > 0) {
+                game.messageTimer -= dt;
+            }
+
+            // Screen shake decay
+            if (game.screenShake > 0) {
+                game.screenShake *= 0.85;
+                if (game.screenShake < 0.1) game.screenShake = 0;
+            }
+
+            // Victory state updates
+            if (game.victoryState) {
+                game.victoryTimer += dt;
+
+                // Update confetti
+                game.confetti.forEach((c, i) => {
+                    c.x += c.vx;
+                    c.y += c.vy;
+                    c.vy += 0.15; // gravity
+                    c.rotation += c.rotationSpeed;
+
+                    if (c.y > canvas.height + 50) {
+                        game.confetti.splice(i, 1);
+                    }
+                });
+
+                return; // Skip normal updates during victory
+            }
+
+            // Update game systems
+            updatePlants(dt);
+            updateLighting(dt);
+            updateDirt(dt);
+            updateVisitors(dt);
+            evaluateEnvironment();
+            checkForDiscoveries();
+            checkVictoryProgress(dt);
+
+            // Update Feynman reaction timer
+            if (game.feynmanReactionTimer > 0) {
+                game.feynmanReactionTimer -= dt;
+                if (game.feynmanReactionTimer <= 0) {
+                    game.feynmanExcited = false;
+                }
+            }
+
+            // Update particles
+            game.particles.forEach((p, i) => {
+                p.y -= p.vy;
+                p.alpha -= 0.02;
+                if (p.alpha <= 0) game.particles.splice(i, 1);
+            });
+        }
+
+        // Render loop
+        function render() {
+            // Apply screen shake
+            ctx.save();
+            if (game.screenShake > 0) {
+                const shakeX = (Math.random() - 0.5) * game.screenShake;
+                const shakeY = (Math.random() - 0.5) * game.screenShake;
+                ctx.translate(shakeX, shakeY);
+            }
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw start screen or game
+            if (!game.gameStarted) {
+                drawStartScreen();
+            } else {
+                drawGame();
+            }
+
+            ctx.restore();
+        }
+
+        function drawStartScreen() {
+            // Title
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 48px Kalam, cursive';
+            ctx.fillStyle = '#2E7D32';
+            ctx.fillText('Living Gallery', canvas.width / 2, canvas.height / 2 - 100);
+
+            ctx.font = '24px Kalam, cursive';
+            ctx.fillStyle = '#666';
+            ctx.fillText('Feynman\'s Environmental Challenge', canvas.width / 2, canvas.height / 2 - 50);
+
+            // Start button
+            const btnX = canvas.width / 2 - 100;
+            const btnY = canvas.height / 2;
+            const btnW = 200;
+            const btnH = 60;
+
+            ctx.fillStyle = game.startButtonHover ? '#4CAF50' : '#66BB6A';
+            ctx.strokeStyle = '#2E7D32';
+            ctx.lineWidth = 4;
+            roundRect(ctx, btnX, btnY, btnW, btnH, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#FFF';
+            ctx.font = 'bold 28px Kalam, cursive';
+            ctx.fillText('Start', canvas.width / 2, canvas.height / 2 + 40);
+
+            // Tutorial messages during startup
+            if (game.messageTimer > 0 && game.feynmanMessage) {
+                drawFeynmanMessage();
+            }
+        }
+
+        function drawGame() {
+            // Draw lighting zones (background overlays)
+            game.lightZones.forEach(zone => {
+                let overlayColor;
+                if (zone.brightness === 0) {
+                    overlayColor = 'rgba(0, 0, 50, 0.3)'; // Dim (blue tint)
+                } else if (zone.brightness === 1) {
+                    overlayColor = 'rgba(255, 255, 200, 0.1)'; // Normal (slight yellow)
+                } else {
+                    overlayColor = 'rgba(255, 255, 150, 0.3)'; // Bright (yellow)
+                }
+
+                ctx.fillStyle = overlayColor;
+                ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
+
+                // Flash effect when lighting changes
+                if (zone.flashTimer > 0) {
+                    const flashAlpha = zone.flashTimer * 0.6;
+                    ctx.fillStyle = `rgba(255, 215, 0, ${flashAlpha})`;
+                    ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
+                }
+            });
+
+            // Draw zone labels
+            game.lightZones.forEach(zone => {
+                ctx.textAlign = 'center';
+                ctx.font = 'bold 12px Kalam, cursive';
+                ctx.fillStyle = '#666';
+                ctx.fillText(zone.name, zone.x + zone.w / 2, 90);
+            });
+
+            // Draw plants
+            game.plants.forEach(plant => {
+                drawPlant(plant);
+            });
+
+            // Draw dirt
+            game.dirtSpots.forEach(dirt => {
+                drawDirt(dirt);
+            });
+
+            // Draw visitors
+            game.visitors.forEach(visitor => {
+                drawVisitor(visitor);
+            });
+
+            // Draw particles
+            game.particles.forEach(p => {
+                ctx.fillStyle = p.color;
+                ctx.globalAlpha = p.alpha;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            });
+
+            // Draw confetti (victory)
+            game.confetti.forEach(c => {
+                ctx.save();
+                ctx.translate(c.x, c.y);
+                ctx.rotate(c.rotation);
+                ctx.fillStyle = c.color;
+                ctx.globalAlpha = c.alpha;
+                ctx.fillRect(-c.size/2, -c.size/2, c.size, c.size);
+                ctx.globalAlpha = 1;
+                ctx.restore();
+            });
+
+            // Draw UI
+            drawToolbar();
+            drawHUD();
+            drawFeynmanNPC();
+
+            if (game.messageTimer > 0 && game.feynmanMessage) {
+                drawFeynmanMessage();
+            }
+
+            // Draw pause overlay
+            if (game.paused && !game.victoryState) {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                ctx.textAlign = 'center';
+                ctx.font = 'bold 60px Kalam, cursive';
+                ctx.fillStyle = '#81C784';
+                ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
+
+                ctx.font = 'bold 24px Kalam, cursive';
+                ctx.fillStyle = '#FFF';
+                ctx.fillText('Click pause icon to resume', canvas.width / 2, canvas.height / 2 + 50);
+            }
+
+            // Draw victory screen
+            if (game.victoryState) {
+                drawVictoryScreen();
+            }
+        }
+
+        function drawPlant(plant) {
+            const baseX = plant.x;
+            const baseY = plant.y;
+
+            // Shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.beginPath();
+            ctx.ellipse(baseX, baseY + 35, 15, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Plant stem and leaves
+            if (plant.growthStage === 0) {
+                // Wilted (brown)
+                ctx.strokeStyle = '#8B4513';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(baseX, baseY + 30);
+                ctx.lineTo(baseX - 5, baseY + 10);
+                ctx.stroke();
+            } else if (plant.growthStage === 1) {
+                // Healthy (green)
+                ctx.strokeStyle = '#4CAF50';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(baseX, baseY + 30);
+                ctx.lineTo(baseX, baseY);
+                ctx.stroke();
+
+                // Leaves
+                ctx.fillStyle = '#66BB6A';
+                ctx.beginPath();
+                ctx.ellipse(baseX - 10, baseY + 15, 8, 12, -0.3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.ellipse(baseX + 10, baseY + 15, 8, 12, 0.3, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                // Blooming (green + flowers + glow)
+
+                // Glow effect for blooming plants
+                const glowPulse = 0.5 + Math.sin(game.time * 2 + plant.id) * 0.3;
+                const gradient = ctx.createRadialGradient(baseX, baseY - 5, 0, baseX, baseY - 5, 40);
+                gradient.addColorStop(0, `rgba(255, 215, 0, ${glowPulse * 0.4})`);
+                gradient.addColorStop(0.5, `rgba(255, 182, 193, ${glowPulse * 0.2})`);
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(baseX, baseY - 5, 40, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Stem
+                ctx.strokeStyle = '#4CAF50';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.moveTo(baseX, baseY + 30);
+                ctx.lineTo(baseX, baseY - 5);
+                ctx.stroke();
+
+                // Leaves with subtle gradient
+                const leafGradient = ctx.createRadialGradient(baseX, baseY + 15, 0, baseX, baseY + 15, 15);
+                leafGradient.addColorStop(0, '#81C784');
+                leafGradient.addColorStop(1, '#66BB6A');
+                ctx.fillStyle = leafGradient;
+                ctx.beginPath();
+                ctx.ellipse(baseX - 12, baseY + 15, 10, 14, -0.3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.ellipse(baseX + 12, baseY + 15, 10, 14, 0.3, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Flowers with glow
+                for (let i = 0; i < 3; i++) {
+                    const flowerX = baseX + (i - 1) * 8;
+                    const flowerY = baseY - 5;
+                    const flowerColors = ['#FF69B4', '#FFD700', '#FF6347'];
+
+                    // Flower glow
+                    ctx.shadowColor = flowerColors[i];
+                    ctx.shadowBlur = 8;
+
+                    ctx.fillStyle = flowerColors[i];
+                    ctx.beginPath();
+                    ctx.arc(flowerX, flowerY, 5, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Flower center
+                    ctx.fillStyle = '#FFE082';
+                    ctx.beginPath();
+                    ctx.arc(flowerX, flowerY, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+
+                // Reset shadow
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
+
+                // Sparkle particles around blooming plants
+                if (Math.random() < 0.1) {
+                    game.particles.push({
+                        x: baseX + (Math.random() - 0.5) * 30,
+                        y: baseY - 10 + (Math.random() - 0.5) * 20,
+                        vy: Math.random() * 1 + 0.5,
+                        size: Math.random() * 2 + 1,
+                        alpha: 1,
+                        color: '#FFD700'
+                    });
+                }
+            }
+
+            // Water level indicator (small bar below plant)
+            const barW = 30;
+            const barH = 4;
+            const barX = baseX - barW / 2;
+            const barY = baseY + 40;
+
+            ctx.fillStyle = '#DDD';
+            ctx.fillRect(barX, barY, barW, barH);
+
+            const waterColor = plant.waterLevel < 30 ? '#F44336' : '#2196F3';
+            ctx.fillStyle = waterColor;
+            ctx.fillRect(barX, barY, (plant.waterLevel / 100) * barW, barH);
+
+            // Watering animation
+            if (plant.wateringAnimation > 0) {
+                for (let i = 0; i < 5; i++) {
+                    const dropX = baseX + (Math.random() - 0.5) * 20;
+                    const dropY = baseY - 20 + Math.random() * 20;
+                    ctx.fillStyle = 'rgba(33, 150, 243, 0.6)';
+                    ctx.beginPath();
+                    ctx.arc(dropX, dropY, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        function drawDirt(dirt) {
+            ctx.fillStyle = 'rgba(101, 67, 33, 0.5)';
+            ctx.beginPath();
+            ctx.arc(dirt.x, dirt.y, dirt.size, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Add some texture
+            for (let i = 0; i < 5; i++) {
+                const spotX = dirt.x + (Math.random() - 0.5) * dirt.size;
+                const spotY = dirt.y + (Math.random() - 0.5) * dirt.size;
+                ctx.fillStyle = 'rgba(80, 50, 20, 0.4)';
+                ctx.beginPath();
+                ctx.arc(spotX, spotY, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawVisitor(visitor) {
+            const bob = Math.sin(game.time * 3 + visitor.id) * 2;
+            const visX = visitor.x;
+            const visY = visitor.y + bob;
+
+            // Shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.beginPath();
+            ctx.ellipse(visX, visitor.y + 25, 12, 4, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Happiness glow
+            const glowSize = 20 + visitor.happiness / 5;
+            const gradient = ctx.createRadialGradient(visX, visY, 0, visX, visY, glowSize);
+
+            let glowColor;
+            if (visitor.happiness >= 70) {
+                glowColor = 'rgba(76, 175, 80, 0.4)'; // Green (happy)
+            } else if (visitor.happiness >= 40) {
+                glowColor = 'rgba(255, 235, 59, 0.4)'; // Yellow (neutral)
+            } else {
+                glowColor = 'rgba(244, 67, 54, 0.4)'; // Red (unhappy)
+            }
+
+            gradient.addColorStop(0, glowColor);
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(visX, visY, glowSize, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Simple stick figure
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+
+            // Head
+            ctx.fillStyle = '#FFE0BD';
+            ctx.beginPath();
+            ctx.arc(visX, visY - 10, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+
+            // Body
+            ctx.beginPath();
+            ctx.moveTo(visX, visY - 2);
+            ctx.lineTo(visX, visY + 15);
+            ctx.stroke();
+
+            // Arms
+            ctx.beginPath();
+            ctx.moveTo(visX - 8, visY + 5);
+            ctx.lineTo(visX + 8, visY + 5);
+            ctx.stroke();
+
+            // Legs
+            ctx.beginPath();
+            ctx.moveTo(visX, visY + 15);
+            ctx.lineTo(visX - 6, visY + 25);
+            ctx.moveTo(visX, visY + 15);
+            ctx.lineTo(visX + 6, visY + 25);
+            ctx.stroke();
+
+            // Happiness indicator (emoji above head)
+            ctx.font = '16px sans-serif';
+            ctx.textAlign = 'center';
+            if (visitor.happiness >= 70) {
+                ctx.fillText('😊', visX, visY - 25);
+            } else if (visitor.happiness >= 40) {
+                ctx.fillText('😐', visX, visY - 25);
+            } else {
+                ctx.fillText('😞', visX, visY - 25);
+            }
+        }
+
+        function drawToolbar() {
+            // Tool selection buttons (left side)
+            game.toolButtons.forEach(btn => {
+                const isSelected = game.currentTool === btn.tool;
+
+                ctx.fillStyle = isSelected ? '#4CAF50' : 'rgba(255, 255, 255, 0.9)';
+                ctx.strokeStyle = isSelected ? '#2E7D32' : '#CCC';
+                ctx.lineWidth = isSelected ? 4 : 2;
+                roundRect(ctx, btn.x, btn.y, btn.w, btn.h, 8);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.font = '28px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(btn.icon, btn.x + btn.w / 2, btn.y + 35);
+
+                ctx.font = 'bold 11px Kalam, cursive';
+                ctx.fillStyle = '#333';
+                ctx.fillText(btn.label, btn.x + btn.w / 2, btn.y + 52);
+            });
+
+            // Lighting controls (only show when light tool selected)
+            if (game.currentTool === 'light') {
+                const controlX = 20;
+                const controlY = 340;
+
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                ctx.strokeStyle = '#666';
+                ctx.lineWidth = 2;
+                roundRect(ctx, controlX, controlY, 80, 180, 8);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.font = 'bold 12px Kalam, cursive';
+                ctx.textAlign = 'center';
+                ctx.fillStyle = '#333';
+                ctx.fillText('Lighting', controlX + 40, controlY + 18);
+
+                // Zone controls
+                game.lightZones.forEach((zone, i) => {
+                    const btnY = controlY + 30 + (i * 45);
+
+                    ctx.font = '10px Kalam, cursive';
+                    ctx.fillText(zone.name, controlX + 40, btnY);
+
+                    // Brightness buttons
+                    const brightnessLabels = ['Dim', 'Normal', 'Bright'];
+                    brightnessLabels.forEach((label, b) => {
+                        const miniX = controlX + 5 + (b * 23);
+                        const miniY = btnY + 5;
+                        const miniW = 20;
+                        const miniH = 20;
+
+                        ctx.fillStyle = zone.brightness === b ? '#FFD700' : '#EEE';
+                        ctx.strokeStyle = '#999';
+                        ctx.lineWidth = 1;
+                        ctx.fillRect(miniX, miniY, miniW, miniH);
+                        ctx.strokeRect(miniX, miniY, miniW, miniH);
+
+                        ctx.font = '9px Kalam, cursive';
+                        ctx.fillStyle = '#333';
+                        ctx.fillText(b.toString(), miniX + miniW / 2, miniY + miniH / 2 + 3);
+                    });
+                });
+            }
+        }
+
+        function drawHUD() {
+            // Top center: Progress bar for victory condition
+            const barX = 250;
+            const barY = 20;
+            const barW = 400;
+            const barH = 30;
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+            ctx.strokeStyle = '#666';
+            ctx.lineWidth = 2;
+            roundRect(ctx, barX, barY, barW, barH, 8);
+            ctx.fill();
+            ctx.stroke();
+
+            // Happiness level
+            const happinessPercent = game.overallHappiness / 100;
+            let barColor;
+            if (game.overallHappiness >= 80) {
+                barColor = '#4CAF50';
+            } else if (game.overallHappiness >= 50) {
+                barColor = '#FFEB3B';
+            } else {
+                barColor = '#F44336';
+            }
+
+            ctx.fillStyle = barColor;
+            ctx.fillRect(barX + 2, barY + 2, (barW - 4) * happinessPercent, barH - 4);
+
+            // Text
+            ctx.font = 'bold 14px Kalam, cursive';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#333';
+            ctx.fillText(`Happiness: ${Math.round(game.overallHappiness)}%`, barX + barW / 2, barY + 20);
+
+            // Victory progress (time at target)
+            if (game.overallHappiness >= game.targetHappiness) {
+                const progressY = barY + 35;
+                const progressW = 400;
+                const progressH = 20;
+
+                ctx.fillStyle = 'rgba(76, 175, 80, 0.3)';
+                roundRect(ctx, barX, progressY, progressW, progressH, 6);
+                ctx.fill();
+
+                const timePercent = game.timeAtTargetHappiness / game.targetDuration;
+                ctx.fillStyle = '#4CAF50';
+                ctx.fillRect(barX + 2, progressY + 2, (progressW - 4) * timePercent, progressH - 4);
+
+                ctx.font = 'bold 12px Kalam, cursive';
+                ctx.fillStyle = '#2E7D32';
+                const mins = Math.floor(game.timeAtTargetHappiness / 60);
+                const secs = Math.floor(game.timeAtTargetHappiness % 60);
+                ctx.fillText(`Victory Progress: ${mins}:${secs.toString().padStart(2, '0')} / 3:00`, barX + progressW / 2, progressY + 14);
+            }
+
+            // Restart button (upper left)
+            const restartBtnCanvasX = 20;
+            const restartBtnCanvasY = 20;
+            const restartBtnCanvasW = 60;
+            const restartBtnCanvasH = 50;
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 3;
+            roundRect(ctx, restartBtnCanvasX, restartBtnCanvasY, restartBtnCanvasW, restartBtnCanvasH, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            // Restart icon (circular arrow)
+            const centerX = restartBtnCanvasX + restartBtnCanvasW / 2;
+            const centerY = restartBtnCanvasY + restartBtnCanvasH / 2;
+            ctx.strokeStyle = '#FFF';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, 12, 0.5, Math.PI * 2 - 0.5);
+            ctx.stroke();
+
+            ctx.fillStyle = '#FFF';
+            ctx.beginPath();
+            ctx.moveTo(centerX + 12, centerY - 3);
+            ctx.lineTo(centerX + 12, centerY + 5);
+            ctx.lineTo(centerX + 18, centerY);
+            ctx.closePath();
+            ctx.fill();
+
+            game.restartButtonCanvasBounds = {
+                x: restartBtnCanvasX,
+                y: restartBtnCanvasY,
+                w: restartBtnCanvasW,
+                h: restartBtnCanvasH
+            };
+
+            // Pause button (upper right)
+            const pauseBtnX = canvas.width - 80;
+            const pauseBtnY = 20;
+            const pauseBtnW = 60;
+            const pauseBtnH = 50;
+
+            ctx.fillStyle = game.paused ? '#4CAF50' : 'rgba(0, 0, 0, 0.6)';
+            ctx.strokeStyle = '#FFD700';
+            ctx.lineWidth = 3;
+            roundRect(ctx, pauseBtnX, pauseBtnY, pauseBtnW, pauseBtnH, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#FFF';
+            if (game.paused) {
+                // Play triangle
+                ctx.beginPath();
+                ctx.moveTo(pauseBtnX + 20, pauseBtnY + 12);
+                ctx.lineTo(pauseBtnX + 20, pauseBtnY + 38);
+                ctx.lineTo(pauseBtnX + 45, pauseBtnY + 25);
+                ctx.closePath();
+                ctx.fill();
+            } else {
+                // Pause bars
+                ctx.fillRect(pauseBtnX + 18, pauseBtnY + 12, 8, 26);
+                ctx.fillRect(pauseBtnX + 34, pauseBtnY + 12, 8, 26);
+            }
+
+            game.pauseButtonBounds = {
+                x: pauseBtnX,
+                y: pauseBtnY,
+                w: pauseBtnW,
+                h: pauseBtnH
+            };
+        }
+
+        function drawFeynmanNPC() {
+            const x = game.feynmanX;
+            const y = game.feynmanY;
+
+            // Simple representation (head + coat)
+            ctx.fillStyle = '#FFE0BD';
+            ctx.beginPath();
+            ctx.arc(x, y, 20, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Excited animation
+            if (game.feynmanExcited) {
+                const bounce = Math.sin(game.time * 8) * 5;
+                ctx.save();
+                ctx.translate(0, bounce);
+            }
+
+            // Hat (optional)
+            ctx.fillStyle = '#333';
+            ctx.fillRect(x - 22, y - 25, 44, 5);
+            ctx.fillRect(x - 15, y - 35, 30, 10);
+
+            // Glasses
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(x - 8, y, 5, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(x + 8, y, 5, 0, Math.PI * 2);
+            ctx.stroke();
+
+            if (game.feynmanExcited) {
+                ctx.restore();
+            }
+        }
+
+        function drawFeynmanMessage() {
+            const msgX = canvas.width / 2 - 200;
+            const msgY = 550;
+            const msgW = 400;
+            const msgH = 80;
+
+            // Message box
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+            ctx.strokeStyle = '#2E7D32';
+            ctx.lineWidth = 3;
+            roundRect(ctx, msgX, msgY, msgW, msgH, 12);
+            ctx.fill();
+            ctx.stroke();
+
+            // Text
+            ctx.font = 'bold 16px Kalam, cursive';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#333';
+            wrapText(ctx, game.feynmanMessage, msgX + msgW / 2, msgY + 25, msgW - 20, 20);
+        }
+
+        function drawVictoryScreen() {
+            // Semi-transparent overlay
+            ctx.fillStyle = 'rgba(46, 125, 50, 0.8)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Victory text
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 60px Kalam, cursive';
+            ctx.strokeStyle = '#1B5E20';
+            ctx.lineWidth = 8;
+            ctx.fillStyle = '#81C784';
+            ctx.strokeText('LEVEL COMPLETE!', canvas.width / 2, canvas.height / 2 - 80);
+            ctx.fillText('LEVEL COMPLETE!', canvas.width / 2, canvas.height / 2 - 80);
+
+            ctx.font = 'bold 28px Kalam, cursive';
+            ctx.fillStyle = '#FFF';
+            ctx.fillText('You created a thriving environment!', canvas.width / 2, canvas.height / 2 - 20);
+
+            // Stats
+            ctx.font = 'bold 20px Kalam, cursive';
+            ctx.fillText(`Final Happiness: ${Math.round(game.overallHappiness)}%`, canvas.width / 2, canvas.height / 2 + 30);
+            ctx.fillText(`Visitors Served: ${game.visitors.length}`, canvas.width / 2, canvas.height / 2 + 60);
+
+            // Continue prompt
+            ctx.font = 'bold 18px Kalam, cursive';
+            ctx.fillStyle = '#C5E1A5';
+            ctx.fillText('Click restart to play again', canvas.width / 2, canvas.height / 2 + 120);
+        }
+
+        function roundRect(ctx, x, y, w, h, r) {
+            ctx.beginPath();
+            ctx.moveTo(x + r, y);
+            ctx.lineTo(x + w - r, y);
+            ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+            ctx.lineTo(x + w, y + h - r);
+            ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            ctx.lineTo(x + r, y + h);
+            ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+            ctx.lineTo(x, y + r);
+            ctx.quadraticCurveTo(x, y, x + r, y);
+            ctx.closePath();
+        }
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            let yPos = y;
+
+            words.forEach((word, i) => {
+                const testLine = line + word + ' ';
+                const metrics = ctx.measureText(testLine);
+
+                if (metrics.width > maxWidth && i > 0) {
+                    ctx.fillText(line, x, yPos);
+                    line = word + ' ';
+                    yPos += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            });
+            ctx.fillText(line, x, yPos);
+        }
+
+        // Mouse event handlers
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Start screen button
+            if (!game.gameStarted && !game.tutorialComplete) {
+                const btnX = canvas.width / 2 - 100;
+                const btnY = canvas.height / 2;
+                const btnW = 200;
+                const btnH = 60;
+
+                if (x >= btnX && x <= btnX + btnW && y >= btnY && y <= btnY + btnH) {
+                    // Tutorial will auto-start
+                }
+                return;
+            }
+
+            // Restart button
+            if (game.restartButtonCanvasBounds &&
+                x >= game.restartButtonCanvasBounds.x &&
+                x <= game.restartButtonCanvasBounds.x + game.restartButtonCanvasBounds.w &&
+                y >= game.restartButtonCanvasBounds.y &&
+                y <= game.restartButtonCanvasBounds.y + game.restartButtonCanvasBounds.h) {
+                location.reload();
+                return;
+            }
+
+            // Pause button
+            if (game.pauseButtonBounds &&
+                x >= game.pauseButtonBounds.x &&
+                x <= game.pauseButtonBounds.x + game.pauseButtonBounds.w &&
+                y >= game.pauseButtonBounds.y &&
+                y <= game.pauseButtonBounds.y + game.pauseButtonBounds.h) {
+                game.paused = !game.paused;
+                return;
+            }
+
+            if (game.paused || !game.gameStarted) return;
+
+            // Tool selection buttons
+            for (const btn of game.toolButtons) {
+                if (x >= btn.x && x <= btn.x + btn.w &&
+                    y >= btn.y && y <= btn.y + btn.h) {
+                    game.currentTool = btn.tool;
+                    return;
+                }
+            }
+
+            // Lighting zone controls (when light tool selected)
+            if (game.currentTool === 'light') {
+                const controlX = 20;
+                const controlY = 340;
+
+                game.lightZones.forEach((zone, i) => {
+                    const btnY = controlY + 30 + (i * 45);
+
+                    for (let b = 0; b < 3; b++) {
+                        const miniX = controlX + 5 + (b * 23);
+                        const miniY = btnY + 5;
+                        const miniW = 20;
+                        const miniH = 20;
+
+                        if (x >= miniX && x <= miniX + miniW &&
+                            y >= miniY && y <= miniY + miniH) {
+                            zone.brightness = b;
+                            zone.flashTimer = 0.5; // Flash effect duration
+
+                            // Spawn particles
+                            for (let p = 0; p < 15; p++) {
+                                game.particles.push({
+                                    x: zone.x + zone.w / 2 + (Math.random() - 0.5) * 150,
+                                    y: zone.y + zone.h / 2 + (Math.random() - 0.5) * 150,
+                                    vy: Math.random() * 2 + 1,
+                                    size: Math.random() * 4 + 2,
+                                    alpha: 1,
+                                    color: '#FFD700'
+                                });
+                            }
+                            return;
+                        }
+                    }
+                });
+            }
+
+            // Water plants
+            if (game.currentTool === 'water') {
+                for (const plant of game.plants) {
+                    const dx = plant.x - x;
+                    const dy = plant.y - y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 30) {
+                        plant.waterLevel += 30;
+                        if (plant.waterLevel > 100) plant.waterLevel = 100;
+                        plant.wateringAnimation = 1;
+
+                        // Spawn water particles
+                        for (let i = 0; i < 15; i++) {
+                            game.particles.push({
+                                x: plant.x + (Math.random() - 0.5) * 20,
+                                y: plant.y + (Math.random() - 0.5) * 20,
+                                vy: Math.random() * 2 + 1,
+                                size: Math.random() * 3 + 1,
+                                alpha: 1,
+                                color: '#2196F3'
+                            });
+                        }
+                        return;
+                    }
+                }
+            }
+
+            // Clean dirt
+            if (game.currentTool === 'clean') {
+                for (let i = game.dirtSpots.length - 1; i >= 0; i--) {
+                    const dirt = game.dirtSpots[i];
+                    const dx = dirt.x - x;
+                    const dy = dirt.y - y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < dirt.size) {
+                        game.dirtSpots.splice(i, 1);
+
+                        // Spawn clean particles
+                        for (let p = 0; p < 20; p++) {
+                            game.particles.push({
+                                x: dirt.x + (Math.random() - 0.5) * 30,
+                                y: dirt.y + (Math.random() - 0.5) * 30,
+                                vy: Math.random() * 3 + 1,
+                                size: Math.random() * 4 + 2,
+                                alpha: 1,
+                                color: '#4CAF50'
+                            });
+                        }
+                        return;
+                    }
+                }
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Check start button hover
+            if (!game.gameStarted && !game.tutorialComplete) {
+                const btnX = canvas.width / 2 - 100;
+                const btnY = canvas.height / 2;
+                const btnW = 200;
+                const btnH = 60;
+
+                game.startButtonHover = (x >= btnX && x <= btnX + btnW && y >= btnY && y <= btnY + btnH);
+            }
+
+            // Update cursor based on tool
+            if (game.currentTool === 'water') {
+                canvas.style.cursor = 'pointer';
+            } else if (game.currentTool === 'clean') {
+                canvas.style.cursor = 'crosshair';
+            } else if (game.currentTool === 'light') {
+                canvas.style.cursor = 'pointer';
+            } else {
+                canvas.style.cursor = 'default';
+            }
+        });
+
+        // Game loop
+        let lastTime = 0;
+        function gameLoop(timestamp) {
+            const dt = Math.min((timestamp - lastTime) / 1000, 0.1); // Cap dt to avoid huge jumps
+            lastTime = timestamp;
+
+            update(dt);
+            render();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start
+        init();
+        requestAnimationFrame(gameLoop);
+    </script>
+</body>
+</html>

@@ -5,7 +5,107 @@ All notable changes to the Gallery Keeper project will be documented in this fil
 ## [Unreleased]
 
 ### Known Issues
-- None - Level 2 MVP complete and playable
+- None - Level 3 MVP complete and playable
+
+## [2025-10-05] - Level 3 Complete: Living Gallery (Feynman's Environmental Management)
+
+### Added
+- **Level 3: Living Gallery - Complete Implementation**
+  - Feynman as mentor character teaching experimentation and discovery
+  - Environmental management gameplay with emergent AI behavior
+  - Victory condition: Maintain 75%+ visitor happiness for 3 continuous minutes
+
+- **Plant System** (6 plant zones)
+  - 3 growth stages: wilted (brown), healthy (green), blooming (flowers + glow)
+  - Water level indicator bars below each plant
+  - Water evaporation over time (1.5/sec)
+  - Click to water plants (+30 water level)
+  - Blooming plants emit golden sparkle particles
+  - Gradient glow effects on blooming plants with pulsing animation
+
+- **Lighting System** (3 adjustable zones: Left, Center, Right)
+  - 3 brightness levels: Dim (0), Normal (1), Bright (2)
+  - Visual overlays: dim = blue tint, normal = slight yellow, bright = strong yellow
+  - Flash effect when changing lighting (golden flash for 0.5 seconds)
+  - Tool-based UI with zone-specific brightness controls
+
+- **Cleanliness System**
+  - Dirt spots spawn every 12 seconds
+  - Click to clean dirt with visual particle effects
+  - Dirt has textured rendering (brown spots with darker particles)
+
+- **Intelligent Visitor AI**
+  - Visitors evaluate 8 candidate positions before choosing target
+  - Attracted to: blooming plants (+25), healthy plants (+10), normal lighting (+15), bright lighting (+8)
+  - Avoid: wilted plants (-15), dim lighting (-12), dirt (-20)
+  - Emergent flocking behavior around well-maintained areas
+  - Happiness-based movement trail particles (green/yellow/red)
+  - Up to 10 visitors simultaneously
+
+- **Feynman Discovery Reactions** (4 discovery types)
+  - "Multiple Blooming Plants" - 4+ blooming plants triggers celebration
+  - "Clean Environment" - Zero dirt triggers praise
+  - "Perfect Lighting" - All zones at normal brightness + 3+ blooming plants
+  - "Synergy" - 5+ blooming plants + ≤1 dirt + 85% happiness = big celebration
+  - Feynman excitement animation (bobbing) when discoveries happen
+  - Screen shake and particle bursts for major discoveries
+
+- **Tool Selection System**
+  - 3 tools: Water (💧), Clean (🧹), Light (💡)
+  - Tool-specific cursors (pointer, crosshair)
+  - Visual button highlighting for selected tool
+  - Lighting tool reveals zone-specific controls
+
+- **Victory and Progression**
+  - Real-time happiness percentage display
+  - Victory progress bar showing time at target happiness
+  - Countdown timer (MM:SS / 3:00)
+  - Confetti celebration on victory with 200 green particles
+  - Victory screen with final stats
+
+### Changed
+- **Balanced Difficulty** (3 minutes instead of 5)
+  - Victory condition: 75%+ happiness for 3 minutes (down from 80% for 5 minutes)
+  - Dirt spawn rate: 12 seconds (more forgiving than initial 8 seconds)
+  - Water evaporation: 1.5/sec (down from 2/sec)
+  - Max visitors: 10 (up from 8 for more activity)
+  - Visitor spawn rate: 2.5 seconds (faster engagement)
+
+### Technical
+- Single-file HTML implementation (1,650+ lines)
+  - Self-contained: all HTML, CSS, JavaScript in one file
+  - Pattern follows Level 2 architecture for consistency
+  - No external dependencies or assets
+
+- **Game Loop Architecture**
+  - 60fps game loop with delta time
+  - Update systems: plants, lighting, dirt, visitors, environment, discoveries, victory
+  - Render systems: lighting zones, plants, dirt, visitors, particles, UI, Feynman
+  - Particle system with 300+ simultaneous particles
+
+- **Environmental Scoring Algorithm**
+  - Happiness calculation considers nearby plants (100px radius), lighting zone, dirt (80px radius)
+  - Cumulative happiness scoring with clamping (0-100)
+  - Real-time happiness history tracking (60 samples rolling window)
+
+### Visual Polish
+- Blooming plant glow with pulsing radial gradients
+- Flower petals with individual glow effects and centers
+- Lighting zone flash effects on brightness changes
+- Visitor happiness glow (green, yellow, red) with sparkles
+- Movement trail particles color-coded by happiness
+- Screen shake on major discoveries
+
+### Documentation
+- Updated index.html with Level 3 link and description
+- Added comprehensive CHANGELOG entry
+- Updated KANBAN board with Level 3 completion
+
+### Performance
+- 60fps maintained with 10 visitors + 6 plants + 200 particles
+- Efficient pathfinding (8 candidate evaluation per visitor)
+- Particle pooling prevents memory leaks
+- No lag during confetti celebrations
 
 ## [2025-10-04] - Level 2 Complete MVP + Major Game Mechanics Overhaul
 
