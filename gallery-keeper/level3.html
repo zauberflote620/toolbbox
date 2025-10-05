@@ -6,7 +6,7 @@
     <title>Level 3: Living Gallery - Gallery Keeper</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -1230,7 +1230,7 @@
         function drawStartScreen() {
             // Title with light shadow
             ctx.textAlign = 'center';
-            ctx.font = 'bold 48px Kalam, cursive';
+            ctx.font = 'bold 48px Caveat, cursive';
 
             // Shadow
             ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
@@ -1241,7 +1241,7 @@
             ctx.fillText('Living Gallery', canvas.width / 2, canvas.height / 2 - 100);
 
             // Subtitle with light shadow
-            ctx.font = '24px Kalam, cursive';
+            ctx.font = '24px Caveat, cursive';
 
             // Shadow
             ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
@@ -1288,7 +1288,7 @@
 
             // Text
             ctx.fillStyle = '#FFF';
-            ctx.font = 'bold 28px Kalam, cursive';
+            ctx.font = 'bold 28px Caveat, cursive';
             ctx.fillText('Start', canvas.width / 2, canvas.height / 2 + 40);
 
             // Tutorial messages during startup
@@ -1406,11 +1406,11 @@
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
                 ctx.textAlign = 'center';
-                ctx.font = 'bold 60px Kalam, cursive';
+                ctx.font = 'bold 60px Caveat, cursive';
                 ctx.fillStyle = '#81C784';
                 ctx.fillText('PAUSED', canvas.width / 2, canvas.height / 2);
 
-                ctx.font = 'bold 24px Kalam, cursive';
+                ctx.font = 'bold 24px Caveat, cursive';
                 ctx.fillStyle = '#FFF';
                 ctx.fillText('Click anywhere to resume', canvas.width / 2, canvas.height / 2 + 50);
             }
@@ -1753,7 +1753,7 @@
                 ctx.textAlign = 'center';
                 ctx.fillText(btn.icon, btn.x + btn.w / 2, btn.y + 35);
 
-                ctx.font = 'bold 11px Kalam, cursive';
+                ctx.font = 'bold 11px Caveat, cursive';
                 ctx.fillStyle = '#333';
                 ctx.fillText(btn.label, btn.x + btn.w / 2, btn.y + 52);
             });
@@ -1770,7 +1770,7 @@
                 ctx.fill();
                 ctx.stroke();
 
-                ctx.font = 'bold 12px Kalam, cursive';
+                ctx.font = 'bold 12px Caveat, cursive';
                 ctx.textAlign = 'center';
                 ctx.fillStyle = '#333';
                 ctx.fillText('Tree Light', controlX + 40, controlY + 20);
@@ -1793,13 +1793,13 @@
                     ctx.fillRect(btnX, btnY, btnW, btnH);
                     ctx.strokeRect(btnX, btnY, btnW, btnH);
 
-                    ctx.font = '9px Kalam, cursive';
+                    ctx.font = '9px Caveat, cursive';
                     ctx.fillStyle = '#333';
                     ctx.fillText(b.toString(), btnX + btnW / 2, btnY + btnH / 2 + 3);
                 });
 
                 // Label
-                ctx.font = '9px Kalam, cursive';
+                ctx.font = '9px Caveat, cursive';
                 ctx.fillStyle = '#666';
                 ctx.fillText('(Brightness from tree)', controlX + 40, controlY + 75);
             }
@@ -1834,7 +1834,7 @@
             // Time text (countdown)
             const minutes = Math.floor(game.timeRemaining / 60);
             const seconds = Math.floor(game.timeRemaining % 60);
-            ctx.font = 'bold 20px Kalam, cursive';
+            ctx.font = 'bold 20px Caveat, cursive';
             ctx.textAlign = 'center';
 
             // Red text if time is running out (< 1 minute)
@@ -1876,7 +1876,7 @@
             ctx.fillRect(barX + 2, barY + 2, (barW - 4) * happinessPercent, barH - 4);
 
             // Text
-            ctx.font = 'bold 14px Kalam, cursive';
+            ctx.font = 'bold 14px Caveat, cursive';
             ctx.textAlign = 'center';
             ctx.fillStyle = '#333';
             ctx.fillText(`Happiness: ${Math.round(game.overallHappiness)}%`, barX + barW / 2, barY + 20);
@@ -1895,7 +1895,7 @@
                 ctx.fillStyle = '#4CAF50';
                 ctx.fillRect(barX + 2, progressY + 2, (progressW - 4) * timePercent, progressH - 4);
 
-                ctx.font = 'bold 12px Kalam, cursive';
+                ctx.font = 'bold 12px Caveat, cursive';
                 ctx.fillStyle = '#2E7D32';
                 const mins = Math.floor(game.timeAtTargetHappiness / 60);
                 const secs = Math.floor(game.timeAtTargetHappiness % 60);
@@ -2059,36 +2059,8 @@
                 ctx.fill();
             }
 
-            // Draw Groot or Branch
-            if (isPerfect && game.imagesLoaded && game.images.groot && game.images.groot.complete) {
-                // Draw Groot when everything is perfect!
-                const grootWidth = 140;
-                const grootHeight = 140;
-
-                // Shadow
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
-                ctx.beginPath();
-                ctx.ellipse(x, y + 70, 55, 12, 0, 0, Math.PI * 2);
-                ctx.fill();
-
-                ctx.drawImage(
-                    game.images.groot,
-                    x - grootWidth / 2,
-                    y - grootHeight / 2,
-                    grootWidth,
-                    grootHeight
-                );
-
-                // "I am Groot!" text
-                ctx.textAlign = 'center';
-                ctx.font = 'bold 14px Kalam, cursive';
-                ctx.strokeStyle = '#1B5E20';
-                ctx.lineWidth = 3;
-                ctx.fillStyle = '#81C784';
-                ctx.strokeText('I AM GROOT!', x, y + 85);
-                ctx.fillText('I AM GROOT!', x, y + 85);
-
-            } else if (game.imagesLoaded && game.images.branch && game.images.branch.complete) {
+            // Draw Branch (Groot only appears as popup, not branch transformation)
+            if (game.imagesLoaded && game.images.branch && game.images.branch.complete) {
                 // Draw regular branch
                 const branchWidth = 120;
                 const branchHeight = 100;
@@ -2121,7 +2093,7 @@
                 // Aura message (only for branch, not Groot)
                 if (game.branchAuraMessage) {
                     ctx.textAlign = 'center';
-                    ctx.font = 'bold 12px Kalam, cursive';
+                    ctx.font = 'bold 12px Caveat, cursive';
                     ctx.fillStyle = '#333';
                     ctx.strokeStyle = '#FFF';
                     ctx.lineWidth = 3;
@@ -2162,7 +2134,7 @@
 
                 // "I am Groot!" text
                 ctx.textAlign = 'center';
-                ctx.font = 'bold 36px Kalam, cursive';
+                ctx.font = 'bold 36px Caveat, cursive';
                 ctx.strokeStyle = '#1B5E20';
                 ctx.lineWidth = 6;
                 ctx.fillStyle = '#81C784';
@@ -2250,7 +2222,7 @@
             game.tutorialMessageBounds = { x: msgX, y: msgY, w: msgW, h: msgH };
 
             // Text with shadow (no box)
-            ctx.font = 'bold 16px Kalam, cursive';
+            ctx.font = 'bold 16px Caveat, cursive';
             ctx.textAlign = 'center';
 
             // Shadow
@@ -2280,7 +2252,7 @@
             // Pulsating scale
             const textPulse = 1 + Math.sin(game.time * 2) * 0.05;
             const fontSize = 60 * textPulse;
-            ctx.font = `bold ${fontSize}px Kalam, cursive`;
+            ctx.font = `bold ${fontSize}px Caveat, cursive`;
 
             // Glow effect
             ctx.shadowColor = '#81C784';
@@ -2296,12 +2268,12 @@
             ctx.shadowColor = 'transparent';
             ctx.shadowBlur = 0;
 
-            ctx.font = 'bold 28px Kalam, cursive';
+            ctx.font = 'bold 28px Caveat, cursive';
             ctx.fillStyle = '#FFF';
             ctx.fillText('You created a thriving environment!', canvas.width / 2, canvas.height / 2 - 40);
 
             // Stats
-            ctx.font = 'bold 20px Kalam, cursive';
+            ctx.font = 'bold 20px Caveat, cursive';
             ctx.fillText(`Final Happiness: ${Math.round(game.overallHappiness)}%`, canvas.width / 2, canvas.height / 2 + 10);
             ctx.fillText(`Visitors Served: ${game.visitors.length}`, canvas.width / 2, canvas.height / 2 + 40);
 
@@ -2343,7 +2315,7 @@
             ctx.shadowBlur = 0;
 
             ctx.fillStyle = '#FFF';
-            ctx.font = 'bold 24px Kalam, cursive';
+            ctx.font = 'bold 24px Caveat, cursive';
             ctx.fillText('Play Again', canvas.width / 2, restartBtnY + 38);
 
             // Learn More Button
@@ -2371,7 +2343,7 @@
             ctx.shadowBlur = 0;
 
             ctx.fillStyle = '#FFF';
-            ctx.font = 'bold 18px Kalam, cursive';
+            ctx.font = 'bold 18px Caveat, cursive';
             ctx.fillText('Learn More', canvas.width / 2, learnBtnY + 32);
 
             // Store button bounds for click detection
@@ -2404,18 +2376,18 @@
             // Game over text (appears after skull is fully visible)
             if (game.skullAlpha > 0.8) {
                 ctx.textAlign = 'center';
-                ctx.font = 'bold 50px Kalam, cursive';
+                ctx.font = 'bold 50px Caveat, cursive';
                 ctx.strokeStyle = '#000';
                 ctx.lineWidth = 6;
                 ctx.fillStyle = '#DC143C';
                 ctx.strokeText('GAME OVER', canvas.width / 2, canvas.height / 2 + 80); // Moved up 120px
                 ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 + 80);
 
-                ctx.font = 'bold 24px Kalam, cursive';
+                ctx.font = 'bold 24px Caveat, cursive';
                 ctx.fillStyle = '#FFF';
                 ctx.fillText('All visitors left unhappy...', canvas.width / 2, canvas.height / 2 + 120); // Moved up 120px
 
-                ctx.font = 'bold 18px Kalam, cursive';
+                ctx.font = 'bold 18px Caveat, cursive';
                 ctx.fillStyle = '#CCC';
                 ctx.fillText('Click restart to try again', canvas.width / 2, canvas.height / 2 + 160); // Moved up 120px
             }
