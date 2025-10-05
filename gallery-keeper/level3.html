@@ -2231,32 +2231,25 @@
         }
 
         function drawFeynmanMessage() {
-            const msgX = canvas.width / 2 - 200;
-            const msgY = 550;
-            const msgW = 400;
-            const msgH = 80;
+            const msgW = 500;
+            const msgH = 100;
+            const msgX = canvas.width / 2 - msgW / 2;
+            const msgY = canvas.height / 2 - msgH / 2;
+            const padding = 20;
 
             // Store bounds for click detection
             game.tutorialMessageBounds = { x: msgX, y: msgY, w: msgW, h: msgH };
 
-            // Text with shadow (no box)
-            ctx.font = 'bold 16px Caveat, cursive';
+            // Semi-transparent box (no border)
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            roundRect(ctx, msgX, msgY, msgW, msgH, 8);
+            ctx.fill();
+
+            // Text
+            ctx.font = 'bold 18px Caveat, cursive';
             ctx.textAlign = 'center';
-
-            // Shadow
-            ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
-            ctx.shadowBlur = 4;
-            ctx.shadowOffsetX = 2;
-            ctx.shadowOffsetY = 2;
-
             ctx.fillStyle = '#333';
-            wrapText(ctx, game.feynmanMessage, msgX + msgW / 2, msgY + 25, msgW - 20, 20);
-
-            // Reset shadow
-            ctx.shadowColor = 'transparent';
-            ctx.shadowBlur = 0;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
+            wrapText(ctx, game.feynmanMessage, msgX + msgW / 2, msgY + padding + 10, msgW - padding * 2, 24);
         }
 
         function drawVictoryScreen() {
