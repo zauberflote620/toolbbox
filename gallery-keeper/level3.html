@@ -497,38 +497,43 @@
                 }
             });
 
-            // Check for Groot popup (all plants fully watered)
-            const allPlantsFullyWatered = game.plants.some(p => p.waterLevel >= 95); // ANY plant fully watered
-            if (allPlantsFullyWatered && !game.grootPopup) {
+            // Check for Groot popup (any plant fully watered)
+            const allPlantsFullyWatered = game.plants.some(p => p.waterLevel >= 95);
+
+            // Only trigger if not already showing and animation is complete
+            if (allPlantsFullyWatered && !game.grootPopup && game.grootPopupTimer === 0) {
                 game.grootPopup = true;
-                game.grootPopupTimer = 0;
+                game.grootPopupTimer = 0.01; // Start slightly above 0 to prevent retriggering
                 game.grootPopupScale = 0;
                 game.grootPopupAlpha = 0;
             }
 
             // Update Groot popup animation
-            if (game.grootPopup && game.grootPopupTimer < 3) {
-                game.grootPopupTimer += dt;
+            if (game.grootPopup) {
+                if (game.grootPopupTimer < 3) {
+                    game.grootPopupTimer += dt;
 
-                // Zoom in animation
-                if (game.grootPopupScale < 1) {
-                    game.grootPopupScale += dt * 2;
-                    if (game.grootPopupScale > 1) game.grootPopupScale = 1;
-                }
+                    // Zoom in animation
+                    if (game.grootPopupScale < 1) {
+                        game.grootPopupScale += dt * 2;
+                        if (game.grootPopupScale > 1) game.grootPopupScale = 1;
+                    }
 
-                // Fade in then fade out
-                if (game.grootPopupTimer < 1.5) {
-                    game.grootPopupAlpha += dt * 1.5;
-                    if (game.grootPopupAlpha > 1) game.grootPopupAlpha = 1;
+                    // Fade in then fade out
+                    if (game.grootPopupTimer < 1.5) {
+                        game.grootPopupAlpha += dt * 1.5;
+                        if (game.grootPopupAlpha > 1) game.grootPopupAlpha = 1;
+                    } else {
+                        game.grootPopupAlpha -= dt * 0.8;
+                        if (game.grootPopupAlpha < 0) game.grootPopupAlpha = 0;
+                    }
                 } else {
-                    game.grootPopupAlpha -= dt * 0.8;
-                    if (game.grootPopupAlpha < 0) game.grootPopupAlpha = 0;
+                    // Animation complete - reset everything
+                    game.grootPopup = false;
+                    game.grootPopupTimer = 0;
+                    game.grootPopupScale = 0;
+                    game.grootPopupAlpha = 0;
                 }
-            }
-
-            // Reset groot popup when plants need water again
-            if (!allPlantsFullyWatered && game.grootPopupTimer >= 3) {
-                game.grootPopup = false;
             }
         }
 
