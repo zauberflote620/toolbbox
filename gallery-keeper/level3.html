@@ -634,7 +634,9 @@
                     speed: 60,
                     direction: direction,
                     bobOffset: 0,
-                    hasRained: false
+                    wateredPlants: [], // Track which plants have been watered
+                    wateredBranch: false,
+                    lastDirtX: null // Track last dirt spawn position
                 };
             }
 
@@ -643,37 +645,63 @@
                 game.thunderCloud.x += game.thunderCloud.speed * game.thunderCloud.direction * dt;
                 game.thunderCloud.bobOffset = Math.sin(game.time * 3) * 5; // Bob in place
 
-                // Rain effect when near center
-                const distFromCenter = Math.abs(game.thunderCloud.x - canvas.width / 2);
-                if (distFromCenter < 150 && !game.thunderCloud.hasRained) {
-                    game.thunderCloud.hasRained = true;
+                // Water plants as cloud passes over them
+                game.plants.forEach((plant, index) => {
+                    const distFromPlant = Math.abs(game.thunderCloud.x - plant.x);
 
-                    // Water all plants (+15)
-                    game.plants.forEach(plant => {
-                        plant.waterLevel += 15;
-                        if (plant.waterLevel > 100) plant.waterLevel = 100;
-                    });
+                    // Water plant when cloud is directly over it (within 60px)
+                    if (distFromPlant < 60 && !game.thunderCloud.wateredPlants.includes(index)) {
+                        plant.waterLevel = 100; // Fill up completely
+                        game.thunderCloud.wateredPlants.push(index);
 
-                    // Water branch
-                    game.branchWaterLevel += 15;
-                    if (game.branchWaterLevel > 100) game.branchWaterLevel = 100;
-
-                    // Spawn 2-3 dirt spots
-                    const dirtCount = 2 + Math.floor(Math.random() * 2);
-                    for (let i = 0; i < dirtCount; i++) {
-                        spawnDirt();
+                        // Rain particles on plant
+                        for (let i = 0; i < 10; i++) {
+                            game.particles.push({
+                                x: plant.x + (Math.random() - 0.5) * 40,
+                                y: game.thunderCloud.y + 50,
+                                vy: Math.random() * 6 + 4,
+                                size: Math.random() * 3 + 1,
+                                alpha: 0.8,
+                                color: '#64B5F6'
+                            });
+                        }
                     }
+                });
 
-                    // Rain particles
-                    for (let i = 0; i < 40; i++) {
+                // Water branch when cloud passes over it
+                const distFromBranch = Math.abs(game.thunderCloud.x - game.branchX);
+                if (distFromBranch < 60 && !game.thunderCloud.wateredBranch) {
+                    game.branchWaterLevel = 100; // Fill up completely
+                    game.thunderCloud.wateredBranch = true;
+
+                    // Rain particles on branch
+                    for (let i = 0; i < 15; i++) {
                         game.particles.push({
-                            x: game.thunderCloud.x + (Math.random() - 0.5) * 120,
+                            x: game.branchX + (Math.random() - 0.5) * 60,
                             y: game.thunderCloud.y + 50,
                             vy: Math.random() * 6 + 4,
                             size: Math.random() * 3 + 1,
                             alpha: 0.8,
                             color: '#64B5F6'
                         });
+                    }
+                }
+
+                // Spawn dirt in cloud's wake (behind it)
+                if (!game.thunderCloud.lastDirtX || Math.abs(game.thunderCloud.x - game.thunderCloud.lastDirtX) > 80) {
+                    // Spawn dirt behind the cloud
+                    const dirtX = game.thunderCloud.direction > 0
+                        ? game.thunderCloud.x - 50  // Behind if moving right
+                        : game.thunderCloud.x + 50; // Behind if moving left
+
+                    // Only spawn if within screen bounds
+                    if (dirtX > 150 && dirtX < 750) {
+                        game.dirtSpots.push({
+                            x: dirtX,
+                            y: 200 + Math.random() * 350, // Random y position in gallery
+                            size: 20 + Math.random() * 15
+                        });
+                        game.thunderCloud.lastDirtX = game.thunderCloud.x;
                     }
                 }
 
@@ -2228,22 +2256,90 @@
             ctx.strokeStyle = '#1B5E20';
             ctx.lineWidth = 8;
             ctx.fillStyle = '#81C784';
-            ctx.strokeText('LEVEL COMPLETE!', canvas.width / 2, canvas.height / 2 - 80);
-            ctx.fillText('LEVEL COMPLETE!', canvas.width / 2, canvas.height / 2 - 80);
+            ctx.strokeText('LEVEL COMPLETE!', canvas.width / 2, canvas.height / 2 - 100);
+            ctx.fillText('LEVEL COMPLETE!', canvas.width / 2, canvas.height / 2 - 100);
 
             ctx.font = 'bold 28px Kalam, cursive';
             ctx.fillStyle = '#FFF';
-            ctx.fillText('You created a thriving environment!', canvas.width / 2, canvas.height / 2 - 20);
+            ctx.fillText('You created a thriving environment!', canvas.width / 2, canvas.height / 2 - 40);
 
             // Stats
             ctx.font = 'bold 20px Kalam, cursive';
-            ctx.fillText(`Final Happiness: ${Math.round(game.overallHappiness)}%`, canvas.width / 2, canvas.height / 2 + 30);
-            ctx.fillText(`Visitors Served: ${game.visitors.length}`, canvas.width / 2, canvas.height / 2 + 60);
+            ctx.fillText(`Final Happiness: ${Math.round(game.overallHappiness)}%`, canvas.width / 2, canvas.height / 2 + 10);
+            ctx.fillText(`Visitors Served: ${game.visitors.length}`, canvas.width / 2, canvas.height / 2 + 40);
 
-            // Continue prompt
+            // Pulsating Restart Button
+            const restartBtnX = canvas.width / 2 - 100;
+            const restartBtnY = canvas.height / 2 + 80;
+            const restartBtnW = 200;
+            const restartBtnH = 60;
+
+            // Pulsating scale effect
+            const pulse = 1 + Math.sin(game.time * 3) * 0.08;
+            const pulsedW = restartBtnW * pulse;
+            const pulsedH = restartBtnH * pulse;
+            const pulsedX = restartBtnX - (pulsedW - restartBtnW) / 2;
+            const pulsedY = restartBtnY - (pulsedH - restartBtnH) / 2;
+
+            // Check hover
+            const restartHover = game.mouseX >= pulsedX && game.mouseX <= pulsedX + pulsedW &&
+                                 game.mouseY >= pulsedY && game.mouseY <= pulsedY + pulsedH;
+
+            // Glow effect
+            if (restartHover) {
+                ctx.shadowColor = '#FFD700';
+                ctx.shadowBlur = 25;
+            }
+
+            const gradient = ctx.createLinearGradient(pulsedX, pulsedY, pulsedX, pulsedY + pulsedH);
+            gradient.addColorStop(0, restartHover ? '#66BB6A' : '#81C784');
+            gradient.addColorStop(1, restartHover ? '#4CAF50' : '#66BB6A');
+
+            ctx.fillStyle = gradient;
+            ctx.strokeStyle = '#1B5E20';
+            ctx.lineWidth = 3;
+            roundRect(ctx, pulsedX, pulsedY, pulsedW, pulsedH, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#FFF';
+            ctx.font = 'bold 24px Kalam, cursive';
+            ctx.fillText('Play Again', canvas.width / 2, restartBtnY + 38);
+
+            // Learn More Button
+            const learnBtnX = canvas.width / 2 - 100;
+            const learnBtnY = canvas.height / 2 + 160;
+            const learnBtnW = 200;
+            const learnBtnH = 50;
+
+            const learnHover = game.mouseX >= learnBtnX && game.mouseX <= learnBtnX + learnBtnW &&
+                               game.mouseY >= learnBtnY && game.mouseY <= learnBtnY + learnBtnH;
+
+            if (learnHover) {
+                ctx.shadowColor = '#64B5F6';
+                ctx.shadowBlur = 20;
+            }
+
+            ctx.fillStyle = learnHover ? 'rgba(100, 181, 246, 0.3)' : 'rgba(255, 255, 255, 0.2)';
+            ctx.strokeStyle = '#81C784';
+            ctx.lineWidth = 2;
+            roundRect(ctx, learnBtnX, learnBtnY, learnBtnW, learnBtnH, 8);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+
+            ctx.fillStyle = '#FFF';
             ctx.font = 'bold 18px Kalam, cursive';
-            ctx.fillStyle = '#C5E1A5';
-            ctx.fillText('Click restart to play again', canvas.width / 2, canvas.height / 2 + 120);
+            ctx.fillText('Learn More', canvas.width / 2, learnBtnY + 32);
+
+            // Store button bounds for click detection
+            game.victoryRestartBounds = { x: pulsedX, y: pulsedY, w: pulsedW, h: pulsedH };
+            game.victoryLearnBounds = { x: learnBtnX, y: learnBtnY, w: learnBtnW, h: learnBtnH };
         }
 
         function drawGameOverScreen() {
@@ -2340,6 +2436,30 @@
                     showTutorial();
                 }
                 return;
+            }
+
+            // Victory screen buttons
+            if (game.victoryComplete) {
+                // Restart button on victory screen
+                if (game.victoryRestartBounds &&
+                    x >= game.victoryRestartBounds.x &&
+                    x <= game.victoryRestartBounds.x + game.victoryRestartBounds.w &&
+                    y >= game.victoryRestartBounds.y &&
+                    y <= game.victoryRestartBounds.y + game.victoryRestartBounds.h) {
+                    window.location.reload();
+                    return;
+                }
+
+                // Learn More button on victory screen
+                if (game.victoryLearnBounds &&
+                    x >= game.victoryLearnBounds.x &&
+                    x <= game.victoryLearnBounds.x + game.victoryLearnBounds.w &&
+                    y >= game.victoryLearnBounds.y &&
+                    y <= game.victoryLearnBounds.y + game.victoryLearnBounds.h) {
+                    // Open learn more page
+                    alert('This level teaches emergent AI behavior!\n\nIn retail, AI systems learn to optimize environments based on customer feedback - just like you optimized the gallery for visitor happiness.\n\nKey concepts:\n• Environmental sensors (plants, lighting, cleanliness)\n• Visitor behavior patterns (AI pathfinding)\n• Feedback loops (happiness metrics)\n• Emergent optimization (discoveries)\n\nThe thunder cloud represents external factors that help but create challenges - like promotions that drive traffic but require cleanup!');
+                    return;
+                }
             }
 
             // Restart button
