@@ -5,7 +5,69 @@ All notable changes to the Gallery Keeper project will be documented in this fil
 ## [Unreleased]
 
 ### Known Issues
-- None - Level 3 MVP complete and playable
+- None - Level 3 enhanced with surprise elements and improved UX
+
+## [2025-10-05] - Level 3 Enhancements: Gameplay Polish & Surprise Elements
+
+### Added
+- **Surprise Elements** (rare easter eggs and events)
+  - Chickens: VERY rare (0.03% spawn chance per frame, max 1 per game)
+  - 4 variations: chick/chicken left-to-right, right-to-left
+  - Walk across bottom with bobbing animation
+  - Thunder cloud: spawns every ~45 seconds
+  - Moves across screen with bobbing animation
+  - Progressive watering: fills plants/branch to 100% as it passes over them
+  - Leaves dirt trail in wake (spawns every 80px behind cloud)
+  - Rain particle effects and lightning flash when active
+
+- **Helper Character** (stick_hands_hip)
+  - Appears in lower right during tutorial (25% larger, closer to center)
+  - Gentle bobbing animation
+  - Flies to Feynman position when game starts (200px/sec)
+  - Transforms into stick_mustache (Feynman) at destination
+
+- **Victory Screen Enhancements**
+  - Pulsating "LEVEL COMPLETE!" text with glow effect
+  - Pulsating restart button (sin wave scale, gold glow on hover)
+  - Learn More button explaining AI/retail concepts
+  - Educational content about emergent behavior, sensors, feedback loops
+
+### Changed
+- **Game Balance Improvements**
+  - Plant decay reduced 50% (0.7/sec to 0.35/sec, last ~4.7 minutes)
+  - Branch decay reduced 55% (1.0/sec to 0.45/sec)
+  - Dirt spawn rate reduced 67% (every 12s to 20s)
+  - Groot bonus: 60% slower decay when active
+  - Happiness bonuses increased 50-200%:
+    - Blooming plants: +15 to +25
+    - Healthy plants: +5 to +15
+    - Normal lighting: +10 to +20
+    - Bright lighting: +5 to +15
+  - Penalties reduced for better playability
+
+- **Lighting System Redesign**
+  - Removed zone-based lighting (3 separate zones)
+  - Light emanates from center tree with visible aura
+  - Tree brightness: Off (80px), Normal (200px), Bright (320px)
+  - Aura width indicates brightness level
+  - Simplified controls: 3 buttons instead of 9
+
+- **Groot Improvements**
+  - Appears when ANY plant fully watered (not perfect conditions)
+  - Provides decay slowdown bonus while active
+  - Already centered at canvas center
+
+### Fixed
+- Restart button functionality (window.location.reload)
+- Green box artifact removed from branch
+- Start screen text shadows added (15% and 12% opacity)
+- Game over screen moved up 120px (1/5 canvas height)
+
+### Technical
+- Added 5 creature sprites (chickens and chicks)
+- Added rain-cloud-thunder.svg and stick-hands-hip.svg
+- Thunder cloud tracks watered plants and dirt spawn positions
+- Victory screen stores button bounds for click detection
 
 ## [2025-10-05] - Level 3 Complete: Living Gallery (Feynman's Environmental Management)
 
