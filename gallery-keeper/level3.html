@@ -142,7 +142,7 @@
             <ul>
                 <li><strong>Goal:</strong> Create a happy environment for gallery visitors</li>
                 <li><strong>Water plants:</strong> Click plants to water them (they'll grow and bloom!)</li>
-                <li><strong>Adjust lighting:</strong> Control 3 lighting zones (dim, normal, bright)</li>
+                <li><strong>Adjust lighting:</strong> Control tree brightness (light emanates from center)</li>
                 <li><strong>Clean dirt:</strong> Click dirt spots to clean them</li>
                 <li><strong>Watch visitors:</strong> They'll naturally gravitate to pleasant areas</li>
                 <li><strong>Victory:</strong> Maintain 75%+ visitor happiness for 3 continuous minutes</li>
@@ -195,12 +195,10 @@
             grootPopupScale: 0,
             grootPopupAlpha: 0,
 
-            // Lighting system (3 zones: left, center, right)
-            lightZones: [
-                { x: 0, y: 100, w: 300, h: 500, brightness: 1, name: 'Left', flashTimer: 0 },      // 0=dim, 1=normal, 2=bright
-                { x: 300, y: 100, w: 300, h: 500, brightness: 1, name: 'Center', flashTimer: 0 },
-                { x: 600, y: 100, w: 300, h: 500, brightness: 1, name: 'Right', flashTimer: 0 }
-            ],
+            // Lighting system (emanates from center tree)
+            treeBrightness: 1, // 0=off, 1=normal, 2=bright
+            treeLightRadius: 200, // Light radius based on brightness
+            lightFlashTimer: 0, // Flash effect when changing brightness
 
             // Cleanliness system
             dirtSpots: [],
@@ -360,7 +358,7 @@
             const messages = [
                 "Welcome to the Living Gallery! I'm Richard Feynman.",
                 "Your goal: create an environment where visitors feel happy.",
-                "Water plants, adjust lighting, and keep things clean.",
+                "Water plants, control the tree's light, and keep things clean.",
                 "Visitors will naturally move toward pleasant areas.",
                 "Experiment! Try different combinations and observe what happens.",
                 "Maintain 75% happiness for 3 minutes to win. Good luck!"
@@ -433,8 +431,15 @@
 
         function updatePlants(dt) {
             game.plants.forEach(plant => {
-                // Water evaporates over time (slower than before)
-                plant.waterLevel -= 0.7 * dt; // Slower decay for easier gameplay
+                // Water evaporates over time (much slower, very forgiving)
+                let decayRate = 0.35; // Base decay (plants last ~4.7 minutes)
+
+                // Groot bonus: decay even slower when Groot is active
+                if (game.grootPopup && game.grootPopupTimer < 2.5) {
+                    decayRate *= 0.4; // 60% slower decay when Groot up
+                }
+
+                plant.waterLevel -= decayRate * dt;
                 if (plant.waterLevel < 0) plant.waterLevel = 0;
                 if (plant.waterLevel > 100) plant.waterLevel = 100;
 
@@ -490,7 +495,14 @@
 
         function updateBranchAura(dt) {
             // Branch itself needs watering
-            game.branchWaterLevel -= 1 * dt; // Slower evaporation than plants
+            let branchDecayRate = 0.45; // Base decay (slower than before)
+
+            // Groot bonus: branch decay slower too
+            if (game.grootPopup && game.grootPopupTimer < 2.5) {
+                branchDecayRate *= 0.4; // 60% slower when Groot active
+            }
+
+            game.branchWaterLevel -= branchDecayRate * dt;
             if (game.branchWaterLevel < 0) game.branchWaterLevel = 0;
             if (game.branchWaterLevel > 100) game.branchWaterLevel = 100;
 
@@ -498,12 +510,8 @@
             const avgWaterLevel = game.plants.reduce((sum, p) => sum + p.waterLevel, 0) / game.plants.length;
             const dirtCount = game.dirtSpots.length;
 
-            // Check if branch is in a dim zone
-            const branchZone = game.lightZones.find(z =>
-                game.branchX >= z.x && game.branchX <= z.x + z.w &&
-                game.branchY >= z.y && game.branchY <= z.y + z.h
-            );
-            const branchInDarkness = branchZone && branchZone.brightness === 0;
+            // Check if tree light is off
+            const branchInDarkness = game.treeBrightness === 0;
 
             const avgHappiness = game.overallHappiness;
 
@@ -530,12 +538,19 @@
         }
 
         function updateLighting(dt) {
-            // Update flash timers
-            game.lightZones.forEach(zone => {
-                if (zone.flashTimer > 0) {
-                    zone.flashTimer -= dt;
-                }
-            });
+            // Update flash timer
+            if (game.lightFlashTimer > 0) {
+                game.lightFlashTimer -= dt;
+            }
+
+            // Update tree light radius based on brightness
+            if (game.treeBrightness === 0) {
+                game.treeLightRadius = 80; // Off - minimal glow
+            } else if (game.treeBrightness === 1) {
+                game.treeLightRadius = 200; // Normal - medium aura
+            } else if (game.treeBrightness === 2) {
+                game.treeLightRadius = 320; // Bright - large aura
+            }
         }
 
         function updateDirt(dt) {
@@ -640,20 +655,20 @@
                     }
                 });
 
-                // Evaluate lighting (INCREASED BONUSES to match happiness calc)
-                const zone = game.lightZones.find(z =>
-                    candidateX >= z.x && candidateX <= z.x + z.w &&
-                    candidateY >= z.y && candidateY <= z.y + z.h
+                // Evaluate lighting (distance from tree light)
+                const distFromTree = Math.sqrt(
+                    Math.pow(candidateX - game.branchX, 2) +
+                    Math.pow(candidateY - game.branchY, 2)
                 );
 
-                if (zone) {
-                    if (zone.brightness === 1) {
-                        score += 20; // Prefer normal lighting (was 15)
-                    } else if (zone.brightness === 2) {
-                        score += 15; // Bright is okay (was 8)
-                    } else {
-                        score -= 8; // Avoid dim areas (was -12)
+                if (distFromTree < game.treeLightRadius) {
+                    if (game.treeBrightness === 1) {
+                        score += 20; // Prefer normal lighting
+                    } else if (game.treeBrightness === 2) {
+                        score += 25; // Bright is even better
                     }
+                } else if (game.treeBrightness === 0) {
+                    score -= 10; // Avoid when tree light is off
                 }
 
                 // Evaluate nearby dirt (REDUCED PENALTY to match happiness calc)
@@ -708,20 +723,22 @@
                 }
             });
 
-            // Check lighting in current zone (INCREASED BONUSES)
-            const zone = game.lightZones.find(z =>
-                visitor.x >= z.x && visitor.x <= z.x + z.w &&
-                visitor.y >= z.y && visitor.y <= z.y + z.h
+            // Check distance from tree light (tree emanates light)
+            const distFromTree = Math.sqrt(
+                Math.pow(visitor.x - game.branchX, 2) +
+                Math.pow(visitor.y - game.branchY, 2)
             );
 
-            if (zone) {
-                if (zone.brightness === 1) {
-                    happiness += 20; // Normal lighting is good (was 10)
-                } else if (zone.brightness === 0) {
-                    happiness -= 8; // Too dim (was -10)
-                } else if (zone.brightness === 2) {
-                    happiness += 15; // Bright is okay (was 5)
+            // Lighting bonus based on proximity to lit tree
+            if (distFromTree < game.treeLightRadius) {
+                if (game.treeBrightness === 1) {
+                    happiness += 20; // Normal lighting is good
+                } else if (game.treeBrightness === 2) {
+                    happiness += 25; // Bright is even better
                 }
+                // No bonus when brightness is 0 (off)
+            } else if (game.treeBrightness === 0) {
+                happiness -= 10; // Penalty when tree light is off
             }
 
             // Check nearby dirt (REDUCED PENALTY)
@@ -787,8 +804,8 @@
             }
 
             // Discovery: Good lighting setup
-            const normalLightZones = game.lightZones.filter(z => z.brightness === 1).length;
-            if (normalLightZones === 3 && bloomingCount >= 3 && !game.discoveryMade.perfectLighting) {
+            // Discovery: Perfect lighting (normal brightness + multiple blooming plants)
+            if (game.treeBrightness === 1 && bloomingCount >= 3 && !game.discoveryMade.perfectLighting) {
                 game.discoveryMade.perfectLighting = true;
                 game.feynmanExcited = true;
                 game.feynmanReactionTimer = 3;
@@ -1081,35 +1098,45 @@
         }
 
         function drawGame() {
-            // Draw lighting zones (background overlays)
-            game.lightZones.forEach(zone => {
-                let overlayColor;
-                if (zone.brightness === 0) {
-                    overlayColor = 'rgba(0, 0, 50, 0.3)'; // Dim (blue tint)
-                } else if (zone.brightness === 1) {
-                    overlayColor = 'rgba(255, 255, 200, 0.1)'; // Normal (slight yellow)
-                } else {
-                    overlayColor = 'rgba(255, 255, 150, 0.3)'; // Bright (yellow)
+            // Draw light aura from tree (emanates from center)
+            if (game.treeBrightness > 0) {
+                const pulse = 0.8 + Math.sin(game.time * 1.5) * 0.2;
+                const radius = game.treeLightRadius * pulse;
+
+                let lightColor;
+                if (game.treeBrightness === 1) {
+                    lightColor = 'rgba(255, 255, 200, 0.15)'; // Normal (soft yellow glow)
+                } else if (game.treeBrightness === 2) {
+                    lightColor = 'rgba(255, 255, 150, 0.25)'; // Bright (strong yellow glow)
                 }
 
-                ctx.fillStyle = overlayColor;
-                ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
+                const gradient = ctx.createRadialGradient(
+                    game.branchX, game.branchY, 0,
+                    game.branchX, game.branchY, radius
+                );
+                gradient.addColorStop(0, lightColor);
+                gradient.addColorStop(1, 'rgba(255, 255, 200, 0)');
+
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(game.branchX, game.branchY, radius, 0, Math.PI * 2);
+                ctx.fill();
 
                 // Flash effect when lighting changes
-                if (zone.flashTimer > 0) {
-                    const flashAlpha = zone.flashTimer * 0.6;
-                    ctx.fillStyle = `rgba(255, 215, 0, ${flashAlpha})`;
-                    ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
+                if (game.lightFlashTimer > 0) {
+                    const flashAlpha = game.lightFlashTimer * 0.6;
+                    const flashGradient = ctx.createRadialGradient(
+                        game.branchX, game.branchY, 0,
+                        game.branchX, game.branchY, radius
+                    );
+                    flashGradient.addColorStop(0, `rgba(255, 215, 0, ${flashAlpha})`);
+                    flashGradient.addColorStop(1, 'rgba(255, 215, 0, 0)');
+                    ctx.fillStyle = flashGradient;
+                    ctx.beginPath();
+                    ctx.arc(game.branchX, game.branchY, radius, 0, Math.PI * 2);
+                    ctx.fill();
                 }
-            });
-
-            // Draw zone labels
-            game.lightZones.forEach(zone => {
-                ctx.textAlign = 'center';
-                ctx.font = 'bold 12px Kalam, cursive';
-                ctx.fillStyle = '#666';
-                ctx.fillText(zone.name, zone.x + zone.w / 2, 90);
-            });
+            }
 
             // Draw central branch (anchor of the game)
             drawBranch();
@@ -1468,7 +1495,7 @@
                 ctx.fillText(btn.label, btn.x + btn.w / 2, btn.y + 52);
             });
 
-            // Lighting controls (only show when light tool selected)
+            // Tree brightness controls (only show when light tool selected)
             if (game.currentTool === 'light') {
                 const controlX = 20;
                 const controlY = 340;
@@ -1476,41 +1503,42 @@
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
                 ctx.strokeStyle = '#666';
                 ctx.lineWidth = 2;
-                roundRect(ctx, controlX, controlY, 80, 180, 8);
+                roundRect(ctx, controlX, controlY, 80, 90, 8);
                 ctx.fill();
                 ctx.stroke();
 
                 ctx.font = 'bold 12px Kalam, cursive';
                 ctx.textAlign = 'center';
                 ctx.fillStyle = '#333';
-                ctx.fillText('Lighting', controlX + 40, controlY + 18);
+                ctx.fillText('Tree Light', controlX + 40, controlY + 20);
 
-                // Zone controls
-                game.lightZones.forEach((zone, i) => {
-                    const btnY = controlY + 30 + (i * 45);
+                // Brightness buttons
+                const brightnessLabels = ['Off', 'On', 'Max'];
+                brightnessLabels.forEach((label, b) => {
+                    const btnX = controlX + 5 + (b * 28);
+                    const btnY = controlY + 35;
+                    const btnW = 25;
+                    const btnH = 25;
 
-                    ctx.font = '10px Kalam, cursive';
-                    ctx.fillText(zone.name, controlX + 40, btnY);
+                    // Hover effect
+                    const isHovering = game.mouseX >= btnX && game.mouseX <= btnX + btnW &&
+                                      game.mouseY >= btnY && game.mouseY <= btnY + btnH;
 
-                    // Brightness buttons
-                    const brightnessLabels = ['Dim', 'Normal', 'Bright'];
-                    brightnessLabels.forEach((label, b) => {
-                        const miniX = controlX + 5 + (b * 23);
-                        const miniY = btnY + 5;
-                        const miniW = 20;
-                        const miniH = 20;
+                    ctx.fillStyle = game.treeBrightness === b ? '#FFD700' : (isHovering ? '#FFF' : '#EEE');
+                    ctx.strokeStyle = game.treeBrightness === b ? '#FFA500' : '#999';
+                    ctx.lineWidth = game.treeBrightness === b ? 2 : 1;
+                    ctx.fillRect(btnX, btnY, btnW, btnH);
+                    ctx.strokeRect(btnX, btnY, btnW, btnH);
 
-                        ctx.fillStyle = zone.brightness === b ? '#FFD700' : '#EEE';
-                        ctx.strokeStyle = '#999';
-                        ctx.lineWidth = 1;
-                        ctx.fillRect(miniX, miniY, miniW, miniH);
-                        ctx.strokeRect(miniX, miniY, miniW, miniH);
-
-                        ctx.font = '9px Kalam, cursive';
-                        ctx.fillStyle = '#333';
-                        ctx.fillText(b.toString(), miniX + miniW / 2, miniY + miniH / 2 + 3);
-                    });
+                    ctx.font = '9px Kalam, cursive';
+                    ctx.fillStyle = '#333';
+                    ctx.fillText(b.toString(), btnX + btnW / 2, btnY + btnH / 2 + 3);
                 });
+
+                // Label
+                ctx.font = '9px Kalam, cursive';
+                ctx.fillStyle = '#666';
+                ctx.fillText('(Brightness from tree)', controlX + 40, controlY + 75);
             }
         }
 
@@ -1730,13 +1758,9 @@
             const x = game.branchX;
             const y = game.branchY;
 
-            // Check if branch is in darkness
-            const branchZone = game.lightZones.find(z =>
-                x >= z.x && x <= z.x + z.w &&
-                y >= z.y && y <= z.y + z.h
-            );
-            const branchInDarkness = branchZone && branchZone.brightness === 0;
-            const branchInLight = branchZone && branchZone.brightness >= 1;
+            // Check tree brightness (no zones, light emanates from tree itself)
+            const branchInDarkness = game.treeBrightness === 0;
+            const branchInLight = game.treeBrightness >= 1;
 
             // Check if any plant is fully watered for Groot to appear
             const isPerfect = game.plants.some(p => p.waterLevel >= 95);
@@ -2118,40 +2142,37 @@
                 }
             }
 
-            // Lighting zone controls (when light tool selected)
+            // Tree brightness controls (when light tool selected)
             if (game.currentTool === 'light') {
                 const controlX = 20;
                 const controlY = 340;
 
-                game.lightZones.forEach((zone, i) => {
-                    const btnY = controlY + 30 + (i * 45);
+                // Three brightness buttons: Off, Normal, Bright
+                for (let b = 0; b < 3; b++) {
+                    const btnX = controlX + 5 + (b * 28);
+                    const btnY = controlY + 35;
+                    const btnW = 25;
+                    const btnH = 25;
 
-                    for (let b = 0; b < 3; b++) {
-                        const miniX = controlX + 5 + (b * 23);
-                        const miniY = btnY + 5;
-                        const miniW = 20;
-                        const miniH = 20;
+                    if (x >= btnX && x <= btnX + btnW &&
+                        y >= btnY && y <= btnY + btnH) {
+                        game.treeBrightness = b;
+                        game.lightFlashTimer = 0.5; // Flash effect duration
 
-                        if (x >= miniX && x <= miniX + miniW &&
-                            y >= miniY && y <= miniY + miniH) {
-                            zone.brightness = b;
-                            zone.flashTimer = 0.5; // Flash effect duration
-
-                            // Spawn particles
-                            for (let p = 0; p < 15; p++) {
-                                game.particles.push({
-                                    x: zone.x + zone.w / 2 + (Math.random() - 0.5) * 150,
-                                    y: zone.y + zone.h / 2 + (Math.random() - 0.5) * 150,
-                                    vy: Math.random() * 2 + 1,
-                                    size: Math.random() * 4 + 2,
-                                    alpha: 1,
-                                    color: '#FFD700'
-                                });
-                            }
-                            return;
+                        // Spawn particles at tree
+                        for (let p = 0; p < 20; p++) {
+                            game.particles.push({
+                                x: game.branchX + (Math.random() - 0.5) * 100,
+                                y: game.branchY + (Math.random() - 0.5) * 100,
+                                vy: Math.random() * 2 + 1,
+                                size: Math.random() * 4 + 2,
+                                alpha: 1,
+                                color: '#FFD700'
+                            });
                         }
+                        return;
                     }
-                });
+                }
             }
 
             // Water plants and branch
