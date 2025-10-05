@@ -382,12 +382,6 @@
         function showTutorial() {
             game.tutorialStarted = true; // Mark tutorial as started
 
-            // Clear any existing timeout
-            if (game.tutorialTimeout) {
-                clearTimeout(game.tutorialTimeout);
-                game.tutorialTimeout = null;
-            }
-
             const messages = [
                 "Welcome to the Living Gallery! I'm Richard Feynman.",
                 "Your goal: create an environment where visitors feel happy.",
@@ -399,24 +393,22 @@
 
             if (game.tutorialStep < messages.length) {
                 game.feynmanMessage = messages[game.tutorialStep];
-                game.messageTimer = 3;
+                game.messageTimer = 999; // Keep message visible until clicked
                 game.tutorialStep++;
 
                 if (game.tutorialStep >= messages.length) {
                     game.tutorialComplete = true;
-                    game.tutorialTimeout = setTimeout(() => {
-                        game.gameStarted = true;
-                        // Clear tutorial message when game starts
-                        game.feynmanMessage = '';
-                        game.messageTimer = 0;
-                        // Move helper to Feynman position
-                        game.helper.targetX = game.feynmanX;
-                        game.helper.targetY = game.feynmanY;
-                        game.helper.moving = true;
-                    }, 3000);
-                } else {
-                    game.tutorialTimeout = setTimeout(() => showTutorial(), 3000);
+                    // Game will start on next click via the click handler
                 }
+            } else if (game.tutorialComplete && !game.gameStarted) {
+                // Last message was clicked, start game
+                game.gameStarted = true;
+                game.feynmanMessage = '';
+                game.messageTimer = 0;
+                // Move helper to Feynman position
+                game.helper.targetX = game.feynmanX;
+                game.helper.targetY = game.feynmanY;
+                game.helper.moving = true;
             }
         }
 
@@ -638,7 +630,8 @@
                     y: 450 + Math.random() * 100, // Bottom area
                     speed: 80,
                     direction: direction,
-                    size: type.includes('chick') ? 30 : 40
+                    size: (type.includes('chick') ? 30 : 40) * 1.1, // 10% larger
+                    lastDirtX: null // Track where we last dropped dirt
                 };
                 game.chickenSpawned = true;
             }
@@ -646,6 +639,16 @@
             // Update chicken position
             if (game.chicken) {
                 game.chicken.x += game.chicken.speed * game.chicken.direction * dt;
+
+                // Leave dirt trail occasionally (every ~50px)
+                if (!game.chicken.lastDirtX || Math.abs(game.chicken.x - game.chicken.lastDirtX) > 50) {
+                    game.dirtSpots.push({
+                        x: game.chicken.x,
+                        y: game.chicken.y + 15,
+                        size: 8 + Math.random() * 4
+                    });
+                    game.chicken.lastDirtX = game.chicken.x;
+                }
 
                 // Remove when off screen
                 if (game.chicken.direction > 0 && game.chicken.x > canvas.width + 60) {
@@ -1691,14 +1694,14 @@
             const img = game.images[game.chicken.type];
             if (!img || !img.complete) return;
 
-            // Draw with slight bob
-            const bob = Math.sin(game.time * 5) * 3;
+            // Draw with up and down movement as it crosses screen
+            const upDown = Math.sin(game.time * 3) * 10; // 10px up/down movement
             const size = game.chicken.size;
 
             ctx.drawImage(
                 img,
                 game.chicken.x - size / 2,
-                game.chicken.y - size / 2 + bob,
+                game.chicken.y - size / 2 + upDown,
                 size,
                 size
             );
@@ -2097,15 +2100,7 @@
                 ctx.ellipse(x, y + 60, shadowSize, 12, 0, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Branch color tint only when dry
-                if (game.branchWaterLevel < 30) {
-                    // Dry - darker/brownish tint
-                    ctx.globalAlpha = 0.4;
-                    ctx.fillStyle = '#8B4513';
-                    ctx.fillRect(x - branchWidth / 2, y - branchHeight / 2, branchWidth, branchHeight);
-                    ctx.globalAlpha = 1;
-                }
-
+                // Draw branch (no color tint - only aura changes)
                 ctx.drawImage(
                     game.images.branch,
                     x - branchWidth / 2,
