@@ -2250,14 +2250,27 @@
             ctx.fillStyle = 'rgba(46, 125, 50, 0.8)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Victory text
+            // Victory text with pulsating effect and glow
             ctx.textAlign = 'center';
-            ctx.font = 'bold 60px Kalam, cursive';
+
+            // Pulsating scale
+            const textPulse = 1 + Math.sin(game.time * 2) * 0.05;
+            const fontSize = 60 * textPulse;
+            ctx.font = `bold ${fontSize}px Kalam, cursive`;
+
+            // Glow effect
+            ctx.shadowColor = '#81C784';
+            ctx.shadowBlur = 20 + Math.sin(game.time * 3) * 10;
+
             ctx.strokeStyle = '#1B5E20';
             ctx.lineWidth = 8;
             ctx.fillStyle = '#81C784';
             ctx.strokeText('LEVEL COMPLETE!', canvas.width / 2, canvas.height / 2 - 100);
             ctx.fillText('LEVEL COMPLETE!', canvas.width / 2, canvas.height / 2 - 100);
+
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
 
             ctx.font = 'bold 28px Kalam, cursive';
             ctx.fillStyle = '#FFF';
