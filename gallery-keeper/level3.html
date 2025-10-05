@@ -12,6 +12,13 @@
             font-style: normal;
         }
 
+        @font-face {
+            font-family: 'mOS';
+            src: url('assets/fonts/mOS-Black.otf') format('opentype');
+            font-weight: bold;
+            font-style: normal;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -19,7 +26,7 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'mOS', sans-serif;
             background: linear-gradient(135deg, #3E2723 0%, #4E342E 50%, #5D4037 100%);
             color: #ECF0F1;
             display: flex;
@@ -350,6 +357,7 @@
                 'groot': '../Excalidraw/assets/nature/i-am-groot.svg',
                 'skull': '../Excalidraw/assets/creatures/crying-head.svg',
                 'alarm': '../Excalidraw/assets/objects/alarm-red.svg',
+                'title': '../Excalidraw/assets/fonts/feynmans-env-challenge.svg',
 
                 // Surprise elements (chickens and weather)
                 'chick_left': '../Excalidraw/assets/creatures/chick-left-to-right.svg',
@@ -1259,6 +1267,10 @@
         }
 
         function drawStartScreen() {
+            // Semi-transparent backdrop overlay
+            ctx.fillStyle = 'rgba(62, 39, 35, 0.85)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
             // Title with light shadow
             ctx.textAlign = 'center';
             ctx.font = 'bold 48px Angelinas, cursive';
@@ -1268,19 +1280,21 @@
             ctx.fillText('Living Gallery', canvas.width / 2 + 2, canvas.height / 2 - 98);
 
             // Title text
-            ctx.fillStyle = '#2E7D32';
+            ctx.fillStyle = '#8D6E63';
             ctx.fillText('Living Gallery', canvas.width / 2, canvas.height / 2 - 100);
 
-            // Subtitle with light shadow
-            ctx.font = '24px Angelinas, cursive';
-
-            // Shadow
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
-            ctx.fillText('Feynman\'s Environmental Challenge', canvas.width / 2 + 1, canvas.height / 2 - 49);
-
-            // Subtitle text
-            ctx.fillStyle = '#666';
-            ctx.fillText('Feynman\'s Environmental Challenge', canvas.width / 2, canvas.height / 2 - 50);
+            // Subtitle as SVG image
+            if (game.imagesLoaded && game.images.title && game.images.title.complete) {
+                const titleW = 400;
+                const titleH = 60;
+                ctx.drawImage(
+                    game.images.title,
+                    canvas.width / 2 - titleW / 2,
+                    canvas.height / 2 - 70,
+                    titleW,
+                    titleH
+                );
+            }
 
             // Start button with hover effects
             const btnX = canvas.width / 2 - 100;
@@ -1295,10 +1309,12 @@
             const scaledX = btnX - (scaledW - btnW) / 2;
             const scaledY = btnY - (scaledH - btnH) / 2;
 
-            // Glow effect
+            // Growing shadow effect on hover
             if (game.startButtonHover) {
-                ctx.shadowColor = '#4CAF50';
-                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#8D6E63';
+                ctx.shadowBlur = 30;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
             }
 
             // Button gradient
