@@ -266,7 +266,23 @@
             gameOverState: false,
             gameOverTimer: 0,
             skullScale: 0,
-            skullAlpha: 0
+            skullAlpha: 0,
+
+            // Surprise elements (rare events)
+            chicken: null, // One chicken per game max
+            chickenSpawned: false,
+            thunderCloud: null,
+            cloudTimer: 0,
+            cloudSpawnInterval: 45, // Cloud appears every ~45 seconds
+
+            // Helper character (stick_hands_hip)
+            helper: {
+                x: canvas.width - 100, // Lower right corner
+                y: canvas.height - 100,
+                targetX: canvas.width - 100,
+                targetY: canvas.height - 100,
+                moving: false
+            }
         };
 
         // Initialize game
@@ -320,12 +336,20 @@
                 'stick_mustache': '../Excalidraw/assets/stick_ppl/stick_mustache.png',
                 'stick_ponytail_pamplet': '../Excalidraw/assets/stick_ppl/stick_ponytail_pamplet.png',
                 'stick_sad': '../Excalidraw/assets/stick_ppl/stick_sad.png',
+                'stick_hands_hip': '../Excalidraw/assets/stick_figures/stick-hands-hip.svg',
 
                 // Special assets
                 'branch': '../Excalidraw/assets/nature/branches.png',
                 'groot': '../Excalidraw/assets/nature/i-am-groot.svg',
                 'skull': '../Excalidraw/assets/symbols/skull_red.png',
-                'alarm': '../Excalidraw/assets/objects/alarm-red.svg'
+                'alarm': '../Excalidraw/assets/objects/alarm-red.svg',
+
+                // Surprise elements (chickens and weather)
+                'chick_left': '../Excalidraw/assets/creatures/chick-left-to-right.svg',
+                'chick_right': '../Excalidraw/assets/creatures/chick-right-to-left.svg',
+                'chicken_left': '../Excalidraw/assets/creatures/chicken-left-to-right.svg',
+                'chicken_right': '../Excalidraw/assets/creatures/chicken-right-to-left.svg',
+                'thunder_cloud': '../Excalidraw/assets/nature/rain-cloud-thunder.svg'
             };
 
             let loadedCount = 0;
@@ -373,6 +397,10 @@
                     game.tutorialComplete = true;
                     setTimeout(() => {
                         game.gameStarted = true;
+                        // Move helper to Feynman position
+                        game.helper.targetX = game.feynmanX;
+                        game.helper.targetY = game.feynmanY;
+                        game.helper.moving = true;
                     }, 3000);
                 } else {
                     setTimeout(() => showTutorial(), 3000);
@@ -559,6 +587,121 @@
             if (game.dirtSpawnTimer >= game.dirtSpawnInterval) {
                 game.dirtSpawnTimer = 0;
                 spawnDirt();
+            }
+        }
+
+        function updateChicken(dt) {
+            // Spawn chicken (VERY RARE - only once per game)
+            if (!game.chickenSpawned && Math.random() < 0.0003) { // ~0.03% chance per frame
+                const types = ['chick_left', 'chick_right', 'chicken_left', 'chicken_right'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                const direction = type.includes('left') ? 1 : -1;
+
+                game.chicken = {
+                    type: type,
+                    x: direction > 0 ? -60 : canvas.width + 60,
+                    y: 450 + Math.random() * 100, // Bottom area
+                    speed: 80,
+                    direction: direction,
+                    size: type.includes('chick') ? 30 : 40
+                };
+                game.chickenSpawned = true;
+            }
+
+            // Update chicken position
+            if (game.chicken) {
+                game.chicken.x += game.chicken.speed * game.chicken.direction * dt;
+
+                // Remove when off screen
+                if (game.chicken.direction > 0 && game.chicken.x > canvas.width + 60) {
+                    game.chicken = null;
+                } else if (game.chicken.direction < 0 && game.chicken.x < -60) {
+                    game.chicken = null;
+                }
+            }
+        }
+
+        function updateThunderCloud(dt) {
+            // Spawn thunder cloud periodically
+            game.cloudTimer += dt;
+            if (game.cloudTimer >= game.cloudSpawnInterval && !game.thunderCloud) {
+                game.cloudTimer = 0;
+                const direction = Math.random() < 0.5 ? 1 : -1;
+
+                game.thunderCloud = {
+                    x: direction > 0 ? -100 : canvas.width + 100,
+                    y: 80 + Math.random() * 40,
+                    speed: 60,
+                    direction: direction,
+                    bobOffset: 0,
+                    hasRained: false
+                };
+            }
+
+            // Update cloud position
+            if (game.thunderCloud) {
+                game.thunderCloud.x += game.thunderCloud.speed * game.thunderCloud.direction * dt;
+                game.thunderCloud.bobOffset = Math.sin(game.time * 3) * 5; // Bob in place
+
+                // Rain effect when near center
+                const distFromCenter = Math.abs(game.thunderCloud.x - canvas.width / 2);
+                if (distFromCenter < 150 && !game.thunderCloud.hasRained) {
+                    game.thunderCloud.hasRained = true;
+
+                    // Water all plants (+15)
+                    game.plants.forEach(plant => {
+                        plant.waterLevel += 15;
+                        if (plant.waterLevel > 100) plant.waterLevel = 100;
+                    });
+
+                    // Water branch
+                    game.branchWaterLevel += 15;
+                    if (game.branchWaterLevel > 100) game.branchWaterLevel = 100;
+
+                    // Spawn 2-3 dirt spots
+                    const dirtCount = 2 + Math.floor(Math.random() * 2);
+                    for (let i = 0; i < dirtCount; i++) {
+                        spawnDirt();
+                    }
+
+                    // Rain particles
+                    for (let i = 0; i < 40; i++) {
+                        game.particles.push({
+                            x: game.thunderCloud.x + (Math.random() - 0.5) * 120,
+                            y: game.thunderCloud.y + 50,
+                            vy: Math.random() * 6 + 4,
+                            size: Math.random() * 3 + 1,
+                            alpha: 0.8,
+                            color: '#64B5F6'
+                        });
+                    }
+                }
+
+                // Remove when off screen
+                if (game.thunderCloud.direction > 0 && game.thunderCloud.x > canvas.width + 100) {
+                    game.thunderCloud = null;
+                } else if (game.thunderCloud.direction < 0 && game.thunderCloud.x < -100) {
+                    game.thunderCloud = null;
+                }
+            }
+        }
+
+        function updateHelper(dt) {
+            // Move helper to target position when game starts
+            if (game.helper.moving) {
+                const dx = game.helper.targetX - game.helper.x;
+                const dy = game.helper.targetY - game.helper.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist > 5) {
+                    const speed = 200;
+                    game.helper.x += (dx / dist) * speed * dt;
+                    game.helper.y += (dy / dist) * speed * dt;
+                } else {
+                    game.helper.x = game.helper.targetX;
+                    game.helper.y = game.helper.targetY;
+                    game.helper.moving = false;
+                }
             }
         }
 
@@ -983,6 +1126,9 @@
             updateBranchAura(dt);
             updateLighting(dt);
             updateDirt(dt);
+            updateChicken(dt);
+            updateThunderCloud(dt);
+            updateHelper(dt);
             updateVisitors(dt);
             evaluateEnvironment();
 
@@ -1041,13 +1187,26 @@
         }
 
         function drawStartScreen() {
-            // Title
+            // Title with light shadow
             ctx.textAlign = 'center';
             ctx.font = 'bold 48px Kalam, cursive';
+
+            // Shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.fillText('Living Gallery', canvas.width / 2 + 2, canvas.height / 2 - 98);
+
+            // Title text
             ctx.fillStyle = '#2E7D32';
             ctx.fillText('Living Gallery', canvas.width / 2, canvas.height / 2 - 100);
 
+            // Subtitle with light shadow
             ctx.font = '24px Kalam, cursive';
+
+            // Shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
+            ctx.fillText('Feynman\'s Environmental Challenge', canvas.width / 2 + 1, canvas.height / 2 - 49);
+
+            // Subtitle text
             ctx.fillStyle = '#666';
             ctx.fillText('Feynman\'s Environmental Challenge', canvas.width / 2, canvas.height / 2 - 50);
 
@@ -1155,6 +1314,14 @@
             game.visitors.forEach(visitor => {
                 drawVisitor(visitor);
             });
+
+            // Draw surprise elements
+            if (game.chicken) {
+                drawChicken();
+            }
+            if (game.thunderCloud) {
+                drawThunderCloud();
+            }
 
             // Draw particles
             game.particles.forEach(p => {
@@ -1450,6 +1617,61 @@
                 ctx.moveTo(visX, visY + 15);
                 ctx.lineTo(visX + 6, visY + 25);
                 ctx.stroke();
+            }
+        }
+
+        function drawChicken() {
+            if (!game.chicken || !game.imagesLoaded) return;
+
+            const img = game.images[game.chicken.type];
+            if (!img || !img.complete) return;
+
+            // Draw with slight bob
+            const bob = Math.sin(game.time * 5) * 3;
+            const size = game.chicken.size;
+
+            ctx.drawImage(
+                img,
+                game.chicken.x - size / 2,
+                game.chicken.y - size / 2 + bob,
+                size,
+                size
+            );
+        }
+
+        function drawThunderCloud() {
+            if (!game.thunderCloud || !game.imagesLoaded) return;
+
+            const img = game.images.thunder_cloud;
+            if (!img || !img.complete) return;
+
+            const cloudSize = 100;
+            const x = game.thunderCloud.x;
+            const y = game.thunderCloud.y + game.thunderCloud.bobOffset;
+
+            // Draw cloud
+            ctx.drawImage(
+                img,
+                x - cloudSize / 2,
+                y - cloudSize / 2,
+                cloudSize,
+                cloudSize
+            );
+
+            // Lightning flash when raining
+            if (Math.abs(game.thunderCloud.x - canvas.width / 2) < 150) {
+                if (Math.random() < 0.3) {
+                    ctx.strokeStyle = '#FFD700';
+                    ctx.lineWidth = 3;
+                    ctx.globalAlpha = 0.6;
+                    ctx.beginPath();
+                    ctx.moveTo(x, y + 30);
+                    ctx.lineTo(x - 10, y + 50);
+                    ctx.lineTo(x + 5, y + 50);
+                    ctx.lineTo(x - 5, y + 70);
+                    ctx.stroke();
+                    ctx.globalAlpha = 1;
+                }
             }
         }
 
@@ -1911,8 +2133,9 @@
         }
 
         function drawFeynmanNPC() {
-            const x = game.feynmanX;
-            const y = game.feynmanY;
+            // Use helper position when game started, otherwise use fixed Feynman position
+            const x = game.gameStarted ? game.helper.x : game.feynmanX;
+            const y = game.gameStarted ? game.helper.y : game.feynmanY;
 
             // Animation: gentle bobbing when idle, excited bounce when celebrating
             let offsetY = 0;
@@ -1927,7 +2150,7 @@
                 offsetX = Math.sin(game.time * 2) * 2;
             }
 
-            // Draw Feynman using stick_mustache
+            // Draw Feynman using stick_mustache (or helper during movement)
             if (game.imagesLoaded && game.images.stick_mustache && game.images.stick_mustache.complete) {
                 const feynmanWidth = 60;
                 const feynmanHeight = 70;
@@ -1955,6 +2178,21 @@
                 ctx.beginPath();
                 ctx.arc(x + 8 + offsetX, y + offsetY, 5, 0, Math.PI * 2);
                 ctx.stroke();
+            }
+
+            // Draw helper (stick_hands_hip) in lower right during tutorial
+            if (!game.gameStarted && game.imagesLoaded && game.images.stick_hands_hip && game.images.stick_hands_hip.complete) {
+                const helperBob = Math.sin(game.time * 2) * 5;
+                const helperWidth = 50;
+                const helperHeight = 60;
+
+                ctx.drawImage(
+                    game.images.stick_hands_hip,
+                    game.helper.x - helperWidth / 2,
+                    game.helper.y - helperHeight / 2 + helperBob,
+                    helperWidth,
+                    helperHeight
+                );
             }
         }
 
