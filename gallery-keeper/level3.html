@@ -358,6 +358,7 @@
                 'skull': '../Excalidraw/assets/creatures/crying-head.svg',
                 'alarm': '../Excalidraw/assets/objects/alarm-red.svg',
                 'title': '../Excalidraw/assets/fonts/feynmans-env-challenge.svg',
+                'start_button': '../Excalidraw/assets/ui/buttons/start-sketch-green-button.svg',
 
                 // Surprise elements (chickens and weather)
                 'chick_left': '../Excalidraw/assets/creatures/chick-left-to-right.svg',
@@ -1297,46 +1298,40 @@
             }
 
             // Start button with hover effects
-            const btnX = canvas.width / 2 - 100;
-            const btnY = canvas.height / 2;
-            const btnW = 200;
-            const btnH = 60;
+            if (game.imagesLoaded && game.images.start_button && game.images.start_button.complete) {
+                const btnW = 200;
+                const btnH = 80;
+                const btnX = canvas.width / 2 - btnW / 2;
+                const btnY = canvas.height / 2;
 
-            // Hover animation: scale and glow
-            const scale = game.startButtonHover ? 1.05 : 1;
-            const scaledW = btnW * scale;
-            const scaledH = btnH * scale;
-            const scaledX = btnX - (scaledW - btnW) / 2;
-            const scaledY = btnY - (scaledH - btnH) / 2;
+                // Hover animation: scale and glow
+                const scale = game.startButtonHover ? 1.05 : 1;
+                const scaledW = btnW * scale;
+                const scaledH = btnH * scale;
+                const scaledX = btnX - (scaledW - btnW) / 2;
+                const scaledY = btnY - (scaledH - btnH) / 2;
 
-            // Growing shadow effect on hover
-            if (game.startButtonHover) {
-                ctx.shadowColor = '#8D6E63';
-                ctx.shadowBlur = 30;
-                ctx.shadowOffsetX = 0;
-                ctx.shadowOffsetY = 0;
+                // Growing shadow effect on hover
+                if (game.startButtonHover) {
+                    ctx.shadowColor = '#8D6E63';
+                    ctx.shadowBlur = 30;
+                    ctx.shadowOffsetX = 0;
+                    ctx.shadowOffsetY = 0;
+                }
+
+                // Draw start button image
+                ctx.drawImage(
+                    game.images.start_button,
+                    scaledX,
+                    scaledY,
+                    scaledW,
+                    scaledH
+                );
+
+                // Reset shadow
+                ctx.shadowColor = 'transparent';
+                ctx.shadowBlur = 0;
             }
-
-            // Button gradient
-            const gradient = ctx.createLinearGradient(scaledX, scaledY, scaledX, scaledY + scaledH);
-            gradient.addColorStop(0, game.startButtonHover ? '#66BB6A' : '#81C784');
-            gradient.addColorStop(1, game.startButtonHover ? '#4CAF50' : '#66BB6A');
-
-            ctx.fillStyle = gradient;
-            ctx.strokeStyle = '#2E7D32';
-            ctx.lineWidth = 4;
-            roundRect(ctx, scaledX, scaledY, scaledW, scaledH, 10);
-            ctx.fill();
-            ctx.stroke();
-
-            // Reset shadow
-            ctx.shadowColor = 'transparent';
-            ctx.shadowBlur = 0;
-
-            // Text
-            ctx.fillStyle = '#FFF';
-            ctx.font = 'bold 28px Angelinas, cursive';
-            ctx.fillText('Start', canvas.width / 2, canvas.height / 2 + 40);
 
             // Tutorial messages during startup
             if (game.messageTimer > 0 && game.feynmanMessage) {

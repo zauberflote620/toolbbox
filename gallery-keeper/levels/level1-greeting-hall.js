@@ -21,6 +21,9 @@ class GreetingHall {
         this.score = 0;
         this.combo = 0;
         this.maxCombo = 0;
+        this.paused = false;
+        this.restartButtonBounds = null;
+        this.pauseButtonBounds = null;
 
         // Visitor types (teaching classification)
         this.visitorTypes = [
@@ -311,6 +314,11 @@ class GreetingHall {
     }
 
     update(dt) {
+        // Skip updates when paused
+        if (this.paused) {
+            return;
+        }
+
         // Count visitors on screen
         const visitorsOnScreen = this.engine.entities.filter(e => e.isVisitor).length;
 
@@ -350,41 +358,34 @@ class GreetingHall {
     }
 
     render(ctx) {
-        // Render door markers (clean circles with icons, no shadows)
+        // Render door markers (icons only, no circles)
         this.doorSprites.forEach(door => {
-            // Colored circle background
-            ctx.fillStyle = door.color;
-            ctx.beginPath();
-            ctx.arc(door.x, door.y, 35, 0, Math.PI * 2);
-            ctx.fill();
-
-            // White border
-            ctx.strokeStyle = '#FFFFFF';
-            ctx.lineWidth = 3;
-            ctx.stroke();
-
             // Icon (large and centered)
             if (door.visitorIcon) {
-                ctx.font = '40px Arial';
+                ctx.font = '50px Arial';  // Slightly larger since no circle
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
+
+                // Add subtle glow for visibility
+                ctx.shadowColor = door.color;
+                ctx.shadowBlur = 10;
                 ctx.fillText(door.visitorIcon, door.x, door.y);
+                ctx.shadowBlur = 0;  // Reset shadow
             }
         });
 
         // Render Carnegie if visible
         if (this.carnegie.visible) {
-            // Carnegie sprite (simple for now)
-            ctx.fillStyle = '#8B4513';
-            ctx.beginPath();
-            ctx.arc(this.carnegie.x, this.carnegie.y, 30, 0, Math.PI * 2);
-            ctx.fill();
-
-            // Carnegie icon
-            ctx.font = '40px Arial';
+            // Carnegie icon (no circle, just icon with glow)
+            ctx.font = '50px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
+
+            // Subtle glow
+            ctx.shadowColor = '#8B4513';
+            ctx.shadowBlur = 15;
             ctx.fillText('📜', this.carnegie.x, this.carnegie.y);
+            ctx.shadowBlur = 0;
 
             // Message bubble
             if (this.carnegie.message) {
@@ -407,21 +408,107 @@ class GreetingHall {
             }
         }
 
-        // Level UI
+        // On-screen restart button (upper left corner) - Level 2 style
+        const restartBtnX = 20;
+        const restartBtnY = 20;
+        const restartBtnW = 60;
+        const restartBtnH = 50;
+
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = 3;
+        this.roundRect(ctx, restartBtnX, restartBtnY, restartBtnW, restartBtnH, 10);
+        ctx.fill();
+        ctx.stroke();
+
+        // Restart icon (circular arrow)
+        ctx.strokeStyle = '#FFF';
+        ctx.fillStyle = '#FFF';
+        ctx.lineWidth = 3;
+        let centerX = restartBtnX + restartBtnW / 2;
+        let centerY = restartBtnY + restartBtnH / 2;
+
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, 12, 0.5, Math.PI * 2 - 0.5);
+        ctx.stroke();
+
+        // Arrow head
+        ctx.beginPath();
+        ctx.moveTo(centerX + 12, centerY - 3);
+        ctx.lineTo(centerX + 12, centerY + 5);
+        ctx.lineTo(centerX + 18, centerY);
+        ctx.closePath();
+        ctx.fill();
+
+        // Store restart button bounds
+        this.restartButtonBounds = { x: restartBtnX, y: restartBtnY, w: restartBtnW, h: restartBtnH };
+
+        // On-screen pause button (upper right corner) - Level 2 style
+        const pauseBtnX = 850 - 80;  // canvas width - 80
+        const pauseBtnY = 20;
+        const pauseBtnW = 60;
+        const pauseBtnH = 50;
+
+        ctx.fillStyle = this.paused ? '#4CAF50' : 'rgba(0, 0, 0, 0.6)';
+        ctx.strokeStyle = '#FFD700';
+        ctx.lineWidth = 3;
+        this.roundRect(ctx, pauseBtnX, pauseBtnY, pauseBtnW, pauseBtnH, 10);
+        ctx.fill();
+        ctx.stroke();
+
+        // Pause/Play icon
+        ctx.fillStyle = '#FFF';
+        if (this.paused) {
+            // Play triangle
+            ctx.beginPath();
+            ctx.moveTo(pauseBtnX + 20, pauseBtnY + 12);
+            ctx.lineTo(pauseBtnX + 20, pauseBtnY + 38);
+            ctx.lineTo(pauseBtnX + 45, pauseBtnY + 25);
+            ctx.closePath();
+            ctx.fill();
+        } else {
+            // Pause bars
+            ctx.fillRect(pauseBtnX + 18, pauseBtnY + 12, 8, 26);
+            ctx.fillRect(pauseBtnX + 34, pauseBtnY + 12, 8, 26);
+        }
+
+        // Store pause button bounds
+        this.pauseButtonBounds = { x: pauseBtnX, y: pauseBtnY, w: pauseBtnW, h: pauseBtnH };
+
+        // Level title and stats - moved to center-left area
+        ctx.fillStyle = '#FFD700';
+        ctx.font = 'bold 24px Kalam, cursive';
+        ctx.textAlign = 'left';
+        ctx.fillText('Level 1', 100, 35);
+
+        // Stats to the right of title
         const visitorsOnScreen = this.engine.entities.filter(e => e.isVisitor).length;
 
         ctx.fillStyle = '#FFFFFF';
         ctx.font = 'bold 16px Arial';
-        ctx.textAlign = 'left';
-        ctx.fillText(`Served: ${this.visitorsServed}/${this.visitorGoal}`, 20, 30);
+        ctx.fillText(`Served: ${this.visitorsServed}/${this.visitorGoal}`, 200, 30);
 
         // Show waiting visitors (warn if getting full)
         const waitingColor = visitorsOnScreen > 6 ? '#e74c3c' : '#FFFFFF';
         ctx.fillStyle = waitingColor;
-        ctx.fillText(`Waiting: ${visitorsOnScreen}/${this.maxVisitorsOnScreen}`, 20, 55);
+        ctx.fillText(`Waiting: ${visitorsOnScreen}/${this.maxVisitorsOnScreen}`, 200, 50);
 
         ctx.fillStyle = '#FFFFFF';
-        ctx.fillText(`Combo: ${this.combo}x`, 20, 80);
+        ctx.fillText(`Combo: ${this.combo}x`, 350, 40);
+
+        // Paused overlay
+        if (this.paused) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+            ctx.fillRect(0, 0, 850, 600);
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 48px Kalam, cursive';
+            ctx.textAlign = 'center';
+            ctx.fillText('PAUSED', 425, 300);
+
+            ctx.font = '20px Kalam, cursive';
+            ctx.fillText('Click anywhere to resume', 425, 340);
+        }
     }
 
     wrapText(ctx, text, maxWidth) {

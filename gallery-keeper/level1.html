@@ -5,13 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gallery Keeper - Level 1: Greeting Hall</title>
     <style>
-        @font-face {
-            font-family: 'mOS';
-            src: url('assets/fonts/mOS-Black.otf') format('opentype');
-            font-weight: bold;
-            font-style: normal;
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -19,9 +12,10 @@
         }
 
         body {
-            font-family: 'mOS', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #FFE680 0%, #FFCC33 50%, #FFB800 100%);
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
@@ -29,136 +23,79 @@
         }
 
         .game-container {
-            background: white;
+            background: rgba(129, 153, 248, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(129, 153, 248, 0.3);
             border-radius: 12px;
             padding: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
             max-width: 900px;
         }
 
-        /* START SCREEN */
-        .start-screen {
+        h1 {
             text-align: center;
-            padding: 60px 40px;
-        }
-
-        .start-screen h1 {
             color: #2C3E50;
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-
-        .start-screen .subtitle {
-            color: #7F8C8D;
-            font-size: 20px;
-            margin-bottom: 40px;
-        }
-
-        .start-btn {
-            padding: 20px 60px;
-            font-size: 24px;
-            font-weight: bold;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-            transition: all 0.3s;
-            animation: pulse 2s infinite;
-        }
-
-        .start-btn:hover {
-            box-shadow: 0 12px 40px rgba(102, 126, 234, 0.7);
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        /* TUTORIAL TEXT */
-        .tutorial-text {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.5s ease, opacity 0.5s ease, margin 0.5s ease;
-            opacity: 0;
-            margin-top: 0;
-        }
-
-        .tutorial-text.visible {
-            max-height: 600px;
-            opacity: 1;
-            margin-top: 30px;
-        }
-
-        .tutorial-text.visible ~ .start-btn,
-        .tutorial-text.visible .start-btn {
-            animation: pulseSlow 3s infinite;
-        }
-
-        @keyframes pulseSlow {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-            }
-            50% {
-                transform: scale(1.08);
-                box-shadow: 0 12px 36px rgba(102, 126, 234, 0.8);
-            }
-        }
-
-        .tutorial-content {
-            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            text-align: left;
-        }
-
-        .tutorial-content h3 {
             margin-bottom: 10px;
-            font-size: 18px;
         }
 
-        .tutorial-content p {
-            line-height: 1.6;
-            margin-bottom: 15px;
+        .subtitle {
+            text-align: center;
+            color: #7F8C8D;
+            margin-bottom: 20px;
         }
 
-        .tutorial-content ul {
-            margin-left: 20px;
-            line-height: 1.8;
-        }
-
-        /* GAME AREA */
-        .game-area {
-            display: none;
-        }
-
-        .game-area.active {
-            display: block;
-        }
-
-        #gameCanvas {
+        canvas {
             border: 3px solid #2C3E50;
             border-radius: 8px;
             display: block;
-            cursor: crosshair;
-            background: linear-gradient(135deg, #FFF9F0 0%, #FFF5E8 100%);
+            cursor: grab;
         }
 
-        .canvas-wrapper {
-            position: relative;
-            display: inline-block;
+        canvas:active {
+            cursor: grabbing;
         }
 
-        #particleCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none;
+        .level-info {
+            background: linear-gradient(135deg, #8B4513 0%, #A0522D 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .level-info h2 {
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+
+        .level-info p {
+            font-size: 14px;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+
+        .objective {
+            background: #ECF0F1;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+
+        .objective h3 {
+            color: #2C3E50;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .objective ul {
+            margin-left: 20px;
+            color: #34495e;
+            font-size: 13px;
+        }
+
+        .objective li {
+            margin: 4px 0;
         }
 
         .controls-bar {
@@ -169,682 +106,178 @@
         }
 
         .btn {
+            display: inline-block;
             padding: 12px 24px;
-            border: 2px solid #2C3E50;
             border-radius: 8px;
-            background: white;
-            color: #2C3E50;
+            text-decoration: none;
             font-weight: bold;
             cursor: pointer;
+            border: none;
             font-size: 14px;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-block;
+            transition: transform 0.2s, opacity 0.2s;
         }
 
         .btn:hover {
-            background: #2C3E50;
-            color: white;
             transform: translateY(-2px);
+            opacity: 0.9;
+        }
+
+        .btn:active {
+            transform: translateY(0);
         }
 
         .btn-primary {
             background: #667eea;
             color: white;
-            border-color: #667eea;
+        }
+
+        .btn-secondary {
+            background: #ECF0F1;
+            color: #2C3E50;
         }
     </style>
 </head>
 <body>
     <div class="game-container">
-        <!-- START SCREEN -->
-        <div class="start-screen" id="startScreen">
-            <h1>Greeting Hall</h1>
-            <p class="subtitle">Level 1 - Carnegie's Routing Challenge</p>
+        <h1>🏛️ Gallery Keeper: Greeting Hall</h1>
+        <p class="subtitle">Level 1 - Carnegie's Routing Challenge</p>
 
-            <button class="start-btn" id="startBtn">Start Level</button>
-
-            <div class="tutorial-text" id="tutorialText">
-                <div class="tutorial-content">
-                    <h3>Carnegie's Story</h3>
-                    <p>
-                        In 1850, young Andrew Carnegie worked as a telegraph messenger boy, learning to route messages
-                        quickly and accurately across Pittsburgh. This skill helped him build 2,509 libraries that served millions.
-                    </p>
-
-                    <h3>Your Mission:</h3>
-                    <ul>
-                        <li>Visitors enter from the top - match their colors to door circles</li>
-                        <li>Drag them to matching colored doors before hall fills up!</li>
-                        <li>Serve 25 visitors to win (gets faster with each success)</li>
-                        <li>Wave mode activates after 3 visitors (2 at once!)</li>
-                        <li>If 8+ visitors pile up, you lose - route quickly!</li>
-                    </ul>
-                </div>
-
-                <button class="start-btn" id="playBtn">Play Now!</button>
+        <div class="level-info">
+            <h2>📜 Carnegie's Story</h2>
+            <p>
+                In 1850, young Andrew Carnegie worked as a telegraph messenger boy, learning to route messages
+                quickly and accurately across Pittsburgh. This skill - understanding what people need and directing
+                them to the right place - helped him build 2,509 libraries that served millions.
+            </p>
+            <div class="objective">
+                <h3>🎯 Your Mission:</h3>
+                <ul>
+                    <li>Visitors walk down and spread out - match their icons to doors</li>
+                    <li>Drag them to matching colored circles before hall fills up!</li>
+                    <li>Serve 25 visitors to win (gets faster with each success)</li>
+                    <li>After 3 visitors, wave mode activates (2 at once!)</li>
+                    <li>If 8+ visitors pile up, you lose - route quickly!</li>
+                </ul>
             </div>
         </div>
 
-        <!-- GAME AREA (hidden until play clicked) -->
-        <div class="game-area" id="gameArea">
-            <div class="canvas-wrapper">
-                <canvas id="gameCanvas" width="850" height="600"></canvas>
-                <canvas id="particleCanvas" width="850" height="600"></canvas>
-            </div>
+        <canvas id="gameCanvas" width="850" height="600"></canvas>
 
-            <div class="controls-bar">
-                <button class="btn btn-primary" id="restartBtn">Restart</button>
-                <a href="index.html" class="btn">Back to Gallery</a>
-            </div>
+        <div class="controls-bar">
+            <button id="restartBtn" class="btn btn-primary">🔄 Restart Level</button>
+            <a href="index.html" class="btn btn-secondary">← Back to Gallery</a>
         </div>
     </div>
 
+    <!-- Core Engine Scripts -->
+    <script src="core/engine.js"></script>
+    <script src="core/sprites-modern.js"></script>
+    <script src="core/input.js"></script>
+    <script src="core/particles.js"></script>
+    <script src="core/audio.js"></script>
+    <script src="core/ui.js"></script>
+    <script src="core/storage.js"></script>
+
+    <!-- Level Script -->
+    <script src="levels/level1-greeting-hall.js"></script>
+
+    <!-- Main Game Script -->
     <script>
-        // ===== START SCREEN LOGIC =====
-        const startBtn = document.getElementById('startBtn');
-        const playBtn = document.getElementById('playBtn');
-        const tutorialText = document.getElementById('tutorialText');
-        const startScreen = document.getElementById('startScreen');
-        const gameArea = document.getElementById('gameArea');
+        // Use modern sprite aliases
+        const Sprite = ModernSprite;
+        const SpriteFactory = ModernSpriteFactory;
 
-        startBtn.addEventListener('click', () => {
-            tutorialText.classList.add('visible');
-            startBtn.style.display = 'none';
+        // Initialize systems
+        const engine = new GameEngine('gameCanvas', 850, 600);
+        const audio = new AudioManager();
+        const ui = new UI(engine.canvas, engine, audio);
+        const particles = new ParticleSystem(500);
+        const input = new InputManager(engine.canvas, engine);
+        const storage = new SaveManager('gallery-keeper');
+
+        // Initialize level
+        const level = new GreetingHall(engine, ui, audio, particles);
+
+        // Add systems to engine
+        engine.addEntity(particles);
+        engine.addEntity(ui);
+
+        // Add level to engine update/render
+        engine.onUpdate((dt) => {
+            ui.update(dt);
+            level.update(dt);
         });
 
-        playBtn.addEventListener('click', () => {
-            startScreen.style.display = 'none';
-            gameArea.classList.add('active');
-            init();
+        engine.onRender((ctx) => {
+            level.render(ctx);
         });
 
-        // ===== SIMPLE ANIMATION LIBRARY =====
-        class Tween {
-            static to(obj, props) {
-                const duration = props.duration * 1000;
-                const startTime = Date.now();
-                const startValues = {};
-                const targetValues = {};
-
-                Object.keys(props).forEach(key => {
-                    if (key !== 'duration' && key !== 'ease' && key !== 'onComplete' && key !== 'onUpdate') {
-                        startValues[key] = obj[key];
-                        targetValues[key] = props[key];
-                    }
-                });
-
-                const animate = () => {
-                    const elapsed = Date.now() - startTime;
-                    const progress = Math.min(elapsed / duration, 1);
-                    const eased = 1 - Math.pow(1 - progress, 2);
-
-                    Object.keys(targetValues).forEach(key => {
-                        obj[key] = startValues[key] + (targetValues[key] - startValues[key]) * eased;
-                    });
-
-                    if (props.onUpdate) props.onUpdate();
-
-                    if (progress < 1) {
-                        requestAnimationFrame(animate);
-                    } else {
-                        if (props.onComplete) props.onComplete();
-                    }
-                };
-
-                animate();
-            }
-        }
-
-        // ===== PARTICLE SYSTEM =====
-        class ParticleSystem {
-            constructor(canvas) {
-                this.canvas = canvas;
-                this.ctx = canvas.getContext('2d');
-                this.particles = [];
-            }
-
-            emit(x, y, color, count = 15) {
-                for (let i = 0; i < count; i++) {
-                    const angle = (Math.PI * 2 * i) / count;
-                    const speed = 2 + Math.random() * 3;
-                    this.particles.push({
-                        x, y,
-                        vx: Math.cos(angle) * speed,
-                        vy: Math.sin(angle) * speed,
-                        life: 1,
-                        color: color || '#FFD700',
-                        size: 3 + Math.random() * 4
-                    });
-                }
-            }
-
-            emitTrail(x, y, color) {
-                if (Math.random() > 0.7) return;
-                this.particles.push({
-                    x, y,
-                    vx: (Math.random() - 0.5) * 2,
-                    vy: (Math.random() - 0.5) * 2,
-                    life: 0.5,
-                    color: color || '#FFFFFF',
-                    size: 2 + Math.random() * 2
-                });
-            }
-
-            update(dt) {
-                this.particles.forEach((p, i) => {
-                    p.x += p.vx;
-                    p.y += p.vy;
-                    p.life -= dt * 2;
-
-                    if (p.life <= 0) {
-                        this.particles.splice(i, 1);
-                    }
-                });
-            }
-
-            render() {
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-                this.particles.forEach(p => {
-                    this.ctx.save();
-                    this.ctx.globalAlpha = p.life;
-                    this.ctx.fillStyle = p.color;
-                    this.ctx.beginPath();
-                    this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                    this.ctx.fill();
-                    this.ctx.restore();
-                });
-            }
-        }
-
-        // ===== ROUGH DRAWING (cached for no jitter) =====
-        const roughCache = new Map();
-
-        function getRoughCirclePoints(radius, seed) {
-            const key = `circle_${radius}_${seed}`;
-            if (roughCache.has(key)) {
-                return roughCache.get(key);
-            }
-
-            const points = [];
-            for (let i = 0; i <= 360; i += 5) {
-                const angle = (i * Math.PI) / 180;
-                const offset = (Math.sin(seed + i * 0.1) * 0.3);
-                const r = radius + offset;
-                points.push({ angle, r });
-            }
-            roughCache.set(key, points);
-            return points;
-        }
-
-        function drawRoughCircle(ctx, x, y, radius, strokeColor, fillColor, seed = 0) {
-            ctx.strokeStyle = strokeColor;
-            ctx.lineWidth = 2;
-            ctx.fillStyle = fillColor;
-
-            const points = getRoughCirclePoints(radius, seed);
-
-            ctx.beginPath();
-            points.forEach((p, i) => {
-                const px = x + Math.cos(p.angle) * p.r;
-                const py = y + Math.sin(p.angle) * p.r;
-
-                if (i === 0) {
-                    ctx.moveTo(px, py);
-                } else {
-                    ctx.lineTo(px, py);
-                }
-            });
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-        }
-
-        function getRoughRectPoints(w, h, seed) {
-            const key = `rect_${w}_${h}_${seed}`;
-            if (roughCache.has(key)) {
-                return roughCache.get(key);
-            }
-
-            const points = [];
-            for (let i = 0; i <= w; i += 10) {
-                points.push({ x: i, y: Math.sin(seed + i * 0.1) * 0.5 });
-            }
-            for (let i = 0; i <= h; i += 10) {
-                points.push({ x: w + Math.sin(seed + i * 0.1) * 0.5, y: i });
-            }
-            for (let i = w; i >= 0; i -= 10) {
-                points.push({ x: i, y: h + Math.sin(seed + i * 0.1) * 0.5 });
-            }
-            for (let i = h; i >= 0; i -= 10) {
-                points.push({ x: Math.sin(seed + i * 0.1) * 0.5, y: i });
-            }
-
-            roughCache.set(key, points);
-            return points;
-        }
-
-        function drawRoughRect(ctx, x, y, w, h, strokeColor, fillColor, seed = 0) {
-            ctx.strokeStyle = strokeColor;
-            ctx.lineWidth = 2;
-            ctx.fillStyle = fillColor;
-
-            const points = getRoughRectPoints(w, h, seed);
-
-            ctx.beginPath();
-            points.forEach((p, i) => {
-                if (i === 0) {
-                    ctx.moveTo(x + p.x, y + p.y);
-                } else {
-                    ctx.lineTo(x + p.x, y + p.y);
-                }
-            });
-            ctx.closePath();
-            ctx.fill();
-            ctx.stroke();
-        }
-
-        // ===== GAME STATE =====
-        const game = {
-            canvas: null,
-            ctx: null,
-            particleCanvas: null,
-            particles: null,
-
-            visitorsServed: 0,
-            maxVisitors: 25,
-            failedVisitors: 0,
-            maxFailed: 3,
-            combo: 0,
-            score: 0,
-            waveMode: false,
-
-            visitors: [],
-            doors: [],
-
-            spawnTimer: 0,
-            spawnInterval: 3,
-
-            dragging: null,
-            dragOffsetX: 0,
-            dragOffsetY: 0,
-
-            gameOver: false,
-            victory: false,
-
-            time: 0,
-
-            doorColors: [
-                { name: 'Blue', hex: '#2196F3' },
-                { name: 'Red', hex: '#F44336' },
-                { name: 'Green', hex: '#4CAF50' },
-                { name: 'Purple', hex: '#9C27B0' },
-                { name: 'Orange', hex: '#FF9800' }
-            ]
-        };
-
-        // ===== INITIALIZATION =====
-        function init() {
-            game.canvas = document.getElementById('gameCanvas');
-            game.ctx = game.canvas.getContext('2d');
-            game.particleCanvas = document.getElementById('particleCanvas');
-            game.particles = new ParticleSystem(game.particleCanvas);
-
-            const doorSpacing = 850 / 6;
-            for (let i = 0; i < 5; i++) {
-                game.doors.push({
-                    x: doorSpacing * (i + 1),
-                    y: 550,
-                    radius: 30,
-                    color: game.doorColors[i],
-                    pulse: 0
-                });
-            }
-
-            setupInput();
-            gameLoop();
-            spawnVisitor();
-
-            console.log('🎮 Level 1 initialized');
-        }
-
-        // ===== VISITOR MANAGEMENT =====
-        function spawnVisitor() {
-            if (game.gameOver || game.victory) return;
-
-            if (game.visitors.length >= 8) {
-                triggerGameOver();
+        // Setup input handlers
+        input.onClick((x, y) => {
+            // Check UI clicks first
+            if (ui.handleClick(x, y)) {
                 return;
             }
 
-            const color = game.doorColors[Math.floor(Math.random() * game.doorColors.length)];
-            const visitor = {
-                x: 425,
-                y: 50,
-                targetY: 150 + game.visitors.length * 60,
-                radius: 20,
-                color: color,
-                id: Date.now() + Math.random(),
-                state: 'entering'
-            };
+            // Tutorial advancement on click
+            if (level.tutorialActive) {
+                level.showTutorial();
+            }
+        });
 
-            game.visitors.push(visitor);
+        input.onDragStart((sprite) => {
+            if (sprite.isVisitor) {
+                particles.emitHearts(sprite.x, sprite.y);
+                audio.playSFX('pickup');
+            }
+        });
 
-            Tween.to(visitor, {
-                y: visitor.targetY,
-                duration: 1,
-                onComplete: () => {
-                    visitor.state = 'waiting';
-                }
+        input.onDrag((sprite, x, y) => {
+            if (sprite.isVisitor && Math.random() < 0.3) {
+                particles.emitTrail(sprite.x, sprite.y, sprite.color);
+            }
+        });
+
+        input.onDragEnd((sprite, x, y) => {
+            if (sprite.isVisitor) {
+                level.onDragEnd(sprite, x, y);
+            }
+        });
+
+        // Initialize audio on first user interaction
+        engine.canvas.addEventListener('click', () => {
+            if (!audio.initialized) {
+                audio.init();
+            }
+        }, { once: true });
+
+        // Load saved settings
+        const settings = storage.loadSettings();
+        audio.setSFXVolume(settings.sfxVolume);
+        audio.setMusicVolume(settings.musicVolume);
+        if (settings.muted) {
+            audio.toggleMute();
+        }
+
+        // Save settings on page unload
+        window.addEventListener('beforeunload', () => {
+            storage.saveSettings({
+                sfxVolume: audio.sfxVolume,
+                musicVolume: audio.musicVolume,
+                muted: audio.muted
             });
-        }
+        });
 
-        function matchVisitorToDoor(visitor, door) {
-            if (visitor.color.name === door.color.name) {
-                visitor.state = 'exiting';
-                game.visitorsServed++;
-                game.combo++;
-                game.score += 100 * game.combo;
+        // Initialize and start level
+        level.init();
+        engine.start();
 
-                game.particles.emit(door.x, door.y, door.color.hex, 20);
+        // Restart button handler
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            location.reload();
+        });
 
-                Tween.to(visitor, {
-                    x: door.x,
-                    y: door.y,
-                    radius: 5,
-                    duration: 0.5,
-                    onComplete: () => {
-                        const index = game.visitors.indexOf(visitor);
-                        if (index > -1) game.visitors.splice(index, 1);
-
-                        if (game.visitorsServed >= game.maxVisitors) {
-                            triggerVictory();
-                        } else {
-                            spawnVisitor();
-                            if (game.waveMode || game.visitorsServed > 3) {
-                                game.waveMode = true;
-                                setTimeout(() => spawnVisitor(), 500);
-                            }
-                        }
-                    }
-                });
-
-                door.pulse = 1;
-                Tween.to(door, { pulse: 0, duration: 0.5 });
-
-            } else {
-                game.combo = 0;
-                game.failedVisitors++;
-
-                Tween.to(visitor, {
-                    x: 425,
-                    y: visitor.targetY,
-                    duration: 0.3
-                });
-
-                visitor.state = 'waiting';
-
-                if (game.failedVisitors >= game.maxFailed) {
-                    triggerGameOver();
-                }
-            }
-        }
-
-        // ===== INPUT =====
-        function setupInput() {
-            game.canvas.addEventListener('mousedown', onMouseDown);
-            game.canvas.addEventListener('mousemove', onMouseMove);
-            game.canvas.addEventListener('mouseup', onMouseUp);
-
-            document.getElementById('restartBtn').addEventListener('click', () => {
-                location.reload();
-            });
-        }
-
-        function onMouseDown(e) {
-            const rect = game.canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            for (let visitor of game.visitors) {
-                if (visitor.state !== 'waiting') continue;
-
-                const dx = x - visitor.x;
-                const dy = y - visitor.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < visitor.radius) {
-                    game.dragging = visitor;
-                    game.dragOffsetX = x - visitor.x;
-                    game.dragOffsetY = y - visitor.y;
-                    visitor.state = 'dragging';
-                    game.canvas.style.cursor = 'grabbing';
-                    break;
-                }
-            }
-        }
-
-        function onMouseMove(e) {
-            const rect = game.canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-
-            if (game.dragging) {
-                game.dragging.x = x - game.dragOffsetX;
-                game.dragging.y = y - game.dragOffsetY;
-
-                game.particles.emitTrail(game.dragging.x, game.dragging.y, game.dragging.color.hex);
-            }
-        }
-
-        function onMouseUp(e) {
-            if (!game.dragging) return;
-
-            const visitorX = game.dragging.x;
-            const visitorY = game.dragging.y;
-
-            let matched = false;
-            for (let door of game.doors) {
-                const dx = visitorX - door.x;
-                const dy = visitorY - door.y;
-                const distance = Math.sqrt(dx * dx + dy * dy);
-
-                if (distance < door.radius + 40) {
-                    matchVisitorToDoor(game.dragging, door);
-                    matched = true;
-                    break;
-                }
-            }
-
-            if (!matched) {
-                const visitor = game.dragging;
-                Tween.to(visitor, {
-                    x: 425,
-                    y: visitor.targetY,
-                    duration: 0.3
-                });
-                visitor.state = 'waiting';
-            }
-
-            game.dragging = null;
-            game.canvas.style.cursor = 'crosshair';
-        }
-
-        // ===== GAME LOOP =====
-        let lastTime = 0;
-        function gameLoop(timestamp = 0) {
-            const dt = Math.min((timestamp - lastTime) / 1000, 0.1);
-            lastTime = timestamp;
-
-            update(dt);
-            render();
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        function update(dt) {
-            if (game.gameOver || game.victory) return;
-
-            game.time += dt;
-            game.particles.update(dt);
-        }
-
-        function render() {
-            const ctx = game.ctx;
-
-            ctx.clearRect(0, 0, game.canvas.width, game.canvas.height);
-
-            const gradient = ctx.createLinearGradient(0, 0, 0, game.canvas.height);
-            gradient.addColorStop(0, '#FFF9F0');
-            gradient.addColorStop(1, '#FFF5E8');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
-
-            drawRoughRect(ctx, 50, 100, 750, 400, '#8B4513', 'rgba(210, 180, 140, 0.1)', 100);
-
-            game.doors.forEach((door, i) => drawDoor(door, i));
-
-            game.visitors.forEach(visitor => drawVisitor(visitor));
-
-            game.particles.render();
-
-            drawUI();
-
-            if (game.gameOver) drawGameOver();
-            if (game.victory) drawVictory();
-        }
-
-        function drawDoor(door, index) {
-            const ctx = game.ctx;
-            const pulse = 1 + door.pulse * 0.3;
-
-            ctx.save();
-            ctx.globalAlpha = 0.3 + door.pulse * 0.3;
-            ctx.shadowColor = door.color.hex;
-            ctx.shadowBlur = 20;
-            ctx.fillStyle = door.color.hex;
-            ctx.beginPath();
-            ctx.arc(door.x, door.y, door.radius * pulse, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-
-            drawRoughCircle(ctx, door.x, door.y, door.radius * pulse, door.color.hex, door.color.hex, index * 10);
-
-            ctx.fillStyle = '#2C3E50';
-            ctx.font = 'bold 14px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(door.color.name, door.x, door.y + door.radius + 20);
-        }
-
-        function drawVisitor(visitor) {
-            const ctx = game.ctx;
-            const bob = Math.sin(game.time * 3 + visitor.id) * 2;
-
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
-            ctx.beginPath();
-            ctx.ellipse(visitor.x, visitor.y + visitor.radius + 5, visitor.radius * 0.8, visitor.radius * 0.3, 0, 0, Math.PI * 2);
-            ctx.fill();
-
-            drawRoughCircle(ctx, visitor.x, visitor.y + bob, visitor.radius, visitor.color.hex, visitor.color.hex, visitor.id * 0.001);
-
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 20px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
-            ctx.fillText('👤', visitor.x, visitor.y + bob);
-        }
-
-        function drawUI() {
-            const ctx = game.ctx;
-
-            drawRoughRect(ctx, 20, 20, 250, 60, '#FFD700', 'rgba(0, 0, 0, 0.7)', 50);
-
-            ctx.fillStyle = 'white';
-            ctx.font = 'bold 16px sans-serif';
-            ctx.textAlign = 'left';
-            ctx.fillText(`Served: ${game.visitorsServed}/${game.maxVisitors}`, 35, 45);
-            ctx.fillText(`Combo: ${game.combo}x`, 35, 65);
-
-            ctx.fillStyle = '#FFD700';
-            ctx.fillText(`Score: ${game.score}`, 160, 45);
-
-            if (game.failedVisitors > 0) {
-                ctx.fillStyle = '#F44336';
-                ctx.fillText(`Mistakes: ${game.failedVisitors}/${game.maxFailed}`, 160, 65);
-            }
-
-            if (game.waveMode) {
-                ctx.fillStyle = '#FF9800';
-                ctx.font = 'bold 14px sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('⚡ WAVE MODE ⚡', 425, 20);
-            }
-        }
-
-        function drawGameOver() {
-            const ctx = game.ctx;
-
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-            ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
-
-            ctx.fillStyle = '#F44336';
-            ctx.font = 'bold 60px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 4;
-            ctx.strokeText('GAME OVER', 425, 250);
-            ctx.fillText('GAME OVER', 425, 250);
-
-            ctx.fillStyle = 'white';
-            ctx.font = '24px sans-serif';
-            ctx.fillText(`Visitors Served: ${game.visitorsServed}/${game.maxVisitors}`, 425, 320);
-            ctx.fillText(`Final Score: ${game.score}`, 425, 360);
-        }
-
-        function drawVictory() {
-            const ctx = game.ctx;
-
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
-            ctx.fillRect(0, 0, game.canvas.width, game.canvas.height);
-
-            const pulse = 1 + Math.sin(game.time * 5) * 0.1;
-            ctx.save();
-            ctx.translate(425, 250);
-            ctx.scale(pulse, pulse);
-            ctx.fillStyle = '#FFD700';
-            ctx.font = 'bold 60px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.strokeStyle = 'black';
-            ctx.lineWidth = 4;
-            ctx.strokeText('VICTORY!', 0, 0);
-            ctx.fillText('VICTORY!', 0, 0);
-            ctx.restore();
-
-            ctx.fillStyle = 'white';
-            ctx.font = '24px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(`Perfect Routing! ${game.visitorsServed} Visitors Served`, 425, 320);
-            ctx.fillText(`Final Score: ${game.score}`, 425, 360);
-            ctx.fillText(`Max Combo: ${game.combo}x`, 425, 400);
-
-            if (Math.random() < 0.1) {
-                game.particles.emit(
-                    Math.random() * game.canvas.width,
-                    0,
-                    ['#FFD700', '#FF9800', '#4CAF50', '#2196F3', '#9C27B0'][Math.floor(Math.random() * 5)],
-                    5
-                );
-            }
-        }
-
-        function triggerGameOver() {
-            game.gameOver = true;
-        }
-
-        function triggerVictory() {
-            game.victory = true;
-        }
+        console.log('🏛️ Level 1: Greeting Hall - Carnegie\'s Routing Challenge');
     </script>
 </body>
 </html>
