@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Level 4: Question Corner - Gallery Keeper</title>
+    <style>
+        @font-face {
+            font-family: 'mOS';
+            src: url('assets/fonts/mOS-Black.otf') format('opentype');
+            font-weight: bold;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'mOS', 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #1A237E 0%, #283593 50%, #3949AB 100%);
+            color: #ECF0F1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #64B5F6;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: #90CAF9;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .game-container {
+            background: #283593;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            max-width: 940px;
+            width: 100%;
+        }
+
+        canvas {
+            display: block;
+            background: linear-gradient(135deg, #E8EAF6 0%, #C5CAE9 50%, #9FA8DA 100%);
+            border-radius: 12px;
+            margin: 0 auto 20px;
+            box-shadow:
+                0 10px 40px rgba(0, 0, 0, 0.3),
+                0 2px 8px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            cursor: default;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #546E7A 0%, #455A64 100%);
+            color: white;
+            box-shadow:
+                0 4px 12px rgba(84, 110, 122, 0.3),
+                0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: linear-gradient(135deg, #455A64 0%, #37474F 100%);
+            transform: translateY(-2px);
+            box-shadow:
+                0 6px 16px rgba(84, 110, 122, 0.4),
+                0 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .instructions {
+            background: #1A237E;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .instructions h3 {
+            color: #64B5F6;
+            margin-bottom: 10px;
+        }
+
+        .instructions ul {
+            margin-left: 20px;
+            line-height: 1.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Gallery Keeper: Question Corner</h1>
+        <p class="subtitle">Level 4 - Turing's Decision Challenge</p>
+
+        <canvas id="gameCanvas" width="900" height="650"></canvas>
+
+        <div class="controls">
+            <a href="index.html" class="btn btn-secondary">Back to Gallery</a>
+        </div>
+
+        <div class="instructions">
+            <h3>How to Play</h3>
+            <ul>
+                <li><strong>Goal:</strong> Answer visitor questions correctly to help them enjoy the gallery</li>
+                <li><strong>Read</strong> each visitor's question carefully</li>
+                <li><strong>Choose</strong> one of three response options by clicking on the response cards</li>
+                <li><strong>Learn:</strong> You'll see the visitor's reaction - perfect responses earn the most points</li>
+                <li><strong>Win condition:</strong> Get 15 perfect responses to complete the level</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Helper functions
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const words = text.split(' ');
+            let line = '';
+            let currentY = y;
+
+            for (let n = 0; n < words.length; n++) {
+                const testLine = line + words[n] + ' ';
+                const metrics = ctx.measureText(testLine);
+                const testWidth = metrics.width;
+
+                if (testWidth > maxWidth && n > 0) {
+                    ctx.fillText(line, x, currentY);
+                    line = words[n] + ' ';
+                    currentY += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, x, currentY);
+        }
+
+        // Question bank - 20 retail/AI scenarios
+        const questionBank = [
+            {
+                question: "Where can I find the impressionist paintings?",
+                responses: [
+                    { text: "They're on the second floor, east wing.", quality: "perfect", reaction: "happy" },
+                    { text: "I don't know, try looking around.", quality: "poor", reaction: "confused" },
+                    { text: "We have many painting styles here.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Is the museum open on Sundays?",
+                responses: [
+                    { text: "Yes! We're open 10am-6pm every Sunday.", quality: "perfect", reaction: "happy" },
+                    { text: "I think so, but I'm not sure.", quality: "poor", reaction: "confused" },
+                    { text: "Most museums are open weekends.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Can I take photos of the exhibits?",
+                responses: [
+                    { text: "Photography is allowed, but no flash please!", quality: "perfect", reaction: "happy" },
+                    { text: "Maybe, check with someone else.", quality: "poor", reaction: "confused" },
+                    { text: "Some museums allow photos.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Do you have a gift shop?",
+                responses: [
+                    { text: "Yes! It's by the main exit, near the cafe.", quality: "perfect", reaction: "happy" },
+                    { text: "I haven't seen one.", quality: "poor", reaction: "confused" },
+                    { text: "Most museums have shops.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Is there a student discount?",
+                responses: [
+                    { text: "Yes! 20% off with a valid student ID.", quality: "perfect", reaction: "happy" },
+                    { text: "You'd have to ask at the desk.", quality: "poor", reaction: "confused" },
+                    { text: "Many places offer student discounts.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Where are the restrooms?",
+                responses: [
+                    { text: "Down this hall, on your left.", quality: "perfect", reaction: "happy" },
+                    { text: "Somewhere around here.", quality: "poor", reaction: "confused" },
+                    { text: "There are facilities in the building.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "What time does the museum close?",
+                responses: [
+                    { text: "We close at 6pm today.", quality: "perfect", reaction: "happy" },
+                    { text: "In the evening sometime.", quality: "poor", reaction: "confused" },
+                    { text: "Check the posted hours.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Do you have wheelchair access?",
+                responses: [
+                    { text: "Yes, we're fully accessible with ramps and elevators.", quality: "perfect", reaction: "happy" },
+                    { text: "I'm not sure about that.", quality: "poor", reaction: "confused" },
+                    { text: "Accessibility is important.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Can I bring my bag inside?",
+                responses: [
+                    { text: "Small bags are fine. Large ones need coat check.", quality: "perfect", reaction: "happy" },
+                    { text: "Maybe? I don't know the policy.", quality: "poor", reaction: "confused" },
+                    { text: "Bags vary by size.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Is there a tour available?",
+                responses: [
+                    { text: "Guided tours start at 11am and 2pm daily.", quality: "perfect", reaction: "happy" },
+                    { text: "I think there might be tours.", quality: "poor", reaction: "confused" },
+                    { text: "Tours are common at museums.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Where can I get an audio guide?",
+                responses: [
+                    { text: "At the information desk near the entrance.", quality: "perfect", reaction: "happy" },
+                    { text: "Not sure, try asking around.", quality: "poor", reaction: "confused" },
+                    { text: "Audio guides are helpful.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Can children visit for free?",
+                responses: [
+                    { text: "Yes! Kids under 12 get free admission.", quality: "perfect", reaction: "happy" },
+                    { text: "I don't handle tickets.", quality: "poor", reaction: "confused" },
+                    { text: "Family policies vary.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Is food allowed inside?",
+                responses: [
+                    { text: "No food in galleries, but we have a cafe downstairs.", quality: "perfect", reaction: "happy" },
+                    { text: "Probably not?", quality: "poor", reaction: "confused" },
+                    { text: "Most museums have food rules.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Can I sketch the artwork?",
+                responses: [
+                    { text: "Yes! Pencil sketching is encouraged.", quality: "perfect", reaction: "happy" },
+                    { text: "I'm not certain about that.", quality: "poor", reaction: "confused" },
+                    { text: "Artists often sketch in museums.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Do you have coat check?",
+                responses: [
+                    { text: "Yes, coat check is free near the main entrance.", quality: "perfect", reaction: "happy" },
+                    { text: "Maybe? Haven't checked.", quality: "poor", reaction: "confused" },
+                    { text: "Coat check is a common service.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "What's the special exhibition this month?",
+                responses: [
+                    { text: "We're featuring Renaissance sculpture through March.", quality: "perfect", reaction: "happy" },
+                    { text: "I'm not sure what's on display.", quality: "poor", reaction: "confused" },
+                    { text: "Exhibitions change regularly.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Is there parking nearby?",
+                responses: [
+                    { text: "Yes, our garage is two blocks north on Main St.", quality: "perfect", reaction: "happy" },
+                    { text: "There's parking somewhere around.", quality: "poor", reaction: "confused" },
+                    { text: "City parking can be challenging.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Can I reserve tickets online?",
+                responses: [
+                    { text: "Yes! Visit our website to book timed entry.", quality: "perfect", reaction: "happy" },
+                    { text: "Not sure about online options.", quality: "poor", reaction: "confused" },
+                    { text: "Many places offer online booking.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Do you have a members program?",
+                responses: [
+                    { text: "Yes! Annual membership is $75 with unlimited visits.", quality: "perfect", reaction: "happy" },
+                    { text: "I don't know about memberships.", quality: "poor", reaction: "confused" },
+                    { text: "Museums often have member benefits.", quality: "neutral", reaction: "neutral" }
+                ]
+            },
+            {
+                question: "Is the cafe still open?",
+                responses: [
+                    { text: "Yes, the cafe is open until 5pm.", quality: "perfect", reaction: "happy" },
+                    { text: "I haven't been to the cafe.", quality: "poor", reaction: "confused" },
+                    { text: "Cafes have varying hours.", quality: "neutral", reaction: "neutral" }
+                ]
+            }
+        ];
+
+        // Shuffle array helper
+        function shuffleArray(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // Game state
+        const game = {
+            gameStarted: false,
+            tutorialStep: 0,
+            tutorialComplete: false,
+            turingMessage: '',
+            messageTimer: 0,
+
+            // Question state
+            currentQuestionIndex: 0,
+            questionOrder: shuffleArray([...Array(questionBank.length).keys()]),
+            selectedResponse: null,
+            showingFeedback: false,
+            feedbackTimer: 0,
+            lastQuality: null,
+
+            // Scoring
+            score: 0,
+            perfectCount: 0,
+            neutralCount: 0,
+            poorCount: 0,
+            totalQuestions: 0,
+
+            // Win condition
+            victoryComplete: false,
+            victoryTimer: 0,
+            perfectRequired: 15,
+
+            // UI state
+            mouseX: 0,
+            mouseY: 0,
+            paused: false,
+            time: 0,
+
+            // Button bounds
+            responseCardBounds: [],
+            restartButtonCanvasBounds: null,
+            pauseButtonBounds: null,
+            victoryRestartBounds: null,
+
+            // Turing position
+            turingX: 100,
+            turingY: 150,
+
+            // Visitor position
+            visitorX: 750,
+            visitorY: 250
+        };
+
+        function init() {
+            console.log('Level 4: Question Corner - Initializing...');
+            startTutorial();
+        }
+
+        function startTutorial() {
+            const messages = [
+                "Welcome to the Question Corner! I'm Alan Turing.",
+                "Visitors have questions, and you must choose the best response.",
+                "Perfect answers show expertise. Poor answers confuse visitors.",
+                "Get 15 perfect responses to win. Good luck!"
+            ];
+
+            if (game.tutorialStep < messages.length) {
+                game.turingMessage = messages[game.tutorialStep];
+                game.messageTimer = 999;
+                game.tutorialStep++;
+
+                if (game.tutorialStep >= messages.length) {
+                    game.tutorialComplete = true;
+                }
+            } else if (game.tutorialComplete && !game.gameStarted) {
+                game.gameStarted = true;
+                game.turingMessage = '';
+                game.messageTimer = 0;
+                startNextQuestion();
+            }
+        }
+
+        function startNextQuestion() {
+            if (game.currentQuestionIndex >= questionBank.length) {
+                // Reached end of question bank
+                if (game.perfectCount >= game.perfectRequired) {
+                    game.victoryComplete = true;
+                    game.victoryTimer = 0;
+                }
+                return;
+            }
+
+            const questionIdx = game.questionOrder[game.currentQuestionIndex];
+            const question = questionBank[questionIdx];
+
+            // Shuffle responses
+            question.responses = shuffleArray(question.responses);
+
+            game.selectedResponse = null;
+            game.showingFeedback = false;
+            game.messageTimer = 0;
+        }
+
+        function selectResponse(responseIdx) {
+            if (game.showingFeedback || !game.gameStarted) return;
+
+            const questionIdx = game.questionOrder[game.currentQuestionIndex];
+            const question = questionBank[questionIdx];
+            const response = question.responses[responseIdx];
+
+            game.selectedResponse = responseIdx;
+            game.showingFeedback = true;
+            game.feedbackTimer = 3; // Show feedback for 3 seconds
+            game.lastQuality = response.quality;
+
+            // Update scoring
+            game.totalQuestions++;
+            if (response.quality === 'perfect') {
+                game.perfectCount++;
+                game.score += 100;
+                game.turingMessage = "Excellent! Perfect response!";
+            } else if (response.quality === 'neutral') {
+                game.neutralCount++;
+                game.score += 50;
+                game.turingMessage = "Not bad, but could be better.";
+            } else {
+                game.poorCount++;
+                game.score += 10;
+                game.turingMessage = "That confused them. Be more specific!";
+            }
+
+            game.messageTimer = 3;
+
+            // Check for victory
+            if (game.perfectCount >= game.perfectRequired) {
+                setTimeout(() => {
+                    game.victoryComplete = true;
+                    game.victoryTimer = 0;
+                }, 3000);
+            }
+        }
+
+        function update(dt) {
+            if (game.paused) return;
+
+            game.time += dt;
+
+            // Update message timer
+            if (game.messageTimer > 0) {
+                game.messageTimer -= dt;
+            }
+
+            // Update feedback timer
+            if (game.showingFeedback && game.feedbackTimer > 0) {
+                game.feedbackTimer -= dt;
+                if (game.feedbackTimer <= 0) {
+                    game.currentQuestionIndex++;
+                    startNextQuestion();
+                }
+            }
+
+            // Update victory timer
+            if (game.victoryComplete) {
+                game.victoryTimer += dt;
+            }
+        }
+
+        function render() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (!game.gameStarted && !game.tutorialComplete) {
+                drawStartScreen();
+            } else if (game.victoryComplete) {
+                drawVictoryScreen();
+            } else {
+                drawGame();
+            }
+
+            // Draw UI overlay
+            drawUI();
+        }
+
+        function drawStartScreen() {
+            // Title
+            ctx.font = 'bold 48px mOS';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#1A237E';
+            ctx.fillText('Question Corner', canvas.width / 2, canvas.height / 2 - 100);
+
+            // Subtitle
+            ctx.font = '24px mOS';
+            ctx.fillStyle = '#283593';
+            ctx.fillText('Level 4: Turing\'s Decision Challenge', canvas.width / 2, canvas.height / 2 - 50);
+
+            // Start button
+            const btnX = canvas.width / 2 - 100;
+            const btnY = canvas.height / 2;
+            const btnW = 200;
+            const btnH = 60;
+
+            const hovered = game.mouseX >= btnX && game.mouseX <= btnX + btnW &&
+                           game.mouseY >= btnY && game.mouseY <= btnY + btnH;
+
+            ctx.fillStyle = hovered ? '#1976D2' : '#2196F3';
+            ctx.strokeStyle = '#1A237E';
+            ctx.lineWidth = 4;
+            roundRect(ctx, btnX, btnY, btnW, btnH, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = 'bold 24px mOS';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillText('Start Level', canvas.width / 2, btnY + 38);
+
+            // Store button bounds
+            game.startButtonBounds = { x: btnX, y: btnY, w: btnW, h: btnH };
+
+            // Tutorial message if active
+            if (!game.tutorialComplete && game.turingMessage) {
+                drawTuringMessage();
+            }
+        }
+
+        function drawGame() {
+            // Draw Turing character
+            ctx.fillStyle = '#1A237E';
+            ctx.beginPath();
+            ctx.arc(game.turingX, game.turingY, 40, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 24px mOS';
+            ctx.textAlign = 'center';
+            ctx.fillText('AT', game.turingX, game.turingY + 8);
+
+            // Turing label
+            ctx.fillStyle = '#1A237E';
+            ctx.font = '16px mOS';
+            ctx.fillText('Alan Turing', game.turingX, game.turingY + 60);
+
+            // Draw visitor
+            ctx.fillStyle = '#546E7A';
+            ctx.beginPath();
+            ctx.arc(game.visitorX, game.visitorY, 35, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 20px mOS';
+            ctx.fillText('?', game.visitorX, game.visitorY + 8);
+
+            // Visitor label
+            ctx.fillStyle = '#37474F';
+            ctx.font = '16px mOS';
+            ctx.fillText('Visitor', game.visitorX, game.visitorY + 55);
+
+            // Show current question if available
+            if (game.currentQuestionIndex < questionBank.length) {
+                const questionIdx = game.questionOrder[game.currentQuestionIndex];
+                const question = questionBank[questionIdx];
+
+                // Question bubble
+                const bubbleX = game.visitorX - 200;
+                const bubbleY = game.visitorY - 120;
+                const bubbleW = 350;
+                const bubbleH = 80;
+
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+                ctx.strokeStyle = '#37474F';
+                ctx.lineWidth = 3;
+                roundRect(ctx, bubbleX, bubbleY, bubbleW, bubbleH, 10);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = '#1A237E';
+                ctx.font = '18px mOS';
+                ctx.textAlign = 'left';
+                wrapText(ctx, question.question, bubbleX + 15, bubbleY + 30, bubbleW - 30, 24);
+
+                // Response cards
+                game.responseCardBounds = [];
+                const cardY = 380;
+                const cardW = 260;
+                const cardH = 120;
+                const cardSpacing = 20;
+                const startX = (canvas.width - (cardW * 3 + cardSpacing * 2)) / 2;
+
+                for (let i = 0; i < 3; i++) {
+                    const cardX = startX + i * (cardW + cardSpacing);
+                    const response = question.responses[i];
+
+                    const isHovered = game.mouseX >= cardX && game.mouseX <= cardX + cardW &&
+                                     game.mouseY >= cardY && game.mouseY <= cardY + cardH;
+
+                    const isSelected = game.selectedResponse === i;
+
+                    // Card background
+                    if (game.showingFeedback && isSelected) {
+                        if (response.quality === 'perfect') {
+                            ctx.fillStyle = 'rgba(76, 175, 80, 0.9)';
+                        } else if (response.quality === 'neutral') {
+                            ctx.fillStyle = 'rgba(255, 193, 7, 0.9)';
+                        } else {
+                            ctx.fillStyle = 'rgba(244, 67, 54, 0.9)';
+                        }
+                    } else {
+                        ctx.fillStyle = isHovered ? 'rgba(33, 150, 243, 0.9)' : 'rgba(255, 255, 255, 0.9)';
+                    }
+
+                    ctx.strokeStyle = isHovered ? '#1976D2' : '#9E9E9E';
+                    ctx.lineWidth = isHovered ? 4 : 2;
+                    roundRect(ctx, cardX, cardY, cardW, cardH, 8);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Response text
+                    ctx.fillStyle = (game.showingFeedback && isSelected) ? '#FFFFFF' : '#1A237E';
+                    ctx.font = '16px mOS';
+                    ctx.textAlign = 'left';
+                    wrapText(ctx, response.text, cardX + 12, cardY + 25, cardW - 24, 22);
+
+                    // Store bounds
+                    game.responseCardBounds.push({ x: cardX, y: cardY, w: cardW, h: cardH });
+                }
+            }
+
+            // Turing message if active
+            if (game.messageTimer > 0 && game.turingMessage) {
+                drawTuringMessage();
+            }
+        }
+
+        function drawTuringMessage() {
+            const msgW = 500;
+            const msgH = 100;
+            const msgX = canvas.width / 2 - msgW / 2;
+            const msgY = 50;
+
+            ctx.fillStyle = 'rgba(25, 118, 210, 0.95)';
+            ctx.strokeStyle = '#1A237E';
+            ctx.lineWidth = 3;
+            roundRect(ctx, msgX, msgY, msgW, msgH, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = 'bold 18px mOS';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#FFFFFF';
+            wrapText(ctx, game.turingMessage, msgX + msgW / 2, msgY + 35, msgW - 40, 24);
+        }
+
+        function drawUI() {
+            // Score panel
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.strokeStyle = '#64B5F6';
+            ctx.lineWidth = 3;
+            roundRect(ctx, 20, 550, 200, 80, 8);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 16px mOS';
+            ctx.textAlign = 'left';
+            ctx.fillText(`Score: ${game.score}`, 35, 575);
+            ctx.fillText(`Perfect: ${game.perfectCount}/${game.perfectRequired}`, 35, 600);
+            ctx.fillText(`Total: ${game.totalQuestions}`, 35, 625);
+
+            // Restart button (upper left)
+            const restartBtnX = 20;
+            const restartBtnY = 20;
+            const restartBtnW = 60;
+            const restartBtnH = 50;
+
+            const restartHovered = game.mouseX >= restartBtnX && game.mouseX <= restartBtnX + restartBtnW &&
+                                  game.mouseY >= restartBtnY && game.mouseY <= restartBtnY + restartBtnH;
+
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.strokeStyle = '#64B5F6';
+            ctx.lineWidth = 3;
+            roundRect(ctx, restartBtnX, restartBtnY, restartBtnW, restartBtnH, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.strokeStyle = '#FFF';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.arc(restartBtnX + 30, restartBtnY + 25, 12, 0.5, Math.PI * 2 - 0.5);
+            ctx.stroke();
+
+            ctx.fillStyle = '#FFF';
+            ctx.beginPath();
+            ctx.moveTo(restartBtnX + 42, restartBtnY + 22);
+            ctx.lineTo(restartBtnX + 42, restartBtnY + 30);
+            ctx.lineTo(restartBtnX + 48, restartBtnY + 25);
+            ctx.closePath();
+            ctx.fill();
+
+            game.restartButtonCanvasBounds = { x: restartBtnX, y: restartBtnY, w: restartBtnW, h: restartBtnH };
+
+            // Pause button (upper right)
+            const pauseBtnX = canvas.width - 80;
+            const pauseBtnY = 20;
+            const pauseBtnW = 60;
+            const pauseBtnH = 50;
+
+            const pauseHovered = game.mouseX >= pauseBtnX && game.mouseX <= pauseBtnX + pauseBtnW &&
+                                game.mouseY >= pauseBtnY && game.mouseY <= pauseBtnY + pauseBtnH;
+
+            ctx.fillStyle = game.paused ? '#4CAF50' : 'rgba(0, 0, 0, 0.6)';
+            ctx.strokeStyle = '#64B5F6';
+            ctx.lineWidth = 3;
+            roundRect(ctx, pauseBtnX, pauseBtnY, pauseBtnW, pauseBtnH, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = '#FFF';
+            if (game.paused) {
+                ctx.beginPath();
+                ctx.moveTo(pauseBtnX + 20, pauseBtnY + 12);
+                ctx.lineTo(pauseBtnX + 20, pauseBtnY + 38);
+                ctx.lineTo(pauseBtnX + 45, pauseBtnY + 25);
+                ctx.closePath();
+                ctx.fill();
+            } else {
+                ctx.fillRect(pauseBtnX + 18, pauseBtnY + 12, 8, 26);
+                ctx.fillRect(pauseBtnX + 34, pauseBtnY + 12, 8, 26);
+            }
+
+            game.pauseButtonBounds = { x: pauseBtnX, y: pauseBtnY, w: pauseBtnW, h: pauseBtnH };
+        }
+
+        function drawVictoryScreen() {
+            // Semi-transparent overlay
+            ctx.fillStyle = 'rgba(25, 118, 210, 0.9)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Title
+            ctx.font = 'bold 64px mOS';
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillText('LEVEL COMPLETE!', canvas.width / 2, canvas.height / 2 - 100);
+
+            // Stats
+            ctx.font = 'bold 24px mOS';
+            ctx.fillText(`Perfect Responses: ${game.perfectCount}`, canvas.width / 2, canvas.height / 2 - 20);
+            ctx.fillText(`Total Questions: ${game.totalQuestions}`, canvas.width / 2, canvas.height / 2 + 20);
+            ctx.fillText(`Final Score: ${game.score}`, canvas.width / 2, canvas.height / 2 + 60);
+
+            // Restart button
+            const btnX = canvas.width / 2 - 100;
+            const btnY = canvas.height / 2 + 120;
+            const btnW = 200;
+            const btnH = 60;
+
+            const hovered = game.mouseX >= btnX && game.mouseX <= btnX + btnW &&
+                           game.mouseY >= btnY && game.mouseY <= btnY + btnH;
+
+            ctx.fillStyle = hovered ? '#1565C0' : '#1976D2';
+            ctx.strokeStyle = '#FFFFFF';
+            ctx.lineWidth = 4;
+            roundRect(ctx, btnX, btnY, btnW, btnH, 10);
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = 'bold 24px mOS';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillText('Play Again', canvas.width / 2, btnY + 38);
+
+            game.victoryRestartBounds = { x: btnX, y: btnY, w: btnW, h: btnH };
+        }
+
+        // Event handlers
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Start button
+            if (!game.gameStarted && !game.tutorialComplete && game.startButtonBounds) {
+                const sb = game.startButtonBounds;
+                if (x >= sb.x && x <= sb.x + sb.w && y >= sb.y && y <= sb.y + sb.h) {
+                    startTutorial();
+                    return;
+                }
+            }
+
+            // Tutorial advancement
+            if (!game.gameStarted && game.tutorialComplete) {
+                startTutorial();
+                return;
+            }
+
+            // Victory restart
+            if (game.victoryComplete && game.victoryRestartBounds) {
+                const vr = game.victoryRestartBounds;
+                if (x >= vr.x && x <= vr.x + vr.w && y >= vr.y && y <= vr.y + vr.h) {
+                    location.reload();
+                    return;
+                }
+            }
+
+            // Restart button
+            if (game.restartButtonCanvasBounds) {
+                const rb = game.restartButtonCanvasBounds;
+                if (x >= rb.x && x <= rb.x + rb.w && y >= rb.y && y <= rb.y + rb.h) {
+                    location.reload();
+                    return;
+                }
+            }
+
+            // Pause button
+            if (game.pauseButtonBounds) {
+                const pb = game.pauseButtonBounds;
+                if (x >= pb.x && x <= pb.x + pb.w && y >= pb.y && y <= pb.y + pb.h) {
+                    game.paused = !game.paused;
+                    return;
+                }
+            }
+
+            // Response cards
+            if (game.gameStarted && !game.showingFeedback && !game.victoryComplete) {
+                for (let i = 0; i < game.responseCardBounds.length; i++) {
+                    const card = game.responseCardBounds[i];
+                    if (x >= card.x && x <= card.x + card.w && y >= card.y && y <= card.y + card.h) {
+                        selectResponse(i);
+                        return;
+                    }
+                }
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            game.mouseX = e.clientX - rect.left;
+            game.mouseY = e.clientY - rect.top;
+        });
+
+        // Game loop
+        let lastTime = 0;
+        function gameLoop(currentTime) {
+            const dt = (currentTime - lastTime) / 1000;
+            lastTime = currentTime;
+
+            update(dt);
+            render();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start the game
+        init();
+        requestAnimationFrame(gameLoop);
+
+        console.log('🎮 Level 4: Question Corner - Turing\'s Decision Challenge');
+    </script>
+</body>
+</html>

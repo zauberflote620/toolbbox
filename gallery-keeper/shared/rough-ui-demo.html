@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rough UI Component Demo - Gallery Keeper</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            font-family: 'Kalam', cursive;
+            color: #2C3E50;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #7F8C8D;
+            margin-bottom: 30px;
+        }
+
+        canvas {
+            display: block;
+            background: #F8F9FA;
+            border-radius: 8px;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: 2px solid #5F3DC4;
+            background: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #5F3DC4;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .demo-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #F8F9FA;
+            border-radius: 8px;
+        }
+
+        .demo-section h2 {
+            font-family: 'Kalam', cursive;
+            color: #495057;
+            margin-bottom: 15px;
+        }
+
+        .color-palette {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .color-swatch {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            border: 2px solid #DEE2E6;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .color-swatch span {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 10px;
+            padding: 4px;
+            text-align: center;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Rough UI Component Demo</h1>
+        <p class="subtitle">Testing the hand-drawn UI system for Gallery Keeper</p>
+
+        <div class="demo-section">
+            <h2>Interactive Canvas Demo</h2>
+            <p>Click buttons to test interactions. Hover to see effects.</p>
+            <canvas id="demoCanvas" width="900" height="600"></canvas>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="demo.showButtons()">Show Buttons</button>
+            <button class="btn" onclick="demo.showPanels()">Show Panels</button>
+            <button class="btn" onclick="demo.showProgress()">Show Progress Bars</button>
+            <button class="btn" onclick="demo.showDialog()">Show Dialog</button>
+            <button class="btn" onclick="demo.showScorePanels()">Show Score Panels</button>
+            <button class="btn" onclick="demo.showIconButtons()">Show Icon Buttons</button>
+            <button class="btn" onclick="demo.showGoldenRatio()">Show Golden Ratio Layout</button>
+            <button class="btn" onclick="demo.clearCanvas()">Clear Canvas</button>
+        </div>
+
+        <div class="demo-section">
+            <h2>Color Palette</h2>
+            <div class="color-palette">
+                <div class="color-swatch" style="background: #5F3DC4"><span>#5F3DC4 Primary</span></div>
+                <div class="color-swatch" style="background: #51CF66"><span>#51CF66 Success</span></div>
+                <div class="color-swatch" style="background: #FFD43B"><span>#FFD43B Warning</span></div>
+                <div class="color-swatch" style="background: #FF6B6B"><span>#FF6B6B Error</span></div>
+                <div class="color-swatch" style="background: #339AF0"><span>#339AF0 Info</span></div>
+                <div class="color-swatch" style="background: #FFF9DB"><span>#FFF9DB Cream</span></div>
+                <div class="color-swatch" style="background: #495057"><span>#495057 Sketch</span></div>
+                <div class="color-swatch" style="background: #1E1E1E"><span>#1E1E1E Black</span></div>
+            </div>
+        </div>
+
+        <div class="demo-section">
+            <h2>Golden Ratio Guidelines</h2>
+            <p><strong>φ (Phi) = 1.618</strong></p>
+            <p>Spacing: XS=8px, SM=13px, MD=21px, LG=34px, XL=55px</p>
+            <p>Canvas golden point: X=556px, Y=371px (for 900x600 canvas)</p>
+        </div>
+    </div>
+
+    <!-- Load Rough.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
+
+    <!-- Load our Rough UI library -->
+    <script src="rough-ui.js"></script>
+
+    <!-- Demo script -->
+    <script>
+        class Demo {
+            constructor() {
+                this.canvas = document.getElementById('demoCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.ui = new RoughUI(this.canvas, this.ctx);
+
+                this.mouseX = 0;
+                this.mouseY = 0;
+                this.hoveredButton = null;
+                this.currentDemo = null;
+                this.progress = 0.65; // Static progress for demo
+
+                this.setupEventListeners();
+                this.startAnimationLoop();
+
+                // Show initial demo
+                this.showButtons();
+            }
+
+            setupEventListeners() {
+                this.canvas.addEventListener('mousemove', (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    this.mouseX = e.clientX - rect.left;
+                    this.mouseY = e.clientY - rect.top;
+                });
+
+                this.canvas.addEventListener('click', (e) => {
+                    const rect = this.canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+
+                    const clickedId = this.ui.hitTest(x, y);
+                    if (clickedId) {
+                        console.log('Clicked:', clickedId);
+                        alert(`You clicked: ${clickedId}`);
+                    }
+                });
+            }
+
+            startAnimationLoop() {
+                const animate = () => {
+                    this.render();
+                    requestAnimationFrame(animate);
+                };
+                requestAnimationFrame(animate);
+            }
+
+            render() {
+                // Clear canvas
+                this.ctx.fillStyle = '#F8F9FA';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+                // Clear buttons from previous frame
+                this.ui.clearButtons();
+
+                // Render current demo
+                if (this.currentDemo) {
+                    this.currentDemo();
+                }
+            }
+
+            clearCanvas() {
+                this.currentDemo = null;
+            }
+
+            showButtons() {
+                this.currentDemo = () => {
+                    const y = 50;
+                    const spacing = 80;
+
+                    // Title
+                    this.ctx.fillStyle = '#2C3E50';
+                    this.ctx.font = 'bold 24px Kalam';
+                    this.ctx.textAlign = 'left';
+                    this.ctx.fillText('Button Variants', 20, 30);
+
+                    // Primary button
+                    const btn1Hovered = this.ui.hitTest(this.mouseX, this.mouseY) === 'btn_primary';
+                    this.ui.button('btn_primary', 50, y, 180, 55, 'Primary', {
+                        variant: 'primary',
+                        hovered: btn1Hovered
+                    });
+
+                    // Secondary button
+                    const btn2Hovered = this.ui.hitTest(this.mouseX, this.mouseY) === 'btn_secondary';
+                    this.ui.button('btn_secondary', 250, y, 180, 55, 'Secondary', {
+                        variant: 'secondary',
+                        hovered: btn2Hovered
+                    });
+
+                    // Success button
+                    const btn3Hovered = this.ui.hitTest(this.mouseX, this.mouseY) === 'btn_success';
+                    this.ui.button('btn_success', 450, y, 180, 55, 'Success', {
+                        variant: 'success',
+                        hovered: btn3Hovered
+                    });
+
+                    // Warning button
+                    const btn4Hovered = this.ui.hitTest(this.mouseX, this.mouseY) === 'btn_warning';
+                    this.ui.button('btn_warning', 650, y, 180, 55, 'Warning', {
+                        variant: 'warning',
+                        hovered: btn4Hovered
+                    });
+
+                    // Danger button
+                    const btn5Hovered = this.ui.hitTest(this.mouseX, this.mouseY) === 'btn_danger';
+                    this.ui.button('btn_danger', 50, y + spacing, 180, 55, 'Danger', {
+                        variant: 'danger',
+                        hovered: btn5Hovered
+                    });
+
+                    // Button with icon
+                    const btn6Hovered = this.ui.hitTest(this.mouseX, this.mouseY) === 'btn_icon';
+                    this.ui.button('btn_icon', 250, y + spacing, 180, 55, 'With Icon', {
+                        variant: 'primary',
+                        hovered: btn6Hovered,
+                        icon: '🎨'
+                    });
+
+                    // Disabled button
+                    this.ui.button('btn_disabled', 450, y + spacing, 180, 55, 'Disabled', {
+                        variant: 'primary',
+                        disabled: true
+                    });
+
+                    // Large button
+                    const btn7Hovered = this.ui.hitTest(this.mouseX, this.mouseY) === 'btn_large';
+                    this.ui.button('btn_large', 250, y + spacing * 2, 380, 80, 'Large Button', {
+                        variant: 'success',
+                        hovered: btn7Hovered,
+                        fontSize: 24
+                    });
+                };
+            }
+
+            showPanels() {
+                this.currentDemo = () => {
+                    // Title
+                    this.ctx.fillStyle = '#2C3E50';
+                    this.ctx.font = 'bold 24px Kalam';
+                    this.ctx.textAlign = 'left';
+                    this.ctx.fillText('Panel Variants', 20, 30);
+
+                    // Basic panel
+                    this.ui.panel(50, 60, 350, 200, {
+                        fill: '#FFF9DB',
+                        stroke: '#495057',
+                        strokeWidth: 3
+                    });
+
+                    // Panel with corner brackets
+                    this.ui.panel(450, 60, 350, 200, {
+                        fill: '#E8EAF6',
+                        stroke: '#5F3DC4',
+                        strokeWidth: 4,
+                        cornerBrackets: true
+                    });
+
+                    // Panel with different fill style
+                    this.ui.panel(50, 300, 350, 250, {
+                        fill: '#E1F5FE',
+                        stroke: '#339AF0',
+                        fillStyle: 'zigzag',
+                        strokeWidth: 3
+                    });
+
+                    // Nested panel
+                    this.ui.panel(450, 300, 350, 250, {
+                        fill: '#FFF9DB',
+                        stroke: '#495057',
+                        strokeWidth: 4,
+                        cornerBrackets: true
+                    });
+
+                    this.ui.panel(480, 330, 290, 180, {
+                        fill: '#FFFFFF',
+                        stroke: '#868E96',
+                        strokeWidth: 2
+                    });
+                };
+            }
+
+            showProgress() {
+                this.currentDemo = () => {
+                    // Title
+                    this.ctx.fillStyle = '#2C3E50';
+                    this.ctx.font = 'bold 24px Kalam';
+                    this.ctx.textAlign = 'left';
+                    this.ctx.fillText('Progress Bars (Static)', 20, 30);
+
+                    // Static progress bar at 65%
+                    this.ui.progressBar(50, 80, 400, 40, 0.65, {
+                        fillColor: '#51CF66',
+                        showPercentage: true
+                    });
+
+                    // Different color
+                    this.ui.progressBar(50, 150, 400, 40, 0.75, {
+                        fillColor: '#339AF0',
+                        showPercentage: true
+                    });
+
+                    // Warning level
+                    this.ui.progressBar(50, 220, 400, 40, 0.35, {
+                        fillColor: '#FFD43B',
+                        showPercentage: true
+                    });
+
+                    // Danger level
+                    this.ui.progressBar(50, 290, 400, 40, 0.15, {
+                        fillColor: '#FF6B6B',
+                        showPercentage: true
+                    });
+
+                    // Large progress bar at 50%
+                    this.ui.progressBar(50, 380, 800, 60, 0.50, {
+                        fillColor: '#5F3DC4',
+                        showPercentage: true,
+                        roughness: 2
+                    });
+                };
+            }
+
+            showDialog() {
+                this.currentDemo = () => {
+                    this.ui.dialog(
+                        200, 100, 500, 400,
+                        'Victory!',
+                        'Congratulations! You have successfully completed Level 3. Your environmental management skills are excellent. The gallery visitors are very happy!',
+                        [
+                            { text: 'Play Again', variant: 'success', hovered: false },
+                            { text: 'Next Level', variant: 'primary', hovered: false },
+                            { text: 'Main Menu', variant: 'secondary', hovered: false }
+                        ],
+                        {
+                            closable: true
+                        }
+                    );
+                };
+            }
+
+            showScorePanels() {
+                this.currentDemo = () => {
+                    // Title
+                    this.ctx.fillStyle = '#2C3E50';
+                    this.ctx.font = 'bold 24px Kalam';
+                    this.ctx.textAlign = 'left';
+                    this.ctx.fillText('Score Panels', 20, 30);
+
+                    this.ui.scorePanel(50, 80, 'Score', '1,234', {
+                        width: 180,
+                        height: 80,
+                        icon: '⭐',
+                        variant: 'default'
+                    });
+
+                    this.ui.scorePanel(260, 80, 'Visitors', '25', {
+                        width: 180,
+                        height: 80,
+                        icon: '👥',
+                        variant: 'success'
+                    });
+
+                    this.ui.scorePanel(470, 80, 'Time', '3:45', {
+                        width: 180,
+                        height: 80,
+                        icon: '⏱️',
+                        variant: 'warning'
+                    });
+
+                    this.ui.scorePanel(680, 80, 'Streak', '10', {
+                        width: 180,
+                        height: 80,
+                        icon: '🔥',
+                        variant: 'danger'
+                    });
+                };
+            }
+
+            showIconButtons() {
+                this.currentDemo = () => {
+                    // Title
+                    this.ctx.fillStyle = '#2C3E50';
+                    this.ctx.font = 'bold 24px Kalam';
+                    this.ctx.textAlign = 'left';
+                    this.ctx.fillText('Icon Buttons', 20, 30);
+
+                    const y = 150;
+                    const spacing = 100;
+
+                    // Play button
+                    const btn1Hovered = this.ui.hitTest(this.mouseX, this.mouseY) === 'icon_play';
+                    this.ui.iconButton('icon_play', 100, y, 30, '▶', {
+                        variant: 'success',
+                        hovered: btn1Hovered
+                    });
+
+                    // Pause button
+                    const btn2Hovered = this.ui.hitTest(this.mouseX, this.mouseY) === 'icon_pause';
+                    this.ui.iconButton('icon_pause', 100 + spacing, y, 30, '⏸', {
+                        variant: 'warning',
+                        hovered: btn2Hovered
+                    });
+
+                    // Stop button
+                    const btn3Hovered = this.ui.hitTest(this.mouseX, this.mouseY) === 'icon_stop';
+                    this.ui.iconButton('icon_stop', 100 + spacing * 2, y, 30, '⏹', {
+                        variant: 'danger',
+                        hovered: btn3Hovered
+                    });
+
+                    // Restart button
+                    const btn4Hovered = this.ui.hitTest(this.mouseX, this.mouseY) === 'icon_restart';
+                    this.ui.iconButton('icon_restart', 100 + spacing * 3, y, 30, '🔄', {
+                        variant: 'primary',
+                        hovered: btn4Hovered
+                    });
+
+                    // Settings button
+                    const btn5Hovered = this.ui.hitTest(this.mouseX, this.mouseY) === 'icon_settings';
+                    this.ui.iconButton('icon_settings', 100 + spacing * 4, y, 30, '⚙️', {
+                        variant: 'secondary',
+                        hovered: btn5Hovered
+                    });
+
+                    // Larger icons
+                    const btn6Hovered = this.ui.hitTest(this.mouseX, this.mouseY) === 'icon_large1';
+                    this.ui.iconButton('icon_large1', 200, y + 150, 50, '🎨', {
+                        variant: 'primary',
+                        hovered: btn6Hovered
+                    });
+
+                    const btn7Hovered = this.ui.hitTest(this.mouseX, this.mouseY) === 'icon_large2';
+                    this.ui.iconButton('icon_large2', 350, y + 150, 50, '🏛️', {
+                        variant: 'success',
+                        hovered: btn7Hovered
+                    });
+
+                    const btn8Hovered = this.ui.hitTest(this.mouseX, this.mouseY) === 'icon_large3';
+                    this.ui.iconButton('icon_large3', 500, y + 150, 50, '🎭', {
+                        variant: 'warning',
+                        hovered: btn8Hovered
+                    });
+                };
+            }
+
+            showGoldenRatio() {
+                this.currentDemo = () => {
+                    const layout = RoughUI.goldenLayout(this.canvas.width, this.canvas.height);
+
+                    // Title
+                    this.ctx.fillStyle = '#2C3E50';
+                    this.ctx.font = 'bold 24px Kalam';
+                    this.ctx.textAlign = 'left';
+                    this.ctx.fillText('Golden Ratio Layout (φ = 1.618)', 20, 30);
+
+                    // Draw golden ratio grid lines
+                    this.ctx.strokeStyle = '#5F3DC4';
+                    this.ctx.lineWidth = 2;
+                    this.ctx.setLineDash([5, 5]);
+
+                    // Vertical golden line
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(layout.goldenX, 0);
+                    this.ctx.lineTo(layout.goldenX, this.canvas.height);
+                    this.ctx.stroke();
+
+                    // Horizontal golden line
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(0, layout.goldenY);
+                    this.ctx.lineTo(this.canvas.width, layout.goldenY);
+                    this.ctx.stroke();
+
+                    this.ctx.setLineDash([]);
+
+                    // Mark golden point
+                    this.ctx.fillStyle = '#FF6B6B';
+                    this.ctx.beginPath();
+                    this.ctx.arc(layout.goldenX, layout.goldenY, 8, 0, Math.PI * 2);
+                    this.ctx.fill();
+
+                    // Label
+                    this.ctx.fillStyle = '#2C3E50';
+                    this.ctx.font = '14px Segoe UI';
+                    this.ctx.textAlign = 'left';
+                    this.ctx.fillText(`Golden Point (${Math.round(layout.goldenX)}, ${Math.round(layout.goldenY)})`,
+                        layout.goldenX + 15, layout.goldenY);
+
+                    // Draw example UI at golden point
+                    this.ui.panel(
+                        layout.goldenX - 150,
+                        layout.goldenY - 100,
+                        300,
+                        200,
+                        {
+                            fill: '#FFF9DB',
+                            stroke: '#5F3DC4',
+                            strokeWidth: 4,
+                            cornerBrackets: true
+                        }
+                    );
+
+                    this.ctx.fillStyle = '#2C3E50';
+                    this.ctx.font = 'bold 20px Kalam';
+                    this.ctx.textAlign = 'center';
+                    this.ctx.fillText('Content at Golden Point', layout.goldenX, layout.goldenY);
+
+                    // Show measurements
+                    this.ctx.fillStyle = '#495057';
+                    this.ctx.font = '12px monospace';
+                    this.ctx.textAlign = 'left';
+                    const infoY = this.canvas.height - 60;
+                    this.ctx.fillText(`Canvas: ${this.canvas.width} × ${this.canvas.height}`, 20, infoY);
+                    this.ctx.fillText(`Golden X: ${Math.round(layout.goldenX)} (width / φ)`, 20, infoY + 20);
+                    this.ctx.fillText(`Golden Y: ${Math.round(layout.goldenY)} (height / φ)`, 20, infoY + 40);
+                };
+            }
+        }
+
+        // Initialize demo when page loads
+        let demo;
+        window.addEventListener('load', () => {
+            demo = new Demo();
+        });
+    </script>
+</body>
+</html>
