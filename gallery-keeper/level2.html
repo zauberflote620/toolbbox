@@ -1458,6 +1458,16 @@
                 }
             }
 
+            // Check if clicking on victory screen restart button
+            if (game.victoryState && game.restartButtonBounds) {
+                const rb = game.restartButtonBounds;
+                if (x >= rb.x && x <= rb.x + rb.w && y >= rb.y && y <= rb.y + rb.h) {
+                    console.log('Victory screen restart button clicked');
+                    location.reload(); // Restart the game
+                    return;
+                }
+            }
+
             // Check if clicking on pause button
             if (game.pauseButtonBounds && !game.victoryState) {
                 const pb = game.pauseButtonBounds;
