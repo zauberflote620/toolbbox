@@ -1,0 +1,401 @@
+/**
+ * Gallery Keeper Typography System
+ *
+ * Custom font loading and typography styles for warm educational sketch aesthetic
+ * Fonts: Angelinas (display/handwritten) + mOS (UI/buttons)
+ *
+ * Font Display Strategy: 'swap' for immediate text visibility
+ * Fallbacks: System fonts for graceful degradation
+ */
+
+/* ===== FONT-FACE DECLARATIONS ===== */
+
+/* Angelinas - Handwritten display font for headings and character names */
+@font-face {
+    font-family: 'Angelinas';
+    src: url('../assets/fonts/AngelinasFont-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap; /* Show fallback immediately, swap when loaded */
+}
+
+/* mOS - Modern UI font family (4 variants) */
+@font-face {
+    font-family: 'mOS';
+    src: url('../assets/fonts/mOS/mOS-Regular.otf') format('opentype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'mOS';
+    src: url('../assets/fonts/mOS/mOS-RegularItalic.otf') format('opentype');
+    font-weight: 400;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'mOS';
+    src: url('../assets/fonts/mOS/mOS-Black.otf') format('opentype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'mOS';
+    src: url('../assets/fonts/mOS/mOS-BlackItalic.otf') format('opentype');
+    font-weight: 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+/* ===== BASE TYPOGRAPHY RESET ===== */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    /* Set base font size for rem calculations */
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    line-height: var(--line-height-normal);
+    color: var(--color-tan-500);
+}
+
+/* ===== HEADING STYLES ===== */
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-normal);
+    line-height: var(--line-height-tight);
+    margin-bottom: var(--space-4);
+    color: var(--color-tan-700);
+}
+
+h1 {
+    font-size: var(--text-5xl);
+    margin-bottom: var(--space-6);
+}
+
+h2 {
+    font-size: var(--text-4xl);
+}
+
+h3 {
+    font-size: var(--text-3xl);
+}
+
+h4 {
+    font-size: var(--text-2xl);
+}
+
+h5 {
+    font-size: var(--text-xl);
+}
+
+h6 {
+    font-size: var(--text-lg);
+}
+
+/* ===== PARAGRAPH AND TEXT STYLES ===== */
+
+p {
+    margin-bottom: var(--space-4);
+    line-height: var(--line-height-relaxed);
+}
+
+.lead {
+    font-size: var(--text-xl);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-tan-600);
+}
+
+.subtitle {
+    font-size: var(--text-lg);
+    color: var(--color-tan-600);
+    font-family: var(--font-ui);
+}
+
+.caption {
+    font-size: var(--text-sm);
+    color: var(--color-tan-600);
+    opacity: var(--opacity-80);
+}
+
+/* ===== UI TEXT STYLES ===== */
+
+.text-ui {
+    font-family: var(--font-ui);
+    font-weight: var(--font-weight-semibold);
+}
+
+.text-display {
+    font-family: var(--font-display);
+}
+
+.text-mono {
+    font-family: var(--font-mono);
+}
+
+/* ===== TEXT UTILITIES ===== */
+
+/* Font sizes */
+.text-xs { font-size: var(--text-xs); }
+.text-sm { font-size: var(--text-sm); }
+.text-base { font-size: var(--text-base); }
+.text-lg { font-size: var(--text-lg); }
+.text-xl { font-size: var(--text-xl); }
+.text-2xl { font-size: var(--text-2xl); }
+.text-3xl { font-size: var(--text-3xl); }
+.text-4xl { font-size: var(--text-4xl); }
+.text-5xl { font-size: var(--text-5xl); }
+
+/* Font weights */
+.font-normal { font-weight: var(--font-weight-normal); }
+.font-medium { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold { font-weight: var(--font-weight-bold); }
+.font-black { font-weight: var(--font-weight-black); }
+
+/* Text alignment */
+.text-left { text-align: left; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-justify { text-align: justify; }
+
+/* Text transform */
+.uppercase { text-transform: uppercase; }
+.lowercase { text-transform: lowercase; }
+.capitalize { text-transform: capitalize; }
+
+/* Line heights */
+.leading-tight { line-height: var(--line-height-tight); }
+.leading-snug { line-height: var(--line-height-snug); }
+.leading-normal { line-height: var(--line-height-normal); }
+.leading-relaxed { line-height: var(--line-height-relaxed); }
+.leading-loose { line-height: var(--line-height-loose); }
+
+/* ===== LINK STYLES ===== */
+
+a {
+    color: var(--color-info);
+    text-decoration: none;
+    transition: var(--transition-colors);
+}
+
+a:hover {
+    color: var(--color-info-hover);
+    text-decoration: underline;
+}
+
+a:focus {
+    outline: 2px solid var(--color-info);
+    outline-offset: 2px;
+}
+
+/* ===== LIST STYLES ===== */
+
+ul, ol {
+    margin-left: var(--space-6);
+    margin-bottom: var(--space-4);
+}
+
+li {
+    margin-bottom: var(--space-2);
+    line-height: var(--line-height-relaxed);
+}
+
+.list-none {
+    list-style: none;
+    margin-left: 0;
+}
+
+/* ===== CODE AND PREFORMATTED TEXT ===== */
+
+code {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    background: var(--color-gray-200);
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    color: var(--color-gray-900);
+}
+
+pre {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    background: var(--color-gray-900);
+    color: var(--color-gray-100);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    margin-bottom: var(--space-4);
+}
+
+pre code {
+    background: transparent;
+    padding: 0;
+    color: inherit;
+}
+
+/* ===== BLOCKQUOTE ===== */
+
+blockquote {
+    border-left: 4px solid var(--color-tan-700);
+    padding-left: var(--space-4);
+    margin-left: 0;
+    margin-bottom: var(--space-4);
+    font-style: italic;
+    color: var(--color-tan-600);
+}
+
+/* ===== SPECIAL TEXT TREATMENTS ===== */
+
+/* Character name styling (for NPC dialogue) */
+.character-name {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-tan-700);
+}
+
+/* Dialogue text */
+.dialogue {
+    font-family: var(--font-ui);
+    font-size: var(--text-base);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-tan-500);
+}
+
+/* Score/stats display */
+.stat-value {
+    font-family: var(--font-mono);
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-tan-700);
+}
+
+/* Labels */
+.label {
+    font-family: var(--font-ui);
+    font-size: var(--text-xs);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-tan-600);
+}
+
+/* Tutorial/instruction text */
+.instruction {
+    font-family: var(--font-ui);
+    font-size: var(--text-sm);
+    line-height: var(--line-height-relaxed);
+    color: var(--color-tan-600);
+    background: var(--color-brown-800);
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--color-info);
+}
+
+/* ===== TEXT COLORS (SEMANTIC) ===== */
+
+.text-success { color: var(--color-success); }
+.text-warning { color: var(--color-warning); }
+.text-error { color: var(--color-error); }
+.text-info { color: var(--color-info); }
+
+.text-muted {
+    color: var(--color-tan-600);
+    opacity: var(--opacity-70);
+}
+
+/* ===== ACCESSIBILITY ===== */
+
+/* Visually hidden but accessible to screen readers */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* Focus visible for keyboard navigation */
+.focus-visible:focus {
+    outline: 2px solid var(--color-info);
+    outline-offset: 2px;
+}
+
+/* ===== SELECTION STYLING ===== */
+
+::selection {
+    background-color: var(--color-brown-600);
+    color: var(--color-tan-400);
+}
+
+::-moz-selection {
+    background-color: var(--color-brown-600);
+    color: var(--color-tan-400);
+}
+
+/* ===== FONT LOADING OPTIMIZATION ===== */
+
+/* Prevent flash of invisible text (FOIT) */
+/* font-display: swap ensures text is visible immediately with fallback fonts */
+
+/* Optional: Show loading indicator while fonts load */
+.fonts-loading body {
+    opacity: var(--opacity-90);
+}
+
+.fonts-loaded body {
+    opacity: var(--opacity-100);
+    transition: opacity var(--transition-fast);
+}
+
+/* ===== RESPONSIVE TYPOGRAPHY ===== */
+
+@media (max-width: 768px) {
+    html {
+        font-size: 14px; /* Reduce base size on mobile */
+    }
+
+    h1 {
+        font-size: var(--text-4xl);
+    }
+
+    h2 {
+        font-size: var(--text-3xl);
+    }
+
+    h3 {
+        font-size: var(--text-2xl);
+    }
+}
+
+@media (min-width: 1280px) {
+    html {
+        font-size: 18px; /* Increase base size on large screens */
+    }
+}
+
+/* ===== VALIDATION ===== */
+/* Fonts loaded successfully if Angelinas and mOS appear in DevTools > Fonts */
+/* Test: Apply .text-display and .text-ui classes to elements */
+/* Expected: Handwritten style (Angelinas) and clean UI style (mOS) */

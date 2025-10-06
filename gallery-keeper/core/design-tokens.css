@@ -1,0 +1,279 @@
+/**
+ * Gallery Keeper Design Tokens
+ *
+ * Unified design system for warm educational sketch gallery aesthetic
+ * Based on Level 3 brown palette with hand-drawn museum theme
+ *
+ * Usage: Include this file in all levels for consistent styling
+ */
+
+:root {
+    /* ===== PRIMARY COLORS: BROWN PALETTE ===== */
+    /* Main gallery browns (from Level 3 - target aesthetic) */
+    --color-brown-900: #3E2723;  /* Darkest brown - primary backgrounds */
+    --color-brown-800: #4E342E;  /* Dark brown - gradient stops */
+    --color-brown-700: #5D4037;  /* Medium brown - containers */
+    --color-brown-600: #6D4C41;  /* Light brown - borders */
+    --color-brown-500: #8B4513;  /* Warm brown - accents */
+    --color-brown-400: #A0522D;  /* Sienna - hover states */
+
+    /* ===== SECONDARY COLORS: TAN/CREAM ===== */
+    /* Warm neutrals for text and highlights */
+    --color-tan-700: #A1887F;    /* Dark tan - headings */
+    --color-tan-600: #BCAAA4;    /* Medium tan - subheadings */
+    --color-tan-500: #D7CCC8;    /* Light tan - text */
+    --color-tan-400: #ECF0F1;    /* Cream - backgrounds */
+
+    /* ===== NATURE PALETTE: CANVAS BACKGROUNDS ===== */
+    /* Light nature-inspired colors for canvas areas */
+    --color-nature-light-green: #E8F5E9;  /* Soft mint */
+    --color-nature-cream: #F1F8E9;        /* Warm cream */
+    --color-nature-yellow: #FFF9C4;       /* Soft yellow */
+    --color-nature-white: #F8F9FA;        /* Near white */
+
+    /* ===== ACCENT COLORS: FEEDBACK ===== */
+    /* Semantic colors for user feedback */
+    --color-success: #4CAF50;    /* Green - correct/complete */
+    --color-success-hover: #66BB6A;
+    --color-success-dark: #388E3C;
+
+    --color-warning: #FFD700;    /* Gold - caution */
+    --color-warning-hover: #FFC107;
+    --color-warning-dark: #FFA000;
+
+    --color-error: #e74c3c;      /* Red - incorrect/error */
+    --color-error-hover: #FF6B6B;
+    --color-error-dark: #c0392b;
+
+    --color-info: #3498DB;       /* Blue - information */
+    --color-info-hover: #5DADE2;
+    --color-info-dark: #2980B9;
+
+    /* ===== NEUTRAL GRAYS ===== */
+    /* For UI elements that need neutral tones */
+    --color-gray-900: #212529;
+    --color-gray-800: #343A40;
+    --color-gray-700: #495057;
+    --color-gray-600: #868E96;
+    --color-gray-500: #ADB5BD;
+    --color-gray-400: #CED4DA;
+    --color-gray-300: #DEE2E6;
+    --color-gray-200: #E9ECEF;
+    --color-gray-100: #F8F9FA;
+
+    /* ===== TYPOGRAPHY SCALE ===== */
+    /* Font sizes following 1.25 major third scale */
+    --text-xs: 0.75rem;     /* 12px - captions, labels */
+    --text-sm: 0.875rem;    /* 14px - small text */
+    --text-base: 1rem;      /* 16px - body text */
+    --text-lg: 1.125rem;    /* 18px - large body */
+    --text-xl: 1.25rem;     /* 20px - subheadings */
+    --text-2xl: 1.5rem;     /* 24px - headings */
+    --text-3xl: 2rem;       /* 32px - large headings */
+    --text-4xl: 2.5rem;     /* 40px - hero text */
+    --text-5xl: 3rem;       /* 48px - display text */
+
+    /* ===== FONT FAMILIES ===== */
+    /* Custom fonts for hand-drawn aesthetic */
+    --font-display: 'Angelinas', 'Comic Sans MS', cursive;  /* Handwritten display */
+    --font-ui: 'mOS', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;  /* UI elements */
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;  /* Body text */
+    --font-mono: 'Courier New', 'Consolas', 'Monaco', monospace;  /* Code/data */
+
+    /* ===== FONT WEIGHTS ===== */
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-black: 900;
+
+    /* ===== LINE HEIGHTS ===== */
+    --line-height-tight: 1.25;
+    --line-height-snug: 1.375;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.625;
+    --line-height-loose: 2;
+
+    /* ===== SPACING SCALE (Golden Ratio: 1.618) ===== */
+    /* Base unit: 8px, multiplied by phi for harmonious spacing */
+    --space-0: 0;
+    --space-1: 0.25rem;   /* 4px */
+    --space-2: 0.5rem;    /* 8px - base unit */
+    --space-3: 0.75rem;   /* 12px */
+    --space-4: 1rem;      /* 16px */
+    --space-5: 1.5rem;    /* 24px */
+    --space-6: 2rem;      /* 32px */
+    --space-8: 3rem;      /* 48px */
+    --space-10: 4rem;     /* 64px */
+    --space-12: 6rem;     /* 96px */
+    --space-16: 8rem;     /* 128px */
+
+    /* Golden ratio spacing */
+    --space-xs: 0.5rem;         /* 8px */
+    --space-sm: 0.8125rem;      /* 13px - phi * base */
+    --space-md: 1.3125rem;      /* 21px - phi^2 * base */
+    --space-lg: 2.125rem;       /* 34px - phi^3 * base */
+    --space-xl: 3.4375rem;      /* 55px - phi^4 * base */
+    --space-2xl: 5.5625rem;     /* 89px - phi^5 * base */
+
+    /* ===== BORDER RADIUS ===== */
+    /* Rounded corners for warm, friendly aesthetic */
+    --radius-none: 0;
+    --radius-sm: 0.25rem;    /* 4px - subtle */
+    --radius-base: 0.375rem; /* 6px - buttons */
+    --radius-md: 0.5rem;     /* 8px - cards */
+    --radius-lg: 0.75rem;    /* 12px - containers */
+    --radius-xl: 1rem;       /* 16px - large cards */
+    --radius-2xl: 1.5rem;    /* 24px - hero sections */
+    --radius-full: 9999px;   /* Fully rounded */
+
+    /* ===== SHADOWS ===== */
+    /* Multi-layer shadows for depth */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1),
+                 0 1px 2px rgba(0, 0, 0, 0.06);
+    --shadow-base: 0 4px 6px rgba(0, 0, 0, 0.1),
+                   0 2px 4px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.1),
+                 0 4px 6px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 20px 25px rgba(0, 0, 0, 0.15),
+                 0 10px 10px rgba(0, 0, 0, 0.04);
+    --shadow-xl: 0 25px 50px rgba(0, 0, 0, 0.25);
+    --shadow-2xl: 0 50px 100px rgba(0, 0, 0, 0.35);
+
+    /* Canvas shadows (from Level 2/3 - multi-layer depth) */
+    --shadow-canvas: 0 10px 40px rgba(0, 0, 0, 0.3),
+                     0 2px 8px rgba(0, 0, 0, 0.2),
+                     inset 0 1px 0 rgba(255, 255, 255, 0.1);
+
+    /* Button shadows with color tint */
+    --shadow-button-primary: 0 4px 12px rgba(76, 175, 80, 0.4),
+                             0 2px 4px rgba(0, 0, 0, 0.2);
+    --shadow-button-secondary: 0 4px 12px rgba(149, 165, 166, 0.4),
+                               0 2px 4px rgba(0, 0, 0, 0.2);
+
+    /* ===== TRANSITIONS ===== */
+    /* Animation timing for smooth interactions */
+    --transition-fastest: 100ms;
+    --transition-fast: 150ms;
+    --transition-base: 200ms;
+    --transition-normal: 300ms;
+    --transition-slow: 400ms;
+    --transition-slowest: 500ms;
+
+    /* Easing functions */
+    --ease-linear: linear;
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    /* Combined transition utilities */
+    --transition-all: all var(--transition-normal) var(--ease-in-out);
+    --transition-colors: color var(--transition-fast) var(--ease-in-out),
+                        background-color var(--transition-fast) var(--ease-in-out),
+                        border-color var(--transition-fast) var(--ease-in-out);
+    --transition-transform: transform var(--transition-normal) var(--ease-out);
+
+    /* ===== Z-INDEX SCALE ===== */
+    /* Layering system for proper stacking */
+    --z-0: 0;
+    --z-10: 10;
+    --z-20: 20;
+    --z-30: 30;
+    --z-40: 40;
+    --z-50: 50;
+    --z-dropdown: 1000;
+    --z-sticky: 1100;
+    --z-modal: 1300;
+    --z-popover: 1400;
+    --z-tooltip: 1500;
+
+    /* ===== OPACITY SCALE ===== */
+    --opacity-0: 0;
+    --opacity-10: 0.1;
+    --opacity-20: 0.2;
+    --opacity-30: 0.3;
+    --opacity-40: 0.4;
+    --opacity-50: 0.5;
+    --opacity-60: 0.6;
+    --opacity-70: 0.7;
+    --opacity-80: 0.8;
+    --opacity-90: 0.9;
+    --opacity-100: 1;
+
+    /* ===== GLASSMORPHISM ===== */
+    /* Frosted glass effect (from Level 1) */
+    --glass-background: rgba(129, 153, 248, 0.15);
+    --glass-border: rgba(129, 153, 248, 0.3);
+    --glass-blur: 10px;
+
+    /* Brown glass variant for target aesthetic */
+    --glass-brown-background: rgba(93, 64, 55, 0.15);
+    --glass-brown-border: rgba(93, 64, 55, 0.3);
+
+    /* ===== BREAKPOINTS ===== */
+    /* Responsive design breakpoints */
+    --breakpoint-xs: 320px;   /* Mobile portrait */
+    --breakpoint-sm: 640px;   /* Mobile landscape */
+    --breakpoint-md: 768px;   /* Tablet */
+    --breakpoint-lg: 1024px;  /* Desktop */
+    --breakpoint-xl: 1280px;  /* Large desktop */
+    --breakpoint-2xl: 1536px; /* Extra large */
+
+    /* ===== CONTAINER SIZES ===== */
+    --container-sm: 640px;
+    --container-md: 768px;
+    --container-lg: 900px;    /* Current max-width */
+    --container-xl: 940px;    /* Level 2/3 max-width */
+    --container-2xl: 1024px;
+
+    /* ===== CANVAS DIMENSIONS ===== */
+    /* Standard canvas sizes across levels */
+    --canvas-width: 800px;
+    --canvas-height: 600px;
+    --canvas-border-width: 3px;
+
+    /* ===== BUTTON SIZES ===== */
+    /* Touch-friendly button dimensions */
+    --button-height-sm: 32px;
+    --button-height-base: 40px;
+    --button-height-lg: 48px;
+    --button-padding-x-sm: 12px;
+    --button-padding-x-base: 16px;
+    --button-padding-x-lg: 24px;
+
+    /* ===== GRADIENTS ===== */
+    /* Predefined gradient directions */
+    --gradient-brown: linear-gradient(135deg, var(--color-brown-900) 0%, var(--color-brown-800) 50%, var(--color-brown-700) 100%);
+    --gradient-tan: linear-gradient(135deg, var(--color-tan-700) 0%, var(--color-tan-600) 100%);
+    --gradient-nature: linear-gradient(135deg, var(--color-nature-light-green) 0%, var(--color-nature-cream) 50%, var(--color-nature-yellow) 100%);
+    --gradient-success: linear-gradient(135deg, var(--color-success-hover) 0%, var(--color-success) 100%);
+    --gradient-info: linear-gradient(135deg, var(--color-info) 0%, var(--color-info-dark) 100%);
+}
+
+/* ===== UTILITY CLASSES FOR COLORS ===== */
+
+/* Background colors */
+.bg-brown-900 { background-color: var(--color-brown-900); }
+.bg-brown-800 { background-color: var(--color-brown-800); }
+.bg-brown-700 { background-color: var(--color-brown-700); }
+.bg-tan-700 { background-color: var(--color-tan-700); }
+.bg-tan-600 { background-color: var(--color-tan-600); }
+.bg-nature { background: var(--gradient-nature); }
+
+/* Text colors */
+.text-brown-900 { color: var(--color-brown-900); }
+.text-tan-700 { color: var(--color-tan-700); }
+.text-tan-600 { color: var(--color-tan-600); }
+.text-tan-500 { color: var(--color-tan-500); }
+
+/* Gradient backgrounds */
+.bg-gradient-brown { background: var(--gradient-brown); }
+.bg-gradient-tan { background: var(--gradient-tan); }
+.bg-gradient-nature { background: var(--gradient-nature); }
+
+/* ===== VALIDATION ===== */
+/* CSS custom properties are valid if this comment is visible in DevTools */
+/* Check: Open DevTools > Elements > :root > Computed > Filter: "--color-brown" */
+/* Expected: All color tokens visible with correct hex values */
