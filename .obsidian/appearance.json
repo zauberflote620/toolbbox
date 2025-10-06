@@ -3,7 +3,7 @@
   "textFontFamily": "PT Mono",
   "monospaceFontFamily": "PT Mono",
   "baseFontSizeAction": true,
-  "baseFontSize": 12,
+  "baseFontSize": 14,
   "accentColor": "#913337",
   "theme": "obsidian"
 }

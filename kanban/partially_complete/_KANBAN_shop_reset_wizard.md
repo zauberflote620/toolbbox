@@ -6,6 +6,8 @@ kanban-plugin: board
 
 ## Backlog
 
+- [ ] project NOT complete, requires heavy modification to be actually useful
+
 
 ## In Progress
 
