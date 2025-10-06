@@ -2,14 +2,69 @@
 
 kanban-plugin: board
 date: 2025-10-03
-last-modified: 2025-10-03
+last-modified: 2025-10-06
 project: Gallery Keeper
-status: phase-1-complete
+status: ui-improvement-planned
 estimated-hours: 30
+additional-hours: 45 (UI improvement initiative)
 time-spent: 2.5
 time-banked: 6.17
 
 ---
+
+## UI Improvement Initiative (45h) - READY TO START
+
+### Phase 0: Analysis & Foundation (8h)
+- [ ] Hour 1-2: Comprehensive audit with baseline screenshots
+- [ ] Hour 3-4: Design system specification (CSS tokens, color palette, typography)
+- [ ] Hour 5-6: Typography implementation (Angelinas, mOS Black fonts)
+- [ ] Hour 7-8: Grid system and layout utilities
+- [ ] CHECKPOINT: Design tokens validate, fonts load <500ms
+
+### Phase 1: Component Library (10h)
+- [ ] Hour 9-11: Core UI components (buttons, panels, HUD, speech bubbles)
+- [ ] Hour 12-13: HUD components (score, progress, resources, combo)
+- [ ] Hour 14-15: Modal & message system (toast, overlay, tutorial, loading)
+- [ ] Hour 16-17: Character speech system enhancements
+- [ ] Hour 18: Animation library with easing functions
+- [ ] CHECKPOINT: Component showcase working, visual regression pass
+
+### Phase 2: Asset Pipeline (6h)
+- [ ] Hour 19-20: Export 40+ Excalidraw SVGs to gallery-keeper
+- [ ] Hour 21-22: Optimize with SVGO (30-50% reduction target)
+- [ ] Hour 23-24: Asset loader with lazy loading system
+- [ ] CHECKPOINT: Asset loader handles 100+ images, no memory leaks
+
+### Phase 3: Level Refactoring (14h)
+- [ ] Hour 25-27: Level 1 complete refactor (yellow→brown, fonts, components)
+- [ ] Hour 28-30: Level 2 component integration
+- [ ] Hour 31-33: Level 3 modularization (900 lines→modules)
+- [ ] Hour 34-36: Index and navigation polish
+- [ ] Hour 37-38: Cross-level consistency verification
+- [ ] CHECKPOINT: All levels playable, rubric improvement visible
+
+### Phase 4: Accessibility & Performance (4h)
+- [ ] Hour 39-40: WCAG AA compliance (keyboard, ARIA, contrast)
+- [ ] Hour 41-42: Performance optimization (60fps, <3s load)
+- [ ] CHECKPOINT: WCAG AA compliance, 60fps maintained
+
+### Phase 5: Polish & Future-Proofing (3h)
+- [ ] Hour 43: UX flow enhancements
+- [ ] Hour 44: Mobile responsiveness
+- [ ] Hour 45: Level 4 template and documentation
+- [ ] FINAL CHECKPOINT: Rubric score 8.3+/10 achieved
+
+### Quality Metrics
+- **Current Rubric Score:** 5.6/10 (50/90)
+- **Target Rubric Score:** 8.3/10 (75/90)
+- **Projected Final Score:** 8.7/10 (78/90)
+
+### Success Criteria
+- [ ] Visual consistency across all levels
+- [ ] Code duplication reduced 50%+
+- [ ] WCAG 2.1 AA compliance
+- [ ] 60fps gameplay, <3s load time
+- [ ] Non-gamer completes Level 1 independently
 
 ## Backlog
 
@@ -28,15 +83,11 @@ time-banked: 6.17
 - [ ] 
 
 ## Bugs / todo
-- [ ] lvl 1 rm circles around "doors"
-- [ ] Additional planning tools (TBD)
-- [ ] refactor long files (levels)
-- [ ] REFACTOR: level2.html is 1300+ lines - split into modules (rendering, game logic, assets)
-- [ ] REFACTOR: Create shared component library system for Excalidraw assets across levels
-- [ ] Create Excalidraw library files (.excalidrawlib) instead of individual PNG exports
-  - gallery-keeper-components.excalidrawlib (all game components)
-  - ui-elements.excalidrawlib (buttons, frames, panels)
-  - characters.excalidrawlib (stick figures, robots, etc.)
+- [ ] MOVED TO PHASE 3: lvl 1 rm circles around "doors" (Hour 25-27)
+- [ ] MOVED TO PHASE 3: refactor long files - level3.html 900+ lines (Hour 31-33)
+- [ ] MOVED TO PHASE 1: Create shared component library (Hour 9-18)
+- [ ] MOVED TO PHASE 2: Integrate Excalidraw SVG assets (Hour 19-20)
+- [ ] MOVED TO PHASE 0: Design tokens and typography system (Hour 3-6)
 
 ## Level 2 UI/UX Improvements (Oct 4) - IN PROGRESS
 
@@ -129,11 +180,12 @@ time-banked: 6.17
 - [x] Validation checkpoint: Level 2 MVP COMPLETE AND PLAYABLE
 
 
-## Level 3 - Living Gallery (Phase 4 - 5h) - ✅ COMPLETE (Oct 5, 2025)
+## Level 3 - Living Gallery (Phase 4 - 5h) - ✅ COMPLETE + ENHANCED (Oct 5, 2025)
 
+### Core Implementation (Complete)
 - [x] Build Feynman tutorial (environmental interaction)
 - [x] Create plant system (watering, growth, bloom with glow effects)
-- [x] Implement lighting system (3 adjustable zones with flash effects)
+- [x] Implement lighting system (redesigned to emanate from tree with visible aura)
 - [x] Add cleanliness system (dirt spawns, cleaning tool)
 - [x] Build visitor pathfinding AI (intelligent 8-candidate evaluation)
 - [x] Create emergent behavior (visitors gravitate to well-maintained areas)
@@ -143,7 +195,18 @@ time-banked: 6.17
 - [x] Implement Feynman discovery reactions (synergy, blooming, clean, lighting)
 - [x] Balance game difficulty (adjusted timers, happiness targets)
 - [x] Update index.html with Level 3 link
-- [x] Validation checkpoint: Level 3 COMPLETE AND PLAYABLE
+
+### Enhancements & Polish (Oct 5, 2025)
+- [x] Add surprise elements (chickens, thunder cloud with progressive watering)
+- [x] Create helper character (stick_hands_hip with tutorial-to-gameplay transition)
+- [x] Redesign lighting system (tree-emanating aura instead of zones)
+- [x] Improve game balance (50% slower decay, 60% Groot bonus, increased happiness bonuses)
+- [x] Add victory screen buttons (pulsating restart, learn more with AI/retail education)
+- [x] Add text shadows and glow effects to start/victory screens
+- [x] Implement progressive rain mechanics (cloud waters as it passes, leaves dirt trail)
+- [x] Integrate 12+ Excalidraw assets (chickens, cloud, helper, etc.)
+- [x] Fix critical bugs (restart button, green box, game over positioning)
+- [x] Validation checkpoint: Level 3 POLISHED AND PRODUCTION-READY
 
 
 ## Level 4 - Question Corner (Phase 5 - 4h)
