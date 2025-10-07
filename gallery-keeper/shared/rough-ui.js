@@ -33,7 +33,7 @@ const COLORS = {
         success: '#51CF66',
         successHover: '#40C057',
         warning: '#FFD43B',
-        error: '#FF6B6B',
+        error: '#E22237',  // From Excalidraw palette
         info: '#339AF0',
         infoHover: '#228BE6'
     },
@@ -58,10 +58,10 @@ const SPACING = {
 
 // Typography
 const FONTS = {
-    heading: '"Kalam", "Comic Sans MS", cursive',
-    body: '"Segoe UI", -apple-system, system-ui, sans-serif',
+    heading: '"mOS", -apple-system, sans-serif',  // mOS Black for UI
+    body: '"mOS", -apple-system, system-ui, sans-serif',  // mOS Black for body
     mono: '"Courier New", "Consolas", monospace',
-    display: '"Angelinas", "Kalam", cursive'
+    display: '"Angelinas", cursive'  // Angelinas for handwriting/script
 };
 
 /**
